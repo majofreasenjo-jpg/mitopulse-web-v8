@@ -34,8 +34,8 @@ label{display:block;margin:8px 0 4px}
 <div class="card">
 <h2>2. Cargar escenario demo</h2>
 <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-<select id="industry"><option value="bank">bank</option><option value="marketplace">marketplace</option><option value="telco">telco</option></select>
-<select id="size"><option value="small">small</option><option value="medium">medium</option><option value="large">large</option></select>
+<select id="industry" onchange="loadScenario()"><option value="bank">bank</option><option value="marketplace">marketplace</option><option value="telco">telco</option></select>
+<select id="size" onchange="loadScenario()"><option value="small">small</option><option value="medium">medium</option><option value="large">large</option></select>
 <button onclick="loadScenario()">Cargar escenario</button>
 <button onclick="saveScenario()">Guardar como corrida</button>
 </div>
