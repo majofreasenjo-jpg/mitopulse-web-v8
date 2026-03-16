@@ -17,6 +17,8 @@ def baseline_node_risk(G, node):
         risk += 0.06
     if contexts["fake_receipt"] > 0:
         risk += 0.08
+    if contexts["social_engineering"] > 0:
+        risk += 0.06
     risk = round(min(risk, 0.99), 3)
     action = "BLOCK" if risk >= 0.82 else "REVIEW" if risk >= 0.50 else "ALLOW"
     return {"node": node, "risk_score": risk, "recommended_action": action}

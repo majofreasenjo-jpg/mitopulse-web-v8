@@ -8,9 +8,12 @@ def relational_identity_score(G, node):
     customer_neighbors = device_neighbors = external_neighbors = suspicious_links = 0
     for nbr in G.neighbors(node):
         nt = G.nodes[nbr].get("node_type", "unknown")
-        if nt == "customer": customer_neighbors += 1
-        elif nt == "device": device_neighbors += 1
-        else: external_neighbors += 1
+        if nt == "customer":
+            customer_neighbors += 1
+        elif nt == "device":
+            device_neighbors += 1
+        else:
+            external_neighbors += 1
         edge = G.get_edge_data(node, nbr, default={})
         if edge.get("label") in {"mule_pattern", "scam_ring", "social_chain"}:
             suspicious_links += 1
@@ -39,7 +42,7 @@ def stigmergic_trace(G, node):
     for nbr in G.neighbors(node):
         edge = G.get_edge_data(node, nbr, default={})
         base = 0.12 if edge.get("label") == "normal" else 0.55
-        if edge.get("context") in {"urgent_transfer", "social_engineering", "fake_receipt"}:
+        if edge.get("context") in {"urgent_transfer", "social_engineering", "fake_receipt", "sim_swap"}:
             base += 0.18
         traces.append(min(base, 1.0))
     if not traces:
@@ -55,7 +58,7 @@ def danger_signal(G, node):
         edge = G.get_edge_data(node, nbr, default={})
         if edge.get("label") in {"mule_pattern", "scam_ring", "social_chain"}:
             danger += 0.22
-        if edge.get("context") in {"urgent_transfer", "social_engineering", "fake_receipt"}:
+        if edge.get("context") in {"urgent_transfer", "social_engineering", "fake_receipt", "sim_swap", "identity_shift"}:
             danger += 0.18
     signal_type = G.nodes[node].get("signal_type")
     if signal_type in {"identity_shift", "sim_swap_hint", "shared_signal_detected", "device_reset"}:
@@ -70,7 +73,7 @@ def reality_anchor(G, node):
         if G.nodes[nbr].get("node_type") == "device":
             anchors += 0.06
         edge = G.get_edge_data(node, nbr, default={})
-        if edge.get("context") in {"salary", "family", "bill_payment", "payroll"}:
+        if edge.get("context") in {"salary", "family", "bill_payment", "payroll", "delivery_confirmed"}:
             anchors += 0.05
     return round(min(anchors, 0.40), 3)
 
@@ -81,8 +84,7 @@ def quorum_score(pr, st, dg, theta=0.80):
 def allostatic_reserve(ri, dg, ra):
     recovery = min(0.35, ri * 0.25 + ra)
     stress = min(0.60, dg * 0.55)
-    reserve = max(0.0, min(1.0, ri + recovery - stress))
-    return round(reserve, 3)
+    return round(max(0.0, min(1.0, ri + recovery - stress)), 3)
 
 def bioinspired_node_risk(G, node):
     if node not in G:

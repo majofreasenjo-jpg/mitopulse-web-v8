@@ -21,3 +21,13 @@ def load_client_folder(folder: str):
             raise ValueError(f"{fname} missing columns: {missing}")
         loaded[fname] = df
     return loaded["customers.csv"], loaded["devices.csv"], loaded["events.csv"], loaded["signals.csv"]
+
+def dataset_profile(customers, devices, events, signals):
+    return {
+        "customers": len(customers),
+        "devices": len(devices),
+        "events": len(events),
+        "signals": len(signals),
+        "event_types": events["event_type"].value_counts().head(10).to_dict(),
+        "contexts": events["context"].value_counts().head(10).to_dict()
+    }

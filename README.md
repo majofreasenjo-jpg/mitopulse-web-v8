@@ -1,15 +1,16 @@
-# MitoPulse Pilot Demo Pack v9
+# MitoPulse Master Pilot Platform v10
 
-Paquete descargable para demostrar:
-- carga de datos por tipo de cliente
-- escenarios por industria
-- escenarios por tamaño (small / medium / large)
+Build maestra que fusiona:
+- lógica operativa multi-tenant
+- upload real
+- casos y auditoría
+- simulaciones por industria y tamaño
 - comparación baseline vs bio-inspired
-- mejora de efectividad
-- reducción de fraude y falsos positivos
+- evidencia comercial para pilotos
 
 ## Ejecutar
 ```bash
+cp .env.example .env
 pip install -r requirements.txt
 python run.py
 ```
@@ -18,6 +19,13 @@ Abrir:
 `http://127.0.0.1:8000`
 
 ## Escenarios incluidos
-- bank_small / bank_medium / bank_large
-- marketplace_small / marketplace_medium / marketplace_large
-- telco_small / telco_medium / telco_large
+- bank_small / medium / large
+- marketplace_small / medium / large
+- telco_small / medium / large
+
+## Flujo recomendado
+1. Generar token
+2. Cargar escenario demo
+3. Guardar corrida
+4. Crear case
+5. Subir dataset real de cliente

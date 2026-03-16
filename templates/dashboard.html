@@ -2,29 +2,42 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>MitoPulse Pilot Demo Pack v9</title>
+<title>MitoPulse Master Pilot Platform v10</title>
 <style>
 body{font-family:Arial,Helvetica,sans-serif;background:#0b1220;color:#e8f0ff;margin:0}
 .top{padding:18px 24px;background:#101a30;border-bottom:1px solid #243a63}
-.wrap{padding:24px;max-width:1600px;margin:0 auto}
+.wrap{padding:24px;max-width:1700px;margin:0 auto}
 .card{background:#15233d;border:1px solid #284368;border-radius:16px;padding:18px;margin-bottom:16px}
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
 .c3{grid-column:span 3}.c4{grid-column:span 4}.c6{grid-column:span 6}.c12{grid-column:span 12}
-button,select{background:#0c1830;color:#fff;border:1px solid #284368;border-radius:10px;padding:10px 12px}
+button,select,input{background:#0c1830;color:#fff;border:1px solid #284368;border-radius:10px;padding:10px 12px}
 pre{white-space:pre-wrap;overflow:auto;background:#0a1326;border:1px solid #284368;border-radius:12px;padding:12px}
 .metric{background:#0a1326;border:1px solid #284368;border-radius:14px;padding:14px}
 .metric .label{font-size:12px;opacity:.8}.metric .value{font-size:28px;font-weight:bold;margin-top:4px}
+table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #284368;padding:8px;text-align:left}
+label{display:block;margin:8px 0 4px}
 @media(max-width:1100px){.c3,.c4,.c6,.c12{grid-column:span 12}}
 </style>
 </head>
 <body>
-<div class="top"><h1 style="margin:0">MitoPulse Pilot Demo Pack v9</h1></div>
+<div class="top"><h1 style="margin:0">MitoPulse Master Pilot Platform v10</h1></div>
 <div class="wrap">
 <div class="card">
+<h2>1. Obtener token</h2>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<input id="tenant_id" value="tenant_demo">
+<button onclick="getToken()">Generar token</button>
+</div>
+<pre id="tokenOut"></pre>
+</div>
+
+<div class="card">
+<h2>2. Cargar escenario demo</h2>
 <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
 <select id="industry"><option value="bank">bank</option><option value="marketplace">marketplace</option><option value="telco">telco</option></select>
 <select id="size"><option value="small">small</option><option value="medium">medium</option><option value="large">large</option></select>
-<button onclick="loadDemo()">Cargar demo</button>
+<button onclick="loadScenario()">Cargar escenario</button>
+<button onclick="saveScenario()">Guardar como corrida</button>
 </div>
 </div>
 
@@ -37,16 +50,72 @@ pre{white-space:pre-wrap;overflow:auto;background:#0a1326;border:1px solid #2843
 <div class="card c4"><h2>Dataset profile</h2><pre id="profile"></pre></div>
 <div class="card c4"><h2>Baseline</h2><pre id="baseline"></pre></div>
 <div class="card c4"><h2>Bio-inspired</h2><pre id="bio"></pre></div>
+
+<div class="card c6">
+<h2>3. Upload real</h2>
+<form action="/api/upload" method="post" enctype="multipart/form-data">
+<label>tenant_id_form</label><input name="tenant_id_form" value="tenant_demo">
+<label>client_type</label><select name="client_type"><option value="bank">bank</option><option value="marketplace">marketplace</option><option value="telco">telco</option></select>
+<label>client_size</label><input name="client_size" value="custom">
+<label>customers.csv</label><input type="file" name="customers" required>
+<label>devices.csv</label><input type="file" name="devices" required>
+<label>events.csv</label><input type="file" name="events" required>
+<label>signals.csv</label><input type="file" name="signals" required>
+<div style="margin-top:12px"><button type="submit">Subir dataset</button></div>
+</form>
+</div>
+
+<div class="card c6">
+<h2>4. Crear case</h2>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<input id="case_run_id" placeholder="run_id">
+<input id="case_title" value="Investigación piloto">
+<button onclick="createCase()">Crear case</button>
+</div>
+<pre id="caseOut"></pre>
+</div>
+
 <div class="card c12"><h2>Improvement summary</h2><pre id="improvement"></pre></div>
+
+<div class="card c12">
+<h2>Corridas</h2>
+<table>
+<thead><tr><th>ID</th><th>Client</th><th>Size</th><th>Source</th><th>Folder</th><th>Fecha</th><th>Abrir</th></tr></thead>
+<tbody>
+{% for r in runs %}
+<tr><td>{{ r.id }}</td><td>{{ r.client_type }}</td><td>{{ r.client_size }}</td><td>{{ r.source_kind }}</td><td>{{ r.folder_path }}</td><td>{{ r.created_at }}</td><td><button onclick="openRun({{ r.id }})">Ver</button></td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
+
+<div class="card c12">
+<h2>Cases</h2>
+<table>
+<thead><tr><th>ID</th><th>Tenant</th><th>Run</th><th>Title</th><th>Status</th><th>Fecha</th></tr></thead>
+<tbody>
+{% for c in cases %}
+<tr><td>{{ c.id }}</td><td>{{ c.tenant_id }}</td><td>{{ c.run_id }}</td><td>{{ c.case_title }}</td><td>{{ c.status }}</td><td>{{ c.created_at }}</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</div>
 </div>
 </div>
 <script>
-function money(n){ return n == null ? '-' : n.toLocaleString(); }
-async function loadDemo(){
-  const industry = document.getElementById('industry').value;
-  const size = document.getElementById('size').value;
-  const j = await (await fetch(`/api/demo?industry=${industry}&client_size=${size}`)).json();
-  document.getElementById('profile').textContent = JSON.stringify({dataset_profile:j.dataset_profile, graph_stats:j.graph_stats}, null, 2);
+let token = "";
+function authHeaders(){ return token ? {"Authorization":"Bearer " + token} : {}; }
+function money(n){ return n == null ? "-" : n.toLocaleString(); }
+
+async function getToken(){
+  const tenant = document.getElementById('tenant_id').value;
+  const j = await (await fetch('/api/auth/token?tenant_id=' + tenant)).json();
+  token = j.token;
+  document.getElementById('tokenOut').textContent = JSON.stringify(j, null, 2);
+}
+
+function paint(j){
+  document.getElementById('profile').textContent = JSON.stringify({dataset_profile:j.dataset_profile, graph_stats:j.graph_stats, morphogenesis:j.morphogenesis}, null, 2);
   document.getElementById('baseline').textContent = JSON.stringify(j.baseline, null, 2);
   document.getElementById('bio').textContent = JSON.stringify(j.bioinspired, null, 2);
   document.getElementById('improvement').textContent = JSON.stringify(j.improvement, null, 2);
@@ -55,7 +124,35 @@ async function loadDemo(){
   document.getElementById('fpred').textContent = j.improvement.false_positive_reduction_pct;
   document.getElementById('exposure').textContent = money(j.improvement.estimated_total_exposure);
 }
-loadDemo();
+
+async function loadScenario(){
+  const industry = document.getElementById('industry').value;
+  const size = document.getElementById('size').value;
+  const j = await (await fetch(`/api/scenario?industry=${industry}&client_size=${size}`)).json();
+  paint(j);
+}
+
+async function saveScenario(){
+  const industry = document.getElementById('industry').value;
+  const size = document.getElementById('size').value;
+  const j = await (await fetch(`/api/load-sample?industry=${industry}&client_size=${size}`, {headers: authHeaders()})).json();
+  paint(j);
+}
+
+async function openRun(id){
+  const j = await (await fetch('/api/run/' + id, {headers: authHeaders()})).json();
+  paint(j);
+  document.getElementById('case_run_id').value = id;
+}
+
+async function createCase(){
+  const runId = document.getElementById('case_run_id').value;
+  const title = document.getElementById('case_title').value;
+  const j = await (await fetch(`/api/cases/create?run_id=${runId}&case_title=${encodeURIComponent(title)}`, {method:'POST', headers: authHeaders()})).json();
+  document.getElementById('caseOut').textContent = JSON.stringify(j, null, 2);
+}
+
+loadScenario();
 </script>
 </body>
 </html>
