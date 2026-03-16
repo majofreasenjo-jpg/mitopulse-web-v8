@@ -2,40 +2,60 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>MitoPulse BioInspired Trust Platform v8</title>
+<title>MitoPulse Pilot Demo Pack v9</title>
 <style>
 body{font-family:Arial,Helvetica,sans-serif;background:#0b1220;color:#e8f0ff;margin:0}
 .top{padding:18px 24px;background:#101a30;border-bottom:1px solid #243a63}
-.wrap{padding:24px;max-width:1600px;margin:0 auto}.card{background:#15233d;border:1px solid #284368;border-radius:16px;padding:18px;margin-bottom:16px}
-.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.c3{grid-column:span 3}.c6{grid-column:span 6}.c12{grid-column:span 12}
-button,input{background:#0c1830;color:#fff;border:1px solid #284368;border-radius:10px;padding:10px 12px}
+.wrap{padding:24px;max-width:1600px;margin:0 auto}
+.card{background:#15233d;border:1px solid #284368;border-radius:16px;padding:18px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.c3{grid-column:span 3}.c4{grid-column:span 4}.c6{grid-column:span 6}.c12{grid-column:span 12}
+button,select{background:#0c1830;color:#fff;border:1px solid #284368;border-radius:10px;padding:10px 12px}
 pre{white-space:pre-wrap;overflow:auto;background:#0a1326;border:1px solid #284368;border-radius:12px;padding:12px}
 .metric{background:#0a1326;border:1px solid #284368;border-radius:14px;padding:14px}
 .metric .label{font-size:12px;opacity:.8}.metric .value{font-size:28px;font-weight:bold;margin-top:4px}
-@media(max-width:1100px){.c3,.c6,.c12{grid-column:span 12}}
+@media(max-width:1100px){.c3,.c4,.c6,.c12{grid-column:span 12}}
 </style>
 </head>
 <body>
-<div class="top"><h1 style="margin:0">MitoPulse BioInspired Trust Platform v8</h1></div>
+<div class="top"><h1 style="margin:0">MitoPulse Pilot Demo Pack v9</h1></div>
 <div class="wrap">
-<div class="card"><div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-<button onclick="loadSummary()">Cargar evaluación</button>
-<input id="nodeId" value="CUST_00001">
-<button onclick="loadNode()">Ver nodo</button>
-</div></div>
+<div class="card">
+<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+<select id="industry"><option value="bank">bank</option><option value="marketplace">marketplace</option><option value="telco">telco</option></select>
+<select id="size"><option value="small">small</option><option value="medium">medium</option><option value="large">large</option></select>
+<button onclick="loadDemo()">Cargar demo</button>
+</div>
+</div>
+
 <div class="grid">
-<div class="card c3 metric"><div class="label">Customers</div><div class="value" id="kpi_customers">-</div></div>
-<div class="card c3 metric"><div class="label">Estimated BLOCK</div><div class="value" id="kpi_block">-</div></div>
-<div class="card c3 metric"><div class="label">Estimated REVIEW</div><div class="value" id="kpi_review">-</div></div>
-<div class="card c3 metric"><div class="label">Morphogenesis</div><div class="value" id="kpi_morph">-</div></div>
-<div class="card c6"><h2>Summary</h2><pre id="summary"></pre></div>
-<div class="card c6"><h2>Top nodes</h2><pre id="top"></pre></div>
-<div class="card c12"><h2>Node assessment</h2><pre id="node"></pre></div>
-</div></div>
+<div class="card c3 metric"><div class="label">Detection lift %</div><div class="value" id="lift">-</div></div>
+<div class="card c3 metric"><div class="label">Fraud reduction %</div><div class="value" id="fraudred">-</div></div>
+<div class="card c3 metric"><div class="label">False positive reduction %</div><div class="value" id="fpred">-</div></div>
+<div class="card c3 metric"><div class="label">Exposure</div><div class="value" id="exposure">-</div></div>
+
+<div class="card c4"><h2>Dataset profile</h2><pre id="profile"></pre></div>
+<div class="card c4"><h2>Baseline</h2><pre id="baseline"></pre></div>
+<div class="card c4"><h2>Bio-inspired</h2><pre id="bio"></pre></div>
+<div class="card c12"><h2>Improvement summary</h2><pre id="improvement"></pre></div>
+</div>
+</div>
 <script>
-async function loadSummary(){const j=await (await fetch('/api/summary')).json();document.getElementById('summary').textContent=JSON.stringify({dataset_profile:j.dataset_profile,graph_stats:j.graph_stats,morphogenesis:j.morphogenesis},null,2);document.getElementById('top').textContent=JSON.stringify(j.portfolio.top,null,2);document.getElementById('kpi_customers').textContent=j.dataset_profile.customers;document.getElementById('kpi_block').textContent=j.portfolio.BLOCK;document.getElementById('kpi_review').textContent=j.portfolio.REVIEW;document.getElementById('kpi_morph').textContent=j.morphogenesis.morphogenetic_signature;}
-async function loadNode(){const id=document.getElementById('nodeId').value;const j=await (await fetch('/api/node/'+id)).json();document.getElementById('node').textContent=JSON.stringify(j,null,2);}
-loadSummary();loadNode();
+function money(n){ return n == null ? '-' : n.toLocaleString(); }
+async function loadDemo(){
+  const industry = document.getElementById('industry').value;
+  const size = document.getElementById('size').value;
+  const j = await (await fetch(`/api/demo?industry=${industry}&client_size=${size}`)).json();
+  document.getElementById('profile').textContent = JSON.stringify({dataset_profile:j.dataset_profile, graph_stats:j.graph_stats}, null, 2);
+  document.getElementById('baseline').textContent = JSON.stringify(j.baseline, null, 2);
+  document.getElementById('bio').textContent = JSON.stringify(j.bioinspired, null, 2);
+  document.getElementById('improvement').textContent = JSON.stringify(j.improvement, null, 2);
+  document.getElementById('lift').textContent = j.improvement.detection_lift_pct;
+  document.getElementById('fraudred').textContent = j.improvement.fraud_reduction_pct;
+  document.getElementById('fpred').textContent = j.improvement.false_positive_reduction_pct;
+  document.getElementById('exposure').textContent = money(j.improvement.estimated_total_exposure);
+}
+loadDemo();
 </script>
 </body>
 </html>
