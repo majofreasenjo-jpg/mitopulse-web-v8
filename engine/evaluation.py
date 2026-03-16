@@ -1,6 +1,6 @@
 from collections import Counter
 from engine.baseline_engine import baseline_projection
-from engine.bioinspired_engine import bioinspired_projection
+from engine.bioinspired_engine import bioinspired_projection, extract_topology
 
 def morphogenetic_growth_signature(events_df):
     labels = Counter(events_df["label"].tolist())
@@ -36,6 +36,8 @@ def evaluate_improvement(G, events_df, industry, client_size):
     fraud_reduction = round((prevented_bio - prevented_baseline) / max(exposure, 1) * 100, 2)
     fp_reduction = round((baseline_fp - bio_fp) / max(baseline_fp, 0.01) * 100, 2)
 
+    topology = extract_topology(G)
+
     return {
         "industry": industry,
         "client_size": client_size,
@@ -57,5 +59,6 @@ def evaluate_improvement(G, events_df, industry, client_size):
             "fraud_reduction_pct": fraud_reduction,
             "false_positive_reduction_pct": fp_reduction,
             "estimated_total_exposure": exposure,
-        }
+        },
+        "topology": topology
     }

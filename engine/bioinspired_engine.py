@@ -159,3 +159,25 @@ def bioinspired_projection(G):
             allow += 1
     top.sort(key=lambda x: x["immune_risk_score"], reverse=True)
     return {"ALLOW": allow, "REVIEW": review, "BLOCK": block, "top": top[:20]}
+
+def extract_topology(G):
+    nodes = []
+    edges = []
+    pulses = {}
+    for node in G.nodes():
+        pulses[node] = calculate_pulse(relational_identity_score(G, node), reality_anchor(G, node), allostatic_reserve(relational_identity_score(G, node), danger_signal(G, node), reality_anchor(G, node)), danger_signal(G, node))
+
+    for node, attrs in G.nodes(data=True):
+        risk_info = bioinspired_node_risk(G, node, pulses)
+        nodes.append({
+            "id": node,
+            "type": attrs.get("node_type", "unknown"),
+            "risk": risk_info["immune_risk_score"]
+        })
+    for u, v, data in G.edges(data=True):
+        edges.append({
+            "source": u,
+            "target": v,
+            "label": data.get("label", "")
+        })
+    return {"nodes": nodes, "edges": edges}
