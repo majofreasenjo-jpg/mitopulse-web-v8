@@ -10,7 +10,10 @@ body{font-family:Arial,Helvetica,sans-serif;background:#0b1220;color:#e8f0ff;mar
 .card{background:#15233d;border:1px solid #284368;border-radius:16px;padding:18px;margin-bottom:16px}
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
 .c3{grid-column:span 3}.c4{grid-column:span 4}.c6{grid-column:span 6}.c12{grid-column:span 12}
-button,select,input{background:#0c1830;color:#fff;border:1px solid #284368;border-radius:10px;padding:10px 12px}
+button,select,input{background:#0c1830;color:#fff;border:1px solid #284368;border-radius:10px;padding:10px 12px;transition:all 0.2s ease;font-family:inherit;}
+button{cursor:pointer;}
+button:hover{background:#152850;border-color:#3a5888;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+button:active{transform:translateY(1px) scale(0.98);box-shadow:none;background:#0c1830;}
 pre{white-space:pre-wrap;overflow:auto;background:#0a1326;border:1px solid #284368;border-radius:12px;padding:12px}
 .metric{background:#0a1326;border:1px solid #284368;border-radius:14px;padding:14px}
 .metric .label{font-size:12px;opacity:.8}.metric .value{font-size:28px;font-weight:bold;margin-top:4px}
