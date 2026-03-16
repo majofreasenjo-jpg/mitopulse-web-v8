@@ -1,0 +1,92 @@
+services:
+  presence_engine:
+    build: ../presence_engine
+    ports: ["8001:8001"]
+  risk_engine:
+    build: ../risk_engine
+    ports: ["8002:8002"]
+  continuity_engine:
+    build: ../continuity_engine
+    ports: ["8003:8003"]
+  trust_engine:
+    build: ../trust_engine
+    ports: ["8004:8004"]
+  fraud_memory:
+    build: ../fraud_memory
+    ports: ["8005:8005"]
+  graph_engine:
+    build: ../graph_engine
+    ports: ["8006:8006"]
+  policy_engine:
+    build: ../policy_engine
+    ports: ["8007:8007"]
+  device_trust_engine:
+    build: ../device_trust_engine
+    ports: ["8008:8008"]
+  anti_spoof_engine:
+    build: ../anti_spoof_engine
+    ports: ["8009:8009"]
+  feature_flag_service:
+    build: ../feature_flag_service
+    ports: ["8011:8011"]
+  challenge_engine:
+    build: ../challenge_engine
+    ports: ["8012:8012"]
+  reputation_network:
+    build: ../reputation_network
+    ports: ["8014:8014"]
+  identity_continuity_protocol:
+    build: ../identity_continuity_protocol
+    ports: ["8015:8015"]
+  edge_orchestrator:
+    build: ../edge_orchestrator
+    environment:
+      GATEWAY_URL: http://gateway:8000
+    depends_on: [gateway]
+    ports: ["8016:8016"]
+  gateway:
+    build: ../gateway
+    environment:
+      PRESENCE_URL: http://presence_engine:8001
+      RISK_URL: http://risk_engine:8002
+      CONTINUITY_URL: http://continuity_engine:8003
+      TRUST_URL: http://trust_engine:8004
+      FRAUD_URL: http://fraud_memory:8005
+      GRAPH_URL: http://graph_engine:8006
+      POLICY_URL: http://policy_engine:8007
+      DEVICE_TRUST_URL: http://device_trust_engine:8008
+      ANTI_SPOOF_URL: http://anti_spoof_engine:8009
+      FEATURE_FLAG_URL: http://feature_flag_service:8011
+      CHALLENGE_URL: http://challenge_engine:8012
+      REPUTATION_URL: http://reputation_network:8014
+      IDCP_URL: http://identity_continuity_protocol:8015
+      WEBHOOK_SECRET: huma_v4_demo_secret
+    depends_on:
+      - presence_engine
+      - risk_engine
+      - continuity_engine
+      - trust_engine
+      - fraud_memory
+      - graph_engine
+      - policy_engine
+      - device_trust_engine
+      - anti_spoof_engine
+      - feature_flag_service
+      - challenge_engine
+      - reputation_network
+      - identity_continuity_protocol
+    ports: ["8000:8000"]
+  dashboard:
+    build: ../dashboard
+    environment:
+      GATEWAY_URL: http://gateway:8000
+    depends_on: [gateway]
+    ports: ["8010:8010"]
+  admin_panel:
+    build: ../admin_panel
+    environment:
+      FEATURE_FLAG_URL: http://feature_flag_service:8011
+      POLICY_URL: http://policy_engine:8007
+      GATEWAY_URL: http://gateway:8000
+    depends_on: [feature_flag_service, policy_engine, gateway]
+    ports: ["8013:8013"]

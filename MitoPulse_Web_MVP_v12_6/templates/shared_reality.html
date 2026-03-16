@@ -1,0 +1,22 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Shared Reality</title>
+<style>
+body{font-family:Arial,sans-serif;background:#0c1220;color:#eef4ff;margin:24px}
+.card{background:#141d31;padding:16px;border-radius:14px;margin-bottom:16px}
+pre{background:#0f1728;padding:12px;border-radius:10px;white-space:pre-wrap}
+a{color:#8dc4ff}
+button,input,select{padding:8px 12px;border-radius:10px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+</style></head><body>
+<h1>Shared Reality</h1>
+<p><a href="/">Home</a></p>
+<div class="card">
+  <label>Source</label><input id="src" value="node_1">
+  <label>Target</label><input id="tgt" value="node_2">
+  <button onclick="run()">Measure</button>
+</div>
+<pre id="out"></pre>
+<script>
+async function run(){const src=document.getElementById('src').value; const tgt=document.getElementById('tgt').value; const r=await fetch('/api/shared-reality/'+src+'/'+tgt); document.getElementById('out').textContent=JSON.stringify(await r.json(),null,2);}
+run();
+</script>
+</body></html>

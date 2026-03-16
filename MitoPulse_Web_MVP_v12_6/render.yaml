@@ -1,0 +1,13 @@
+
+services:
+  - type: web
+    name: mitopulse-v12-6
+    env: docker
+    plan: starter
+    envVars:
+      - key: APP_MODE
+        value: cloud
+      - key: DATABASE_URL
+        sync: false
+      - key: DEMO_MODE
+        value: "true"

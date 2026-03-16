@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Mobile Eval</title>
+<style>
+body{font-family:Arial,sans-serif;background:#0c1220;color:#eef4ff;margin:24px}
+.card{background:#141d31;padding:16px;border-radius:14px;margin-bottom:16px}
+pre{background:#0f1728;padding:12px;border-radius:10px;white-space:pre-wrap}
+a{color:#8dc4ff}
+button,input,select{padding:8px 12px;border-radius:10px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+</style></head><body>
+<h2>Quick Evaluation</h2>
+<div class="card"><div>Source node: <span id="src"></span></div><label>Target node</label><input id="tgt" value="node_10"><label>Industry</label><select id="industry"><option>banking</option><option>marketplace</option><option>crypto</option><option>messaging</option></select><button onclick="runEval()">Run</button></div>
+<pre id="out"></pre><a href="/mobile">Back</a>
+<script>
+function getNodeId(){let n=localStorage.getItem('mitopulse_node_id'); if(!n){n='node_'+Math.random().toString(16).slice(2,10); localStorage.setItem('mitopulse_node_id',n)} return n}
+const nodeId=getNodeId(); document.getElementById('src').textContent=nodeId;
+async function runEval(){const r=await fetch('/api/evaluate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({source_node_id:nodeId,target_node_id:document.getElementById('tgt').value,industry:document.getElementById('industry').value,amount_anomaly:0.9,routine_break:0.8})}); const j=await r.json(); localStorage.setItem('mitopulse_last_eval',j.evaluation_id); document.getElementById('out').textContent=JSON.stringify(j,null,2);}
+</script>
+</body></html>

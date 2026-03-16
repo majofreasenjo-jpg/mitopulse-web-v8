@@ -1,0 +1,1 @@
+{"user_id": "usr_123", "scenario": "legit_transfer", "amount": 0, "device_reality": 95, "started_at": 10000000, "click_count": 3, "key_count": 0, "move_count": 30, "interaction_entropy": 0.8, "hesitation": 0.1, "urgency": 0.1, "dictation_risk": 0, "routine_break": 0, "social_overlap": 0.8, "temporal_alignment": 0.9, "context_fit": 0.9, "interaction_coherence": 0.9}

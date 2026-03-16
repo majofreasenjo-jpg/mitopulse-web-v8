@@ -1,0 +1,23 @@
+openapi: 3.1.0
+info:
+  title: MitoPulse Gateway API
+  version: 1.0.0
+paths:
+  /health:
+    get:
+      summary: Health
+      responses:
+        '200':
+          description: OK
+  /v1/presence/event:
+    post:
+      summary: Submit presence event
+      responses:
+        '200':
+          description: OK
+  /v1/identity/state:
+    get:
+      summary: Identity state
+      responses:
+        '200':
+          description: OK

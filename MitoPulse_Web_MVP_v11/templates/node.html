@@ -1,0 +1,88 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>MitoPulse Node</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin:24px; background:#0c1220; color:#e8eefb; }
+    .card { background:#141d31; padding:16px; border-radius:14px; max-width:700px; }
+    input, select, button { padding:8px; margin:6px 0; border-radius:10px; }
+    pre { white-space: pre-wrap; background:#0e1728; padding:12px; border-radius:10px; }
+    a { color:#8dc4ff; }
+  </style>
+</head>
+<body>
+<h1>Node</h1>
+<p><a href="/">Dashboard</a> · <a href="/network">Network</a> · <a href="/simulator">Simulator</a></p>
+<div class="card">
+  <div><b>Node ID:</b> <span id="nid"></span></div>
+  <div><b>Pulse Count:</b> <span id="pc">0</span></div>
+  <div><b>Cross Count:</b> <span id="cc">0</span></div>
+  <div><b>Guardian:</b> <span id="guardian">false</span></div>
+  <div><b>Status:</b> <span id="status">healthy</span></div>
+
+  <button onclick="emitPulse()">Emit Pulse</button>
+  <div>
+    <label>Cross-pulse target</label>
+    <select id="target"></select>
+    <button onclick="crossPulse()">Cross Pulse</button>
+  </div>
+  <pre id="out"></pre>
+</div>
+
+<script>
+function getNodeId() {
+  let n = localStorage.getItem('mitopulse_node_id');
+  if (!n) {
+    n = 'node_' + Math.random().toString(16).slice(2,10);
+    localStorage.setItem('mitopulse_node_id', n);
+  }
+  return n;
+}
+const nodeId = getNodeId();
+document.getElementById('nid').textContent = nodeId;
+
+async function register() {
+  await fetch('/api/register_node', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({node_id: nodeId})
+  });
+}
+async function refresh() {
+  const nodes = await (await fetch('/api/nodes')).json();
+  const me = nodes.find(n => n.node_id === nodeId);
+  if (me) {
+    document.getElementById('pc').textContent = me.pulse_count;
+    document.getElementById('cc').textContent = me.cross_pulse_count;
+    document.getElementById('guardian').textContent = me.is_guardian;
+    document.getElementById('status').textContent = me.status;
+  }
+  const opts = nodes.filter(n => n.node_id !== nodeId).map(n => `<option value="${n.node_id}">${n.node_id}</option>`);
+  document.getElementById('target').innerHTML = opts.join('');
+}
+async function emitPulse() {
+  const res = await fetch('/api/pulse', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({node_id: nodeId})
+  });
+  document.getElementById('out').textContent = JSON.stringify(await res.json(), null, 2);
+  refresh();
+}
+async function crossPulse() {
+  const target = document.getElementById('target').value;
+  const res = await fetch('/api/crosspulse', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({node_a: nodeId, node_b: target, source: 'relay_handshake'})
+  });
+  document.getElementById('out').textContent = JSON.stringify(await res.json(), null, 2);
+  refresh();
+}
+register().then(refresh);
+setInterval(emitPulse, 30000);
+</script>
+</body>
+</html>

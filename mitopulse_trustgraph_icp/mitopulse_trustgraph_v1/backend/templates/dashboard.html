@@ -1,0 +1,147 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MitoPulse TrustGraph + ICP</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;background:#0b0f14;color:#e6edf3;}
+    header{padding:18px 22px;border-bottom:1px solid #1f2a37;position:sticky;top:0;background:#0b0f14;}
+    h1{margin:0;font-size:18px}
+    .sub{opacity:.75;font-size:12px;margin-top:6px}
+    .wrap{padding:18px 22px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .card{border:1px solid #1f2a37;border-radius:14px;padding:14px;background:#0f1623;box-shadow:0 10px 24px rgba(0,0,0,.25)}
+    .card h2{margin:0 0 10px 0;font-size:14px;opacity:.9}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th,td{border-bottom:1px solid #1f2a37;padding:8px 6px;vertical-align:top}
+    th{opacity:.7;text-align:left}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;border:1px solid #2b3a4f;font-size:11px;opacity:.95}
+    .ok{background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.35)}
+    .warn{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.35)}
+    .bad{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35)}
+    a{color:#7dd3fc;text-decoration:none}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    .full{grid-column:1 / -1}
+  </style>
+</head>
+<body>
+<header>
+  <h1>MitoPulse TrustGraph + ICP <span class="pill">v1</span></h1>
+  <div class="sub">Tenant actual: <span class="mono">{{tenant_id}}</span> · dashboard sin API key · API en <a href="/docs">/docs</a></div>
+</header>
+
+<div class="wrap">
+  <div class="card full">
+    <h2>Tenants (para usar con scripts)</h2>
+    <table>
+      <thead><tr><th>tenant_id</th><th>api_key</th></tr></thead>
+      <tbody>
+        {% for t in tenants %}
+        <tr><td class="mono">{{t.tenant_id}}</td><td class="mono">{{t.api_key}}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Identity Events (derivados)</h2>
+    <table>
+      <thead><tr><th>ts</th><th>user/device/epoch</th><th>tier</th><th>index</th><th>risk</th><th>stability</th><th>human</th><th>coercion</th></tr></thead>
+      <tbody>
+        {% for e in events %}
+        <tr>
+          <td class="mono">{{e.ts}}</td>
+          <td class="mono">{{e.user_id}}<br/>{{e.device_id}}<br/>e{{e.epoch}}</td>
+          <td><span class="pill">{{e.tier_used}}</span></td>
+          <td>{{"%.3f"|format(e.index_value)}}</td>
+          <td>
+            {% if e.risk >= 85 %}<span class="pill bad">{{e.risk}}</span>
+            {% elif e.risk >= 60 %}<span class="pill warn">{{e.risk}}</span>
+            {% else %}<span class="pill ok">{{e.risk}}</span>{% endif %}
+          </td>
+          <td>{{"%.3f"|format(e.stability)}}</td>
+          <td>{{"%.3f"|format(e.human_conf)}}</td>
+          <td>{% if e.coercion == 1 %}<span class="pill bad">YES</span>{% else %}<span class="pill ok">no</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Identity State (baselines + hibernación)</h2>
+    <table>
+      <thead><tr><th>user/device/epoch</th><th>mean</th><th>std</th><th>band</th><th>last_ts</th><th>dormant_since</th></tr></thead>
+      <tbody>
+        {% for s in states %}
+        <tr>
+          <td class="mono">{{s.user_id}}<br/>{{s.device_id}}<br/>e{{s.epoch}}</td>
+          <td>{{"%.3f"|format(s.baseline_mean or 0)}}</td>
+          <td>{{"%.3f"|format(s.baseline_std or 0)}}</td>
+          <td>{{"%.3f"|format(s.stability_band or 0)}}</td>
+          <td class="mono">{{s.last_ts}}</td>
+          <td class="mono">{{s.dormant_since}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Trust Graph (edges)</h2>
+    <table>
+      <thead><tr><th>type</th><th>src → dst</th><th>w</th><th>ts</th></tr></thead>
+      <tbody>
+        {% for g in edges %}
+        <tr>
+          <td><span class="pill">{{g.edge_type}}</span></td>
+          <td class="mono">{{g.src_node}}<br/>→ {{g.dst_node}}</td>
+          <td>{{"%.2f"|format(g.weight)}}</td>
+          <td class="mono">{{g.created_at}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>Clusters (snapshot)</h2>
+    <table>
+      <thead><tr><th>type</th><th>label</th><th>score</th><th>members</th></tr></thead>
+      <tbody>
+        {% for c in clusters %}
+        <tr>
+          <td><span class="pill">{{c.cluster_type}}</span></td>
+          <td class="mono">{{c.label}}</td>
+          <td>{{"%.2f"|format(c.score)}}</td>
+          <td class="mono">{{c.members_json}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card full">
+    <h2>Audit Logs</h2>
+    <table>
+      <thead><tr><th>ts</th><th>action</th><th>outcome</th><th>user/device</th><th>detail</th></tr></thead>
+      <tbody>
+        {% for a in audits %}
+        <tr>
+          <td class="mono">{{a.created_at}}</td>
+          <td class="mono">{{a.action}}</td>
+          <td>
+            {% if a.outcome == 'ok' %}<span class="pill ok">ok</span>
+            {% elif a.outcome == 'suspicious' %}<span class="pill warn">suspicious</span>
+            {% else %}<span class="pill bad">{{a.outcome}}</span>{% endif %}
+          </td>
+          <td class="mono">{{a.user_id}} / {{a.device_id}}</td>
+          <td class="mono">{{a.detail}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+</body>
+</html>

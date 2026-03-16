@@ -1,0 +1,81 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>MitoPulse Human Infrastructure v1</title>
+  <style>
+    body { background:#0b0f14; color:#e5edf5; font-family:system-ui; margin:0; padding:20px; }
+    h1,h2 { margin:0 0 12px 0; }
+    .grid { display:grid; grid-template-columns: 1.3fr 1fr; gap:16px; }
+    .card { background:#111827; border:1px solid #263244; border-radius:14px; padding:14px; margin-bottom:16px; }
+    table { width:100%; border-collapse:collapse; font-size:12px; }
+    th,td { border-bottom:1px solid #223045; padding:8px; text-align:left; vertical-align:top; }
+    .ok { color:#9ae6b4; }
+    .bad { color:#fc8181; }
+    .mono { font-family:ui-monospace,monospace; }
+  </style>
+</head>
+<body>
+  <h1>MitoPulse Human Infrastructure v1</h1>
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h2>Identity / Human Presence States</h2>
+        <table>
+          <thead><tr><th>node</th><th>tier</th><th>index</th><th>stability</th><th>band</th><th>human</th><th>risk</th><th>coercion</th></tr></thead>
+          <tbody>
+          {% for s in states %}
+            <tr>
+              <td class="mono">{{ s.node_id }}</td>
+              <td>{{ s.tier }}</td>
+              <td>{{ '%.3f' % s.index }}</td>
+              <td>{{ '%.3f' % s.stability }}</td>
+              <td>{{ s.stability_band }}</td>
+              <td>{{ '%.2f' % s.human_conf }}</td>
+              <td>{{ s.risk }}</td>
+              <td>{% if s.coercion %}<span class="bad">COERCION</span>{% else %}<span class="ok">OK</span>{% endif %}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Trust Graph Edges</h2>
+        <table>
+          <thead><tr><th>type</th><th>src</th><th>dst</th><th>w</th><th>reason</th></tr></thead>
+          <tbody>
+          {% for e in edges %}
+            <tr>
+              <td>{{ e.type }}</td>
+              <td class="mono">{{ e.src }}</td>
+              <td class="mono">{{ e.dst }}</td>
+              <td>{{ e.weight }}</td>
+              <td>{{ e.reason }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h2>Audit Log</h2>
+        <table>
+          <thead><tr><th>ts</th><th>action</th><th>status</th><th>reason</th></tr></thead>
+          <tbody>
+          {% for a in audits %}
+            <tr>
+              <td>{{ a.ts }}</td>
+              <td>{{ a.action }}</td>
+              <td>{% if a.status == 'accepted' %}<span class="ok">{{ a.status }}</span>{% else %}<span class="bad">{{ a.status }}</span>{% endif %}</td>
+              <td>{{ a.reason }}</td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

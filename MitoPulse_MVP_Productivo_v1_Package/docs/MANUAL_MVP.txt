@@ -1,0 +1,36 @@
+
+MITOPULSE MVP PRODUCTIVO v1
+Manual de Uso
+
+Fecha: 2026-03-13T17:47:30.674270
+
+1. Objetivo
+Este MVP demuestra el funcionamiento del sistema inmunológico digital MitoPulse.
+
+2. Componentes
+- Fast Decision Plane
+- Deep Intelligence Plane
+- Red piloto de 4 nodos
+- Guardian Layer
+- Simulación de ataques
+
+3. Red Piloto
+Nodos incluidos:
+- nd_manu_01
+- nd_ana_01
+- nd_bruno_01
+- nd_carla_01
+
+4. Ejecutar
+pip install fastapi uvicorn
+uvicorn app.main:app --reload
+
+5. Endpoint principal
+/health
+
+6. Uso en presentaciones
+Este MVP está diseñado para mostrar:
+- identidad relacional
+- detección antifraude
+- propagación de riesgo
+- gobernanza con guardian nodes

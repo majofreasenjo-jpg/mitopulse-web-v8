@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mitopulse-gateway
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mitopulse-gateway
+  template:
+    metadata:
+      labels:
+        app: mitopulse-gateway
+    spec:
+      containers:
+        - name: gateway
+          image: mitopulse/gateway:v4
+          ports:
+            - containerPort: 8080
