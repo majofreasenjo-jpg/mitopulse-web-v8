@@ -81,14 +81,29 @@ def quorum_score(pr, st, dg, theta=0.80):
     total = 0.45 * pr + 0.25 * st + 0.35 * dg
     return round(total, 3), total >= theta
 
+def calculate_pulse(ri, anchors, reserve, danger):
+    """Layer 2: Pulse Engine"""
+    health = (ri * 0.40) + (anchors * 0.30) + (reserve * 0.30)
+    pulse = max(0.01, health - (danger * 0.50))
+    return round(pulse, 3)
+
+def cross_pulse(G, node, pulses):
+    """Layer 3: Cross-Pulse Engine"""
+    cp = 0.0
+    for nbr in G.neighbors(node):
+        edge = G.get_edge_data(node, nbr, default={})
+        weight = 0.8 if edge.get("label") == "normal" else 1.5
+        cp += pulses.get(node, 0.01) * pulses.get(nbr, 0.01) * weight
+    return round(cp, 3)
+
 def allostatic_reserve(ri, dg, ra):
     recovery = min(0.35, ri * 0.25 + ra)
     stress = min(0.60, dg * 0.55)
     return round(max(0.0, min(1.0, ri + recovery - stress)), 3)
 
-def bioinspired_node_risk(G, node):
+def bioinspired_node_risk(G, node, pulses=None):
     if node not in G:
-        return {"node": node, "risk_score": 0.0, "recommended_action": "ALLOW"}
+        return {"node": node, "immune_risk_score": 0.0, "recommended_action": "ALLOW"}
     ri = relational_identity_score(G, node)
     pr = propagated_risk(G, node)
     st = stigmergic_trace(G, node)
@@ -96,12 +111,21 @@ def bioinspired_node_risk(G, node):
     ra = reality_anchor(G, node)
     qscore, qactive = quorum_score(pr, st, dg)
     reserve = allostatic_reserve(ri, dg, ra)
-    risk = max(0.0, min(1.0, 0.40 * pr + 0.25 * st + 0.35 * dg + (0.10 if qactive else 0.0) - 0.20 * ra))
-    risk = round(max(0.0, min(0.99, risk + (0.05 if reserve < 0.30 else 0.0))), 3)
-    action = "BLOCK" if risk >= 0.80 else "REVIEW" if risk >= 0.45 else "ALLOW"
+    
+    pulse = calculate_pulse(ri, ra, reserve, dg)
+    if pulses is not None:
+        pulses[node] = pulse
+    cp = cross_pulse(G, node, pulses) if pulses else 0.0
+
+    # Layer 8: Immune Risk Score
+    irs_base = 0.40 * pr + 0.25 * st + 0.35 * dg + (0.10 if qactive else 0.0) - 0.20 * ra
+    health_modifier = min(1.0, (1.0 - pulse) * 0.30 + (0.05 if cp > 0.8 else 0.0))
+    
+    irs = round(max(0.0, min(0.99, irs_base + health_modifier)), 3)
+    action = "BLOCK" if irs >= 0.80 else "REVIEW" if irs >= 0.45 else "ALLOW"
     return {
         "node": node,
-        "risk_score": risk,
+        "immune_risk_score": irs,
         "recommended_action": action,
         "relational_identity": ri,
         "propagated_risk": pr,
@@ -111,15 +135,21 @@ def bioinspired_node_risk(G, node):
         "allostatic_reserve": reserve,
         "quorum_score": qscore,
         "quorum_activated": qactive,
+        "pulse_score": pulse,
+        "cross_pulse_score": cp
     }
 
 def bioinspired_projection(G):
     allow = review = block = 0
     top = []
+    pulses = {}
+    for node in G.nodes():
+        pulses[node] = calculate_pulse(relational_identity_score(G, node), reality_anchor(G, node), allostatic_reserve(relational_identity_score(G, node), danger_signal(G, node), reality_anchor(G, node)), danger_signal(G, node))
+
     for node, attrs in G.nodes(data=True):
         if attrs.get("node_type") != "customer":
             continue
-        r = bioinspired_node_risk(G, node)
+        r = bioinspired_node_risk(G, node, pulses)
         top.append(r)
         if r["recommended_action"] == "BLOCK":
             block += 1
@@ -127,5 +157,5 @@ def bioinspired_projection(G):
             review += 1
         else:
             allow += 1
-    top.sort(key=lambda x: x["risk_score"], reverse=True)
+    top.sort(key=lambda x: x["immune_risk_score"], reverse=True)
     return {"ALLOW": allow, "REVIEW": review, "BLOCK": block, "top": top[:20]}
