@@ -149,18 +149,15 @@ function renderGraph(topology) {
       .selectAll("line")
       .data(topology.edges)
       .enter().append("line")
-      .attr("stroke-width", 1.5);
+      .attr("stroke-width", 1.5)
+      .attr("id", (d, i) => "link-" + i);
 
   const node = g.append("g")
       .selectAll("circle")
       .data(topology.nodes)
       .enter().append("circle")
       .attr("r", 8)
-      .attr("fill", d => {
-          if (d.risk > 0.8) return "#ff4444";
-          if (d.risk > 0.45) return "#ffaa00";
-          return "#44bb44";
-      })
+      .attr("fill", "#44bb44") // Day -3: All normal
       .attr("stroke", "#101a30")
       .attr("stroke-width", 1.5)
       .call(d3.drag()
@@ -175,6 +172,31 @@ function renderGraph(topology) {
         .attr("x2", d => d.target.x).attr("y2", d => d.target.y);
     node.attr("cx", d => d.x).attr("cy", d => d.y);
   });
+
+  // Storytelling Timeline
+  let timelineLabel = svg.append("text").attr("x", 20).attr("y", 30).attr("fill", "#fff").attr("font-size", "20px").text("Day -3: Estructura Normal");
+  
+  d3.timeout(() => {
+    timelineLabel.text("Day -1: Detectando Coordinación en la Sombra (Shadow Edges)");
+    link.transition().duration(1000).attr("stroke", d => {
+      const sourceRisk = typeof d.source === 'object' ? d.source.risk : 0;
+      const targetRisk = typeof d.target === 'object' ? d.target.risk : 0;
+      return (sourceRisk > 0.45 || targetRisk > 0.45) ? "#ffaa00" : "#284368";
+    }).attr("stroke-width", d => {
+      const sourceRisk = typeof d.source === 'object' ? d.source.risk : 0;
+      const targetRisk = typeof d.target === 'object' ? d.target.risk : 0;
+      return (sourceRisk > 0.45 || targetRisk > 0.45) ? 3 : 1.5;
+    });
+  }, 3500);
+
+  d3.timeout(() => {
+    timelineLabel.text("Day 0: Cuarentena Activada (Immune Defense)");
+    node.transition().duration(1500).attr("fill", d => {
+        if (d.risk > 0.8) return "#ff4444";
+        if (d.risk > 0.45) return "#ffaa00";
+        return "#44bb44";
+    });
+  }, 7000);
 }
 
 function paint(j){
@@ -230,7 +252,21 @@ async function createCase(){
   document.getElementById('caseOut').textContent = JSON.stringify(j, null, 2);
 }
 
-loadScenario();
+async function autoLoadDemo() {
+  await getToken();
+  const res = await fetch('/api/run/1', {headers: authHeaders()});
+  if (res.ok) {
+    const j = await res.json();
+    paint(j);
+    document.getElementById('case_run_id').value = 1;
+  } else {
+    await saveScenario();
+    await createCase();
+    setTimeout(() => location.reload(), 1500);
+  }
+}
+
+autoLoadDemo();
 </script>
 </body>
 </html>
