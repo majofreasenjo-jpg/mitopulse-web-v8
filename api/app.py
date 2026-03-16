@@ -40,6 +40,10 @@ def home(request: Request, db: Session = Depends(get_db)):
 def token(tenant_id: str):
     return {"tenant_id": tenant_id, "token": create_token(tenant_id)}
 
+@app.get("/verify", response_class=HTMLResponse)
+def verify_challenge(request: Request):
+    return templates.TemplateResponse("verify.html", {"request": request})
+
 @app.get("/api/scenario")
 def scenario(industry: str = "bank", client_size: str = "small"):
     folder = f"data/{industry}_{client_size}"
