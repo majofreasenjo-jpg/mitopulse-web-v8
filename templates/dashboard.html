@@ -125,7 +125,19 @@ function paint(j){
   document.getElementById('exposure').textContent = money(j.improvement.estimated_total_exposure);
 }
 
+function setLoading(){
+  document.getElementById('lift').textContent = '...';
+  document.getElementById('fraudred').textContent = '...';
+  document.getElementById('fpred').textContent = '...';
+  document.getElementById('exposure').textContent = '...';
+  document.getElementById('profile').textContent = 'Calculando tensores biológicos...';
+  document.getElementById('baseline').textContent = 'Calculando...';
+  document.getElementById('bio').textContent = 'Calculando...';
+  document.getElementById('improvement').textContent = 'Calculando...';
+}
+
 async function loadScenario(){
+  setLoading();
   const industry = document.getElementById('industry').value;
   const size = document.getElementById('size').value;
   const j = await (await fetch(`/api/scenario?industry=${industry}&client_size=${size}`)).json();
@@ -133,6 +145,7 @@ async function loadScenario(){
 }
 
 async function saveScenario(){
+  setLoading();
   const industry = document.getElementById('industry').value;
   const size = document.getElementById('size').value;
   const j = await (await fetch(`/api/load-sample?industry=${industry}&client_size=${size}`, {headers: authHeaders()})).json();
