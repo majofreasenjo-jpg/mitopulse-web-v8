@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MitoPulse Client Simulation Platform v4</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;background:#0b1220;color:#e8f0ff;margin:0}
+.top{padding:18px 24px;background:#101a30;border-bottom:1px solid #243a63}
+.wrap{padding:24px;max-width:1600px;margin:0 auto}
+.card{background:#15233d;border:1px solid #284368;border-radius:16px;padding:18px;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.c4{grid-column:span 4}.c6{grid-column:span 6}.c8{grid-column:span 8}.c12{grid-column:span 12}
+button,select,input{background:#0c1830;color:#fff;border:1px solid #284368;border-radius:10px;padding:10px 12px}
+pre{white-space:pre-wrap;overflow:auto;background:#0a1326;border:1px solid #284368;border-radius:12px;padding:12px}
+.step{padding:8px 10px;border:1px solid #284368;border-radius:10px;background:#0c1830}
+table{width:100%;border-collapse:collapse}
+td,th{border-bottom:1px solid #284368;padding:8px;text-align:left}
+label{display:block;margin:8px 0 4px}
+@media(max-width:1000px){.c4,.c6,.c8,.c12{grid-column:span 12}}
+</style>
+</head>
+<body>
+<div class="top"><h1 style="margin:0">MitoPulse Client Simulation Platform v4</h1></div>
+<div class="wrap">
+<div class="card">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+    <select id="client_type">
+      <option value="bank">bank</option>
+      <option value="marketplace">marketplace</option>
+      <option value="telco">telco</option>
+    </select>
+    <button onclick="loadSample()">Cargar muestra</button>
+    <button onclick="generateSynthetic()">Generar dataset</button>
+  </div>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+    <div class="step">1. Cliente entrega CSV</div>
+    <div class="step">2. Backend valida e ingesta</div>
+    <div class="step">3. Normaliza IDs / hashes</div>
+    <div class="step">4. Construye grafo relacional</div>
+    <div class="step">5. Detecta clusters y riesgo</div>
+    <div class="step">6. Persiste corrida</div>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="card c6">
+    <h2>Upload real de archivos</h2>
+    <form action="/api/upload" method="post" enctype="multipart/form-data">
+      <label>client_type</label>
+      <select name="client_type">
+        <option value="bank">bank</option>
+        <option value="marketplace">marketplace</option>
+        <option value="telco">telco</option>
+      </select>
+      <label>customers.csv</label><input type="file" name="customers" required>
+      <label>devices.csv</label><input type="file" name="devices" required>
+      <label>events.csv</label><input type="file" name="events" required>
+      <label>signals.csv</label><input type="file" name="signals" required>
+      <div style="margin-top:12px"><button type="submit">Subir dataset del cliente</button></div>
+    </form>
+  </div>
+  <div class="card c6"><h2>¿Todo queda en la web?</h2><pre id="storage"></pre></div>
+  <div class="card c4"><h2>Perfil dataset</h2><pre id="profile"></pre></div>
+  <div class="card c4"><h2>Stats del grafo</h2><pre id="graphstats"></pre></div>
+  <div class="card c4"><h2>Cómo se arma</h2><pre id="how"></pre></div>
+  <div class="card c6"><h2>Clusters sospechosos</h2><pre id="clusters"></pre></div>
+  <div class="card c6"><h2>Top risky customers</h2><pre id="toprisk"></pre></div>
+  <div class="card c12">
+    <h2>Corridas persistidas</h2>
+    <table>
+      <thead><tr><th>ID</th><th>Tipo cliente</th><th>Origen</th><th>Folder</th><th>Fecha</th></tr></thead>
+      <tbody>
+      {% for r in runs %}
+        <tr><td>{{ r.id }}</td><td>{{ r.client_type }}</td><td>{{ r.source_kind }}</td><td>{{ r.folder_path }}</td><td>{{ r.created_at }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<script>
+async function refreshHow(){
+  const j = await (await fetch('/api/how-client-data-is-built')).json();
+  document.getElementById('how').textContent = JSON.stringify(j, null, 2);
+}
+function paint(data){
+  document.getElementById('storage').textContent = JSON.stringify(data.storage_model || {
+    web_ui: "solo interfaz",
+    uploaded_data: data.sample_folder || "sample folder",
+    processing: "backend",
+    database_recommendation: "CSV para demo; PostgreSQL en producción"
+  }, null, 2);
+  document.getElementById('profile').textContent = JSON.stringify(data.dataset_profile, null, 2);
+  document.getElementById('graphstats').textContent = JSON.stringify(data.graph_stats, null, 2);
+  document.getElementById('clusters').textContent = JSON.stringify(data.clusters, null, 2);
+  document.getElementById('toprisk').textContent = JSON.stringify(data.decision_projection.top_risky_customers, null, 2);
+}
+async function loadSample(){
+  const t = document.getElementById('client_type').value;
+  const j = await (await fetch('/api/load-sample?client_type=' + t)).json();
+  paint(j);
+}
+async function generateSynthetic(){
+  const t = document.getElementById('client_type').value;
+  const j = await (await fetch('/api/generate?client_type=' + t)).json();
+  paint(j);
+}
+refreshHow();
+loadSample();
+</script>
+</body>
+</html>

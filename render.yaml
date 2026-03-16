@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: mitopulse-v4-data-science
+    env: docker
+    plan: starter
+    startCommand: uvicorn api.mitopulse_api:app --host 0.0.0.0 --port 10000
