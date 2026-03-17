@@ -1,0 +1,10 @@
+{
+  "type": "websocket",
+  "source_name": "ws_crypto_demo",
+  "symbols": [
+    "BTCUSD",
+    "ETHUSD",
+    "SOLUSD"
+  ],
+  "output_dir": "live_output/ws_crypto_demo"
+}
