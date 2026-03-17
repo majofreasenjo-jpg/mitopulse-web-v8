@@ -1,6 +1,6 @@
 import requests
 from datetime import datetime, timezone
-from normalizer import (
+from connectors.normalizer import (
     normalize_market_ticks_to_events,
     normalize_orderflow_to_signals,
     seed_entities_for_symbols
