@@ -16,7 +16,7 @@ def load_client_folder(folder: str):
         f = d / fname
         if not f.exists():
             raise ValueError(f"Missing required file: {fname}")
-        limit = 3500 if fname == "events.csv" else 1500
+        limit = 800 if fname == "events.csv" else 200
         df = pd.read_csv(f, nrows=limit)
         missing = [c for c in cols if c not in df.columns]
         if missing:
