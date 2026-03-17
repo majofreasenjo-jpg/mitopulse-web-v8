@@ -72,6 +72,12 @@ code{display:block;background:#09162c;padding:8px 10px;border-radius:10px;margin
       <button onclick="runLiveConnector()" style="background:var(--interaction); color:#fff; border-color:var(--identity)">Ejecutar Motor en Vivo</button>
       <div id="liveInfo" class="small" style="color:var(--collective); font-family:monospace; margin-left:10px;"></div>
     </div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)">
+      <div style="font-size:12px; font-weight:bold; margin-bottom:8px; color:var(--muted)">V17 Detection & Systemic Collapse:</div>
+      <button class="glass-btn btn-action" onclick="runDetection()" style="width:100%; margin-bottom:8px; background:#ef4444; color:#fff; border-color:#dc2626">Run Fraud Detection Core</button>
+      <button class="glass-btn btn-action" onclick="runSystemic()" style="width:100%; background:#f97316; color:#fff; border-color:#ea580c">Run Systemic Collapse Predictor</button>
+      <div id="detectionOutput" class="small" style="margin-top:12px; color:var(--collective); font-family:monospace; margin-left:10px; white-space:pre-wrap"></div>
+    </div>
   </div>
 
   <div class="card">
@@ -248,11 +254,24 @@ async function loadLiveOptions(){
 async function runLiveConnector(){
   const v = document.getElementById('liveSelect').value;
   if(!v) return;
-  document.getElementById('liveInfo').textContent = 'Iniciando conector ' + v + '...';
+  document.getElementById('liveInfo').textContent = 'Ejecutando connector: ' + v + ' ...';
   const res = await fetch('/api/live/run/' + v, {method:'POST'});
   const j = await res.json();
-  document.getElementById('liveInfo').textContent = JSON.stringify(j);
+  document.getElementById('liveInfo').textContent = JSON.stringify(j, null, 2);
 }
+
+async function runDetection(){
+  const res = await fetch('/api/detection/run');
+  const j = await res.json();
+  document.getElementById('detectionOutput').textContent = JSON.stringify(j, null, 2);
+}
+
+async function runSystemic(){
+  const res = await fetch('/api/systemic/run');
+  const j = await res.json();
+  document.getElementById('detectionOutput').textContent = JSON.stringify(j, null, 2);
+}
+
 loadLiveOptions();
 
 async function autoLoadDemo() {
