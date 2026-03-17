@@ -131,7 +131,7 @@ def load_historical_scenario(name: str) -> dict:
 
 def top_node_scores(G, events_df, limit: int = 14):
     rows = []
-    for node, attrs in G.nodes(data=True):
+    for node, attrs in list(G.nodes(data=True))[:60]:
         if attrs.get('node_type') != 'customer':
             continue
         ri = relational_identity_score(G, node)

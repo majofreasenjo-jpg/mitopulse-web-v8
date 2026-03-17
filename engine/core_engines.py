@@ -58,7 +58,7 @@ def safe_corr(a: list[float], b: list[float]) -> float:
 
 def cross_pulse_pairs(events_df: pd.DataFrame, top_n: int = 12) -> list[dict]:
     series = pulse_series(events_df)
-    nodes = list(series.keys())
+    nodes = list(series.keys())[:60]
     pairs = []
     for i in range(len(nodes)):
         for j in range(i + 1, len(nodes)):
@@ -148,7 +148,7 @@ def pattern_match(events_df: pd.DataFrame, nodes: tuple[str, str]) -> float:
 
 def shadow_coordination(events_df: pd.DataFrame, G: nx.Graph, top_n: int = 10) -> list[dict]:
     series = pulse_series(events_df)
-    nodes = list(series.keys())
+    nodes = list(series.keys())[:60]
     results = []
     for i in range(len(nodes)):
         for j in range(i + 1, len(nodes)):
