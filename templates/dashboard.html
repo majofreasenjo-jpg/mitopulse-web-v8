@@ -55,7 +55,11 @@ code{display:block;background:#09162c;padding:8px 10px;border-radius:10px;margin
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <select id="profileSelect">{% for p in profiles %}<option value="{{p.name}}">{{p.name}} · {{p.industry}} · {{p.size}} · {{p.mode}}</option>{% endfor %}</select>
       <button onclick="loadProfile()">Cargar perfil modular</button>
-      <select id="historicalSelect">{% for h in historical %}<option value="{{h.name}}">{{h.title}}</option>{% endfor %}</select>
+      <select id="historicalSelect">
+          <option value="subprime_pre_12m">Subprime Pre-12M</option>
+          <option value="asian_crisis_1997">Asian Crisis 1997</option>
+          <option value="ftx_collapse">FTX Collapse</option>
+      </select>
       <button onclick="loadHistorical()">Cargar crisis histórica</button>
       <select id="demoSelect">{% for d in demos %}<option value="{{d.name}}">{{d.title}}</option>{% endfor %}</select>
       <button onclick="loadDemo()">Cargar Demo Killer</button>
