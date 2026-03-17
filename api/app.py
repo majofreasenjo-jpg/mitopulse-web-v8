@@ -7,6 +7,10 @@ from ingestion.client_data_loader import save_uploaded_file
 from api.live_service import list_live_configs, run_live_config
 from core.fraud_detection_engine import FraudDetectionEngine
 from core.systemic_collapse_predictor import SystemicCollapsePredictor
+from core.fraud_evolution_engine import FraudEvolutionEngine
+from core.guardian_swarm import GuardianSwarm
+from core.relational_dark_matter import RelationalDarkMatter
+from core.relational_wave_engine import RelationalWaveEngine
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 app = FastAPI(title="MitoPulse Final Modular Prototype v13")
@@ -119,4 +123,63 @@ def systemic_run():
     return {
         'dataset': str(target),
         'metrics': metrics
+    }
+
+@app.get('/api/v18/run')
+def v18_run():
+    import pandas as pd
+    from pathlib import Path
+
+    candidate_dirs = [
+        Path('live_output/yahoo_live_market'),
+        Path('live_output/binance_live_crypto'),
+        Path('data/afp_systemic_realistic_v1'),
+        Path('data/bank_medium_realistic_v1'),
+    ]
+    target = next((p for p in candidate_dirs if p.exists()), None)
+    if target is None:
+        return {'error': 'no dataset found in live_output or mapped data folders'}
+
+    events_fp = target / 'events.csv'
+    if not events_fp.exists():
+        return {'error': f'events.csv not found in {target}'}
+
+    events = pd.read_csv(events_fp)
+
+    # V18 Engines
+    rdm = RelationalDarkMatter()
+    mdi = rdm.compute_mdi(events)
+    clusters = rdm.detect_hidden_clusters(events)
+
+    rwe = RelationalWaveEngine()
+    waves = rwe.propagate(events)
+
+    fee = FraudEvolutionEngine()
+    p1 = fee.generate_pattern()
+    p2 = fee.mutate_pattern(fee.generate_pattern())
+
+    gs = GuardianSwarm()
+    alerts_to_validate = [
+        {"id": "A1", "score": 0.8},
+        {"id": "A2", "score": 0.3},
+        {"id": "A3", "score": 0.9}
+    ]
+    validated_alerts = gs.validate(alerts_to_validate)
+
+    return {
+        'dataset': str(target),
+        'relational_dark_matter': {
+            'mdi': mdi,
+            'hidden_clusters_count': len(clusters)
+        },
+        'relational_wave_engine': {
+            'waves_detected': len(waves)
+        },
+        'fraud_evolution_engine': {
+            'generated_pattern': p1,
+            'mutated_pattern': p2
+        },
+        'guardian_swarm': {
+            'validated_alerts': validated_alerts
+        }
     }

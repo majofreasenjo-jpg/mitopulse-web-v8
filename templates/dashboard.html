@@ -78,6 +78,11 @@ code{display:block;background:#09162c;padding:8px 10px;border-radius:10px;margin
       <button class="glass-btn btn-action" onclick="runSystemic()" style="width:100%; background:#f97316; color:#fff; border-color:#ea580c">Run Systemic Collapse Predictor</button>
       <div id="detectionOutput" class="small" style="margin-top:12px; color:var(--collective); font-family:monospace; margin-left:10px; white-space:pre-wrap"></div>
     </div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)">
+      <div style="font-size:12px; font-weight:bold; margin-bottom:8px; color:var(--muted)">V18 Full Modules (Waves & Dark Matter):</div>
+      <button class="glass-btn btn-action" onclick="runV18Modules()" style="width:100%; background:#8b5cf6; color:#fff; border-color:#7c3aed">Execute V18 Nexus Engines</button>
+      <div id="v18Output" class="small" style="margin-top:12px; color:#a78bfa; font-family:monospace; margin-left:10px; white-space:pre-wrap"></div>
+    </div>
   </div>
 
   <div class="card">
@@ -270,6 +275,13 @@ async function runSystemic(){
   const res = await fetch('/api/systemic/run');
   const j = await res.json();
   document.getElementById('detectionOutput').textContent = JSON.stringify(j, null, 2);
+}
+
+async function runV18Modules(){
+  document.getElementById('v18Output').textContent = "Inicializando motores V18 (RelationalDarkMatter, Waves, GuardianSwarm)...";
+  const res = await fetch('/api/v18/run');
+  const j = await res.json();
+  document.getElementById('v18Output').textContent = JSON.stringify(j, null, 2);
 }
 
 loadLiveOptions();
