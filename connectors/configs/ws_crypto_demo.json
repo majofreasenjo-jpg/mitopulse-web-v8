@@ -1,10 +1,7 @@
 {
   "type": "websocket",
-  "source_name": "ws_crypto_demo",
-  "symbols": [
-    "BTCUSD",
-    "ETHUSD",
-    "SOLUSD"
-  ],
-  "output_dir": "live_output/ws_crypto_demo"
+  "source_name": "binance_live_crypto",
+  "symbols": ["btcusdt", "ethusdt", "solusdt"],
+  "duration_seconds": 15,
+  "output_dir": "live_output/binance_live_crypto"
 }

@@ -1,11 +1,6 @@
 {
   "type": "rest",
-  "source_name": "rest_market_demo",
-  "symbols": [
-    "IPSA",
-    "SPY",
-    "QQQ",
-    "DXY"
-  ],
-  "output_dir": "live_output/rest_market_demo"
+  "source_name": "yahoo_live_market",
+  "symbols": ["AAPL", "MSFT", "NVDA", "SPY", "QQQ", "DXY"],
+  "output_dir": "live_output/yahoo_live_market"
 }

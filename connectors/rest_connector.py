@@ -1,17 +1,61 @@
-from pathlib import Path
-import json
+import requests
 from datetime import datetime, timezone
-from normalizer import normalize_market_ticks_to_events, normalize_orderflow_to_signals, seed_entities_for_symbols
+from normalizer import (
+    normalize_market_ticks_to_events,
+    normalize_orderflow_to_signals,
+    seed_entities_for_symbols
+)
+
+def fetch_yahoo_quote(symbol: str):
+    url = f"https://query1.finance.yahoo.com/v7/finance/quote?symbols={symbol}"
+    r = requests.get(url, timeout=15, headers={"User-Agent": "Mozilla/5.0"})
+    r.raise_for_status()
+    payload = r.json()
+    result = payload.get("quoteResponse", {}).get("result", [])
+    if not result:
+        return None
+    q = result[0]
+    return {
+        "symbol": symbol,
+        "price": q.get("regularMarketPrice", 0) or 0,
+        "change_pct": q.get("regularMarketChangePercent", 0) or 0,
+        "volume": q.get("regularMarketVolume", 0) or 0,
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
 
 def run_rest_connector(cfg: dict):
-    source = cfg.get("source_name", "rest_source")
+    source = cfg.get("source_name", "yahoo_live_market")
     output_dir = cfg.get("output_dir", f"live_output/{source}")
-    symbols = cfg.get("symbols", ["SPY","QQQ","IPSA"])
-    # Stub payload for v1: replace with real HTTP polling logic
-    now = datetime.now(timezone.utc).isoformat()
-    ticks = [{"symbol": s, "price": 100 + i * 3.5, "timestamp": now} for i, s in enumerate(symbols, start=1)]
-    signals = [{"entity_id": s, "signal_type": "volatility_shift", "severity": round(0.25 + i*0.1, 2), "timestamp": now} for i, s in enumerate(symbols, start=1)]
+    symbols = cfg.get("symbols", ["AAPL", "MSFT", "TSLA", "SPY", "NVDA"])
+
     seed_entities_for_symbols(symbols, output_dir)
+
+    ticks = []
+    signals = []
+    for s in symbols:
+        try:
+            quote = fetch_yahoo_quote(s)
+        except Exception as e:
+            print(f"[rest] {source}: error fetching {s}: {e}")
+            continue
+        if not quote:
+            continue
+
+        ticks.append({
+            "symbol": quote["symbol"],
+            "price": quote["price"],
+            "timestamp": quote["timestamp"]
+        })
+
+        severity = min(1.0, abs(float(quote["change_pct"])) / 10.0)
+        signal_type = "volatility_shift" if severity >= 0.35 else "market_movement"
+        signals.append({
+            "entity_id": quote["symbol"],
+            "signal_type": signal_type,
+            "severity": round(severity, 3),
+            "timestamp": quote["timestamp"]
+        })
+
     n1 = normalize_market_ticks_to_events(source, ticks, output_dir)
     n2 = normalize_orderflow_to_signals(source, signals, output_dir)
     print(f"[rest] {source}: wrote {n1} events, {n2} signals → {output_dir}")
