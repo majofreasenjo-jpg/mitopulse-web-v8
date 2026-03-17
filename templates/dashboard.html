@@ -66,6 +66,12 @@ code{display:block;background:#09162c;padding:8px 10px;border-radius:10px;margin
       <input type="file" id="fileInput" />
       <button onclick="uploadFile()">Subir dataset</button>
     </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)">
+      <div class="layerchip" style="background:var(--interaction); margin:0; padding:4px 8px; border-radius:6px; font-weight:bold;">V16 Live Connectors:</div>
+      <select id="liveSelect"><option value="">Cargando conectores VIVO...</option></select>
+      <button onclick="runLiveConnector()" style="background:var(--interaction); color:#fff; border-color:var(--identity)">Ejecutar Motor en Vivo</button>
+      <div id="liveInfo" class="small" style="color:var(--collective); font-family:monospace; margin-left:10px;"></div>
+    </div>
   </div>
 
   <div class="card">
@@ -232,6 +238,22 @@ async function loadProfile(){ const v=document.getElementById('profileSelect').v
 async function loadHistorical(){ const v=document.getElementById('historicalSelect').value; const j=await (await fetch('/api/historical/'+v)).json(); paintHistorical(j); }
 async function loadDemo(){ const v=document.getElementById('demoSelect').value; const j=await (await fetch('/api/demo/'+v)).json(); paintDemo(j); }
 async function uploadFile(){ const file=document.getElementById('fileInput').files[0]; if(!file) return alert('Selecciona un archivo'); const fd = new FormData(); fd.append('file', file); const res=await (await fetch('/api/upload',{method:'POST',body:fd})).json(); alert('Subido: '+res.filename); }
+
+async function loadLiveOptions(){
+  const res = await fetch('/api/live/options');
+  const j = await res.json();
+  const sel = document.getElementById('liveSelect');
+  sel.innerHTML = (j.connectors||[]).map(c => `<option value="${c.config_name}">${c.config_name} · ${c.type} · ${c.source_name}</option>`).join('');
+}
+async function runLiveConnector(){
+  const v = document.getElementById('liveSelect').value;
+  if(!v) return;
+  document.getElementById('liveInfo').textContent = 'Iniciando conector ' + v + '...';
+  const res = await fetch('/api/live/run/' + v, {method:'POST'});
+  const j = await res.json();
+  document.getElementById('liveInfo').textContent = JSON.stringify(j);
+}
+loadLiveOptions();
 
 async function autoLoadDemo() {
   const profileSelect = document.getElementById('profileSelect');
