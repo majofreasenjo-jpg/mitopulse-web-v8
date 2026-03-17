@@ -50,10 +50,17 @@ def safe_corr(a: list[float], b: list[float]) -> float:
     b = b + [0.0] * (m - len(b))
     if len(set(a)) == 1 and len(set(b)) == 1:
         return 1.0 if a == b else 0.0
-    sa = pd.Series(a)
-    sb = pd.Series(b)
-    c = sa.corr(sb)
-    return round(float(0.0 if pd.isna(c) else c), 3)
+    n = len(a)
+    sum_a = sum(a)
+    sum_b = sum(b)
+    sum_ab = sum(x*y for x, y in zip(a, b))
+    sum_a_sq = sum(x**2 for x in a)
+    sum_b_sq = sum(y**2 for y in b)
+    num = n * sum_ab - sum_a * sum_b
+    den = math.sqrt((n * sum_a_sq - sum_a**2) * (n * sum_b_sq - sum_b**2))
+    if den == 0:
+        return 0.0
+    return round(float(num / den), 3)
 
 
 def cross_pulse_pairs(events_df: pd.DataFrame, top_n: int = 12) -> list[dict]:
