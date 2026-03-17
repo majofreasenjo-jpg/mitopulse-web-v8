@@ -211,18 +211,30 @@ def technical_metrics(events_df, shadow_pairs, top_nodes, system):
 
 
 def run_live_profile(profile_name: str) -> dict:
+    import time
+    t0 = time.time()
     profile = load_profile(profile_name)
     ds_path = BASE_DIR / profile['dataset']
+    t1 = time.time()
     customers, devices, events, signals = load_client_folder(str(ds_path))
+    t2 = time.time()
     G = build_graph(customers, devices, events, signals)
+    t3 = time.time()
     dp = dataset_profile(customers, devices, events, signals)
+    t4 = time.time()
 
     cpairs = cross_pulse_pairs(events)
+    t5 = time.time()
     shadow = shadow_coordination(events, G)
+    t6 = time.time()
     top_nodes = top_node_scores(G, events)
+    t7 = time.time()
     morph = morphogenesis_signature(events)
+    t8 = time.time()
     system = system_indices(G, events, shadow, top_nodes)
+    t9 = time.time()
     tech = technical_metrics(events, shadow, top_nodes, system)
+    t10 = time.time()
 
     cluster_pattern = max([x['pattern'] for x in shadow], default=0.0)
     if top_nodes:
@@ -244,6 +256,18 @@ def run_live_profile(profile_name: str) -> dict:
 
     return {
         'kind': 'profile',
+        'debug_timings': {
+            'load_yaml': round(t1 - t0, 3),
+            'load_csv': round(t2 - t1, 3),
+            'build_graph': round(t3 - t2, 3),
+            'dataset_profile': round(t4 - t3, 3),
+            'cross_pulse': round(t5 - t4, 3),
+            'shadow': round(t6 - t5, 3),
+            'top_nodes': round(t7 - t6, 3),
+            'morph': round(t8 - t7, 3),
+            'system_indices': round(t9 - t8, 3),
+            'tech': round(t10 - t9, 3)
+        },
         'profile': profile,
         'dataset_profile': dp,
         'graph_stats': {'nodes': G.number_of_nodes(), 'edges': G.number_of_edges()},
