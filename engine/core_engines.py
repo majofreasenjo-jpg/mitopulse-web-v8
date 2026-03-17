@@ -57,7 +57,9 @@ def safe_corr(a: list[float], b: list[float]) -> float:
     sum_a_sq = sum(x**2 for x in a)
     sum_b_sq = sum(y**2 for y in b)
     num = n * sum_ab - sum_a * sum_b
-    den = math.sqrt((n * sum_a_sq - sum_a**2) * (n * sum_b_sq - sum_b**2))
+    variance_a = max(0.0, n * sum_a_sq - sum_a**2)
+    variance_b = max(0.0, n * sum_b_sq - sum_b**2)
+    den = math.sqrt(variance_a * variance_b)
     if den == 0:
         return 0.0
     return round(float(num / den), 3)
