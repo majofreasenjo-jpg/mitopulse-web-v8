@@ -1,7 +1,0 @@
-{
-  "type": "websocket",
-  "source_name": "binance_live_crypto",
-  "symbols": ["btcusdt", "ethusdt", "solusdt"],
-  "duration_seconds": 15,
-  "output_dir": "live_output/binance_live_crypto"
-}
