@@ -89,15 +89,12 @@ def trust_propagation_score(G: nx.Graph, node: str, max_depth: int = 2, beta: fl
     if node not in G:
         return 0.0
     risk = 0.0
-    for other, attrs in G.nodes(data=True):
-        sev = float(attrs.get("signal_severity", 0.0) or 0.0)
-        if sev <= 0:
+    paths = nx.single_source_shortest_path_length(G, node, cutoff=max_depth)
+    for other, depth in paths.items():
+        if other == node or depth == 0:
             continue
-        try:
-            depth = len(nx.shortest_path(G, node, other)) - 1
-        except nx.NetworkXNoPath:
-            continue
-        if depth <= max_depth:
+        sev = float(G.nodes[other].get("signal_severity", 0.0) or 0.0)
+        if sev > 0:
             risk += sev * (beta ** max(depth - 1, 0))
     return round(min(risk, 1.0), 3)
 
@@ -106,12 +103,9 @@ def relational_gravity(G: nx.Graph, node: str) -> float:
     if node not in G:
         return 0.0
     gravity = 0.0
-    for other in G.nodes:
-        if other == node:
-            continue
-        try:
-            d = len(nx.shortest_path(G, node, other)) - 1
-        except nx.NetworkXNoPath:
+    paths = nx.single_source_shortest_path_length(G, node)
+    for other, d in paths.items():
+        if other == node or d == 0:
             continue
         trust = float(G.nodes[other].get("signal_severity", 0.0) or 0.0) + max(1, G.degree(other)) / 10.0
         gravity += trust / ((d + 1) ** 2)
