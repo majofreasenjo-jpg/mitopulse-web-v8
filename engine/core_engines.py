@@ -121,11 +121,7 @@ def structure_similarity(G: nx.Graph, a: str, b: str) -> float:
     return round(len(na & nb) / union, 3)
 
 
-def path_similarity(events_df: pd.DataFrame, a: str, b: str) -> float:
-    def sig(node: str):
-        sub = events_df[events_df["source_id"].astype(str) == str(node)]
-        return sub["event_type"].astype(str).tolist()[:6]
-    sa, sb = sig(a), sig(b)
+def path_similarity(sa: list, sb: list) -> float:
     if not sa and not sb:
         return 0.0
     m = max(len(sa), len(sb), 1)
@@ -133,8 +129,8 @@ def path_similarity(events_df: pd.DataFrame, a: str, b: str) -> float:
     return round(eq / m, 3)
 
 
-def pattern_match(events_df: pd.DataFrame, nodes: tuple[str, str]) -> float:
-    labels = Counter(events_df[events_df["source_id"].astype(str).isin([str(nodes[0]), str(nodes[1])])]["label"].astype(str).tolist())
+def pattern_match(labels_a: list, labels_b: list) -> float:
+    labels = Counter(labels_a + labels_b)
     suspicious = labels.get("mule_pattern", 0) + labels.get("scam_ring", 0) + labels.get("social_chain", 0) + labels.get("historical_stress", 0)
     total = max(sum(labels.values()), 1)
     return round(min(1.0, suspicious / total + (0.15 if suspicious else 0.0)), 3)
@@ -143,6 +139,14 @@ def pattern_match(events_df: pd.DataFrame, nodes: tuple[str, str]) -> float:
 def shadow_coordination(events_df: pd.DataFrame, G: nx.Graph, top_n: int = 10) -> list[dict]:
     series = pulse_series(events_df)
     nodes = list(series.keys())[:60]
+    
+    sigs = {}
+    node_labels = {}
+    for n in nodes:
+        sub = events_df[events_df["source_id"].astype(str) == str(n)]
+        sigs[n] = sub["event_type"].astype(str).tolist()[:6]
+        node_labels[n] = sub["label"].astype(str).tolist()
+
     results = []
     for i in range(len(nodes)):
         for j in range(i + 1, len(nodes)):
@@ -150,8 +154,8 @@ def shadow_coordination(events_df: pd.DataFrame, G: nx.Graph, top_n: int = 10) -
             direct = G.has_edge(a, b)
             sync = max(0.0, safe_corr(series[a], series[b]))
             struct = structure_similarity(G, a, b)
-            path = path_similarity(events_df, a, b)
-            patt = pattern_match(events_df, (a, b))
+            path = path_similarity(sigs[a], sigs[b])
+            patt = pattern_match(node_labels[a], node_labels[b])
             score = round(0.35 * sync + 0.20 * struct + 0.20 * path + 0.25 * patt, 3)
             if score >= 0.55 and not direct:
                 results.append({"a": a, "b": b, "sync": sync, "struct": struct, "path": path, "pattern": patt, "score": score})
