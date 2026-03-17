@@ -1,45 +1,36 @@
-# MitoPulse Modular Institutional Platform v12
+# MitoPulse Final Modular Prototype v13
 
-Plataforma modular de demostración y desarrollo para MitoPulse.
+Prototipo final modular completo de MitoPulse basado en la plataforma institucional v12, ampliado con la arquitectura total del baúl de seguridad.
 
-## Qué incluye
-- arquitectura institucional modular
-- perfiles activables por industria, tamaño y tipo de demo
-- datasets por industria y tamaño
-- Historical Scenario Lab con ventanas pre / mid / post crisis
-- dashboard grande, claro y coherente para demos
-- base ejecutable para seguir desarrollando el producto real
+## Incluye
+- Dashboard institucional final con grafo vivo y colores oficiales
+- Perfiles modulares por industria / tamaño / escenario
+- Crisis históricas pre / mid / post crisis
+- Demo Killer Studio:
+  - The Invisible Storm
+  - The Invisible Network
+  - The Coming Collapse
+- Runtime map visible
+- Mathematical core visible
+- Upload de datasets
 
-## Ejecutar
+## Cómo correr
 ```bash
+cd MitoPulse_Final_Modular_Prototype_v13
+python -m venv .venv
+source .venv/bin/activate   # Linux/Mac
+# .venv\Scripts\activate   # Windows
 pip install -r requirements.txt
-python run.py
+uvicorn api.app:app --reload
 ```
 
-Abrir en el navegador:
+Abrir:
+- http://127.0.0.1:8000/
 
-`http://127.0.0.1:8000`
+## KPIs ejecutivos
+- NHI
+- TPI
+- SCR
 
-## Qué puedes demostrar
-- fintech / banco / marketplace / telco
-- riesgo sistémico para banco central
-- caso AFP / seguros / portafolio
-- crisis históricas: subprime, crisis asiática, FTX
-
-## Filosofía de ejecución
-Una sola plataforma, múltiples perfiles.
-
-No se construyen productos separados. Se activa o desactiva la capa analítica según:
-- industria
-- tamaño
-- amenaza
-- modo de demo
-
-## Estructura principal
-- `api/` endpoints FastAPI
-- `engine/` motores base y runner modular
-- `profiles/` configuraciones de demo
-- `historical/` escenarios históricos
-- `data/` datasets por industria y tamaño
-- `templates/` dashboard institucional
-- `docs/` arquitectura, datasets, runtime, matemática, demos
+## Índice técnico estructural
+- MDI

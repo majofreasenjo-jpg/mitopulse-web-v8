@@ -1,5 +1,6 @@
 from pathlib import Path
 import pandas as pd
+from fastapi import UploadFile
 
 REQUIRED = {
     "customers.csv": ["customer_id"],
@@ -29,5 +30,13 @@ def dataset_profile(customers, devices, events, signals):
         "events": len(events),
         "signals": len(signals),
         "event_types": events["event_type"].value_counts().head(10).to_dict(),
-        "contexts": events["context"].value_counts().head(10).to_dict()
+        "contexts": events["context"].value_counts().head(10).to_dict(),
+        "signal_types": signals["signal_type"].value_counts().head(10).to_dict(),
     }
+
+async def save_uploaded_file(upload_dir: Path, file: UploadFile):
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    target = upload_dir / file.filename
+    content = await file.read()
+    target.write_bytes(content)
+    return {"status": "uploaded", "filename": file.filename, "path": str(target)}
