@@ -2,133 +2,106 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>MitoPulse Master Pilot Platform v10</title>
+<title>MitoPulse Modular Institutional Platform v12</title>
 <style>
-body{font-family:Arial,Helvetica,sans-serif;background:#0b1220;color:#e8f0ff;margin:0}
-.top{padding:18px 24px;background:#101a30;border-bottom:1px solid #243a63}
-.wrap{padding:24px;max-width:1700px;margin:0 auto}
-.card{background:#15233d;border:1px solid #284368;border-radius:16px;padding:18px;margin-bottom:16px}
+body{font-family:Arial,Helvetica,sans-serif;background:#09111f;color:#e9f1ff;margin:0}
+.top{padding:18px 28px;background:#0d1830;border-bottom:1px solid #213659;position:sticky;top:0;z-index:10}
+.wrap{padding:24px;max-width:1800px;margin:0 auto}
+.card{background:#13223c;border:1px solid #28456c;border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 10px 20px rgba(0,0,0,.15)}
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
-.c3{grid-column:span 3}.c4{grid-column:span 4}.c6{grid-column:span 6}.c12{grid-column:span 12}
-button,select,input{background:#0c1830;color:#fff;border:1px solid #284368;border-radius:10px;padding:10px 12px;transition:all 0.2s ease;font-family:inherit;}
-button{cursor:pointer;}
-button:hover{background:#152850;border-color:#3a5888;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.2);}
-button:active{transform:translateY(1px) scale(0.98);box-shadow:none;background:#0c1830;}
-pre{white-space:pre-wrap;overflow:auto;background:#0a1326;border:1px solid #284368;border-radius:12px;padding:12px}
+.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+select,button{background:#0b1630;color:#fff;border:1px solid #2b4a73;border-radius:12px;padding:10px 12px}
+button{cursor:pointer}
+pre{white-space:pre-wrap;background:#0a1326;border:1px solid #274164;border-radius:14px;padding:12px;overflow:auto;max-height:420px}
 .metric{background:#0a1326;border:1px solid #284368;border-radius:14px;padding:14px}
-.metric .label{font-size:12px;opacity:.8}.metric .value{font-size:28px;font-weight:bold;margin-top:4px}
-table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #284368;padding:8px;text-align:left}
-label{display:block;margin:8px 0 4px}
-@media(max-width:1100px){.c3,.c4,.c6,.c12{grid-column:span 12}}
+.metric .label{font-size:12px;opacity:.8}.metric .value{font-size:30px;font-weight:bold;margin-top:4px}
+.small{font-size:12px;opacity:.8}
+.bar{height:12px;background:#0a1326;border-radius:10px;overflow:hidden;border:1px solid #284368}
+.bar > div{height:100%;background:linear-gradient(90deg,#29b6f6,#7e57c2)}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #32557f;background:#0a1326;margin:0 8px 8px 0;font-size:12px}
+ul{margin-top:8px}
+@media(max-width:1200px){.c3,.c4,.c5,.c6,.c7,.c8,.c12{grid-column:span 12}}
 </style>
 </head>
 <body>
-<div class="top"><h1 style="margin:0">MitoPulse Master Pilot Platform v10</h1></div>
+<div class="top">
+  <h1 style="margin:0">MitoPulse Modular Institutional Platform v12</h1>
+  <div class="small">Una sola plataforma · múltiples industrias · distintos tamaños · casos históricos pre / mid / post crisis</div>
+</div>
 <div class="wrap">
-<div class="card">
-<h2>1. Obtener token</h2>
-<div style="display:flex;gap:10px;flex-wrap:wrap">
-<input id="tenant_id" value="tenant_demo">
-<button onclick="getToken()">Generar token</button>
-</div>
-<pre id="tokenOut"></pre>
-</div>
+  <div class="card">
+    <h2>1. Selección de demo</h2>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <select id="profileSelect">
+        {% for p in profiles %}
+        <option value="{{p.name}}">{{p.name}} · {{p.industry}} · {{p.size}} · {{p.mode}}</option>
+        {% endfor %}
+      </select>
+      <button onclick="loadProfile()">Cargar perfil institucional</button>
+      <select id="historicalSelect">
+        {% for h in historical %}
+        <option value="{{h}}">{{h}}</option>
+        {% endfor %}
+      </select>
+      <button onclick="loadHistorical()">Cargar crisis histórica</button>
+    </div>
+  </div>
 
-<div class="card">
-<h2>2. Cargar escenario demo</h2>
-<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-<select id="industry" onchange="loadScenario()"><option value="bank">bank</option><option value="marketplace">marketplace</option><option value="telco">telco</option></select>
-<select id="size" onchange="loadScenario()"><option value="small">small</option><option value="medium">medium</option><option value="large">large</option></select>
-<button onclick="loadScenario()">Cargar escenario</button>
-<button onclick="saveScenario()">Guardar como corrida</button>
-</div>
-</div>
+  <div class="grid">
+    <div class="card c3 metric"><div class="label">Network Health Index</div><div class="value" id="nhi">-</div></div>
+    <div class="card c3 metric"><div class="label">Threat Pressure Index</div><div class="value" id="tpi">-</div></div>
+    <div class="card c3 metric"><div class="label">Systemic Collapse Radar</div><div class="value" id="scr">-</div></div>
+    <div class="card c3 metric"><div class="label">Nodos / Aristas</div><div class="value" id="graphstats">-</div></div>
 
-<div class="grid">
-<div class="card c3 metric"><div class="label">Detection lift %</div><div class="value" id="lift">-</div></div>
-<div class="card c3 metric"><div class="label">Fraud reduction %</div><div class="value" id="fraudred">-</div></div>
-<div class="card c3 metric"><div class="label">False positive reduction %</div><div class="value" id="fpred">-</div></div>
-<div class="card c3 metric"><div class="label">Exposure</div><div class="value" id="exposure">-</div></div>
+    <div class="card c4">
+      <h2>2. Módulos activos</h2>
+      <div id="modules"></div>
+    </div>
 
-<div class="card c4"><h2>Dataset profile</h2><pre id="profile"></pre></div>
-<div class="card c4"><h2>Baseline</h2><pre id="baseline"></pre></div>
-<div class="card c4"><h2>Bio-inspired</h2><pre id="bio"></pre></div>
+    <div class="card c4">
+      <h2>3. Perfil de dataset</h2>
+      <pre id="dataset"></pre>
+    </div>
 
-<div class="card c12" style="height: 600px; display: flex; flex-direction: column;">
-  <h2>Relational DNA Graph</h2>
-  <svg id="graph" style="flex: 1; width: 100%; height: 100%; background: #0a1326; border-radius: 12px; border: 1px solid #284368;"></svg>
-</div>
+    <div class="card c4">
+      <h2>4. Lógica visible de la demo</h2>
+      <ul id="storyline"></ul>
+    </div>
 
-<div class="card c6">
-<h2>3. Upload real</h2>
-<form action="/api/upload" method="post" enctype="multipart/form-data">
-<label>tenant_id_form</label><input name="tenant_id_form" value="tenant_demo">
-<label>client_type</label><select name="client_type"><option value="bank">bank</option><option value="marketplace">marketplace</option><option value="telco">telco</option></select>
-<label>client_size</label><input name="client_size" value="custom">
-<label>customers.csv</label><input type="file" name="customers" required>
-<label>devices.csv</label><input type="file" name="devices" required>
-<label>events.csv</label><input type="file" name="events" required>
-<label>signals.csv</label><input type="file" name="signals" required>
-<div style="margin-top:12px"><button type="submit">Subir dataset</button></div>
-</form>
-</div>
+    <div class="card c6">
+      <h2>5. Riesgo y decisión por nodo</h2>
+      <pre id="nodes"></pre>
+    </div>
 
-<div class="card c6">
-<h2>4. Crear case</h2>
-<div style="display:flex;gap:10px;flex-wrap:wrap">
-<input id="case_run_id" placeholder="run_id">
-<input id="case_title" value="Investigación piloto">
-<button onclick="createCase()">Crear case</button>
-</div>
-<pre id="caseOut"></pre>
-</div>
+    <div class="card c6">
+      <h2>6. Shadow Coordination / Cross-Pulse</h2>
+      <pre id="shadow"></pre>
+    </div>
 
-<div class="card c12"><h2>Improvement summary</h2><pre id="improvement"></pre></div>
+    <div class="card c6">
+      <h2>7. Ventanas históricas</h2>
+      <div id="historicalPanel" class="small">Carga una crisis histórica para comparar pre / mid / post crisis.</div>
+    </div>
 
-<div class="card c12">
-<h2>Corridas</h2>
-<table>
-<thead><tr><th>ID</th><th>Client</th><th>Size</th><th>Source</th><th>Folder</th><th>Fecha</th><th>Abrir</th></tr></thead>
-<tbody>
-{% for r in runs %}
-<tr><td>{{ r.id }}</td><td>{{ r.client_type }}</td><td>{{ r.client_size }}</td><td>{{ r.source_kind }}</td><td>{{ r.folder_path }}</td><td>{{ r.created_at }}</td><td><button onclick="openRun({{ r.id }})">Ver</button></td></tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
+    <div class="card c6">
+      <h2>8. Señales del ecosistema</h2>
+      <pre id="system"></pre>
+    </div>
 
-<div class="card c12">
-<h2>Cases</h2>
-<table>
-<thead><tr><th>ID</th><th>Tenant</th><th>Run</th><th>Title</th><th>Status</th><th>Fecha</th></tr></thead>
-<tbody>
-{% for c in cases %}
-<tr><td>{{ c.id }}</td><td>{{ c.tenant_id }}</td><td>{{ c.run_id }}</td><td>{{ c.case_title }}</td><td>{{ c.status }}</td><td>{{ c.created_at }}</td></tr>
-{% endfor %}
-</tbody>
-</table>
-</div>
-</div>
+    <div class="card c12" style="height:600px; display:flex; flex-direction:column;">
+      <h2>9. Network Topology (Live Simulation)</h2>
+      <svg id="graph" style="flex:1; width:100%; height:100%; background:#0a1326; border-radius:12px; border:1px solid #284368;"></svg>
+    </div>
+  </div>
 </div>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-let token = "";
-function authHeaders(){ return token ? {"Authorization":"Bearer " + token} : {}; }
-function money(n){ return n == null ? "-" : n.toLocaleString(); }
-
-async function getToken(){
-  const tenant = document.getElementById('tenant_id').value;
-  const j = await (await fetch('/api/auth/token?tenant_id=' + tenant)).json();
-  token = j.token;
-  document.getElementById('tokenOut').textContent = JSON.stringify(j, null, 2);
-}
-
 let simulation;
 function renderGraph(topology) {
   const svg = d3.select("#graph");
   svg.selectAll("*").remove();
   if(!topology) return;
-  
+
   const width = svg.node().clientWidth || 800;
   const height = svg.node().clientHeight || 600;
 
@@ -175,7 +148,7 @@ function renderGraph(topology) {
 
   // Storytelling Timeline
   let timelineLabel = svg.append("text").attr("x", 20).attr("y", 30).attr("fill", "#fff").attr("font-size", "20px").text("Day -3: Estructura Normal");
-  
+
   d3.timeout(() => {
     timelineLabel.text("Day -1: Detectando Coordinación en la Sombra (Shadow Edges)");
     link.transition().duration(1000).attr("stroke", d => {
@@ -199,74 +172,47 @@ function renderGraph(topology) {
   }, 7000);
 }
 
-function paint(j){
-  document.getElementById('profile').textContent = JSON.stringify({dataset_profile:j.dataset_profile, graph_stats:j.graph_stats, morphogenesis:j.morphogenesis}, null, 2);
-  document.getElementById('baseline').textContent = JSON.stringify(j.baseline, null, 2);
-  document.getElementById('bio').textContent = JSON.stringify(j.bioinspired, null, 2);
-  document.getElementById('improvement').textContent = JSON.stringify(j.improvement, null, 2);
-  document.getElementById('lift').textContent = j.improvement.detection_lift_pct;
-  document.getElementById('fraudred').textContent = j.improvement.fraud_reduction_pct;
-  document.getElementById('fpred').textContent = j.improvement.false_positive_reduction_pct;
-  document.getElementById('exposure').textContent = money(j.improvement.estimated_total_exposure);
+function setText(id, value){ document.getElementById(id).textContent = value; }
+function paintProfile(j){
+  setText('nhi', j.system_indices?.NHI ?? '-');
+  setText('tpi', j.system_indices?.TPI ?? '-');
+  setText('scr', j.system_indices?.SCR ?? '-');
+  setText('graphstats', `${j.graph_stats?.nodes ?? '-'} / ${j.graph_stats?.edges ?? '-'}`);
+  document.getElementById('modules').innerHTML = (j.active_modules || []).map(m => `<span class="badge">${m}</span>`).join('');
+  setText('dataset', JSON.stringify({profile:j.profile, dataset_profile:j.dataset_profile, morphogenesis:j.morphogenesis}, null, 2));
+  setText('nodes', JSON.stringify(j.top_nodes, null, 2));
+  setText('shadow', JSON.stringify({cross_pulse:j.cross_pulse_pairs, shadow_pairs:j.shadow_pairs}, null, 2));
+  setText('system', JSON.stringify(j.system_indices, null, 2));
+  document.getElementById('storyline').innerHTML = (j.storyline || []).map(s => `<li>${s}</li>`).join('');
   
-  if(j.topology) renderGraph(j.topology);
-}
-
-function setLoading(){
-  document.getElementById('lift').textContent = '...';
-  document.getElementById('fraudred').textContent = '...';
-  document.getElementById('fpred').textContent = '...';
-  document.getElementById('exposure').textContent = '...';
-  document.getElementById('profile').textContent = 'Calculando tensores biológicos...';
-  document.getElementById('baseline').textContent = 'Calculando...';
-  document.getElementById('bio').textContent = 'Calculando...';
-  document.getElementById('improvement').textContent = 'Calculando...';
-}
-
-async function loadScenario(){
-  setLoading();
-  const industry = document.getElementById('industry').value;
-  const size = document.getElementById('size').value;
-  const j = await (await fetch(`/api/scenario?industry=${industry}&client_size=${size}`)).json();
-  paint(j);
-}
-
-async function saveScenario(){
-  setLoading();
-  const industry = document.getElementById('industry').value;
-  const size = document.getElementById('size').value;
-  const j = await (await fetch(`/api/load-sample?industry=${industry}&client_size=${size}`, {headers: authHeaders()})).json();
-  paint(j);
-}
-
-async function openRun(id){
-  const j = await (await fetch('/api/run/' + id, {headers: authHeaders()})).json();
-  paint(j);
-  document.getElementById('case_run_id').value = id;
-}
-
-async function createCase(){
-  const runId = document.getElementById('case_run_id').value;
-  const title = document.getElementById('case_title').value;
-  const j = await (await fetch(`/api/cases/create?run_id=${runId}&case_title=${encodeURIComponent(title)}`, {method:'POST', headers: authHeaders()})).json();
-  document.getElementById('caseOut').textContent = JSON.stringify(j, null, 2);
-}
-
-async function autoLoadDemo() {
-  await getToken();
-  const res = await fetch('/api/run/1', {headers: authHeaders()});
-  if (res.ok) {
-    const j = await res.json();
-    paint(j);
-    document.getElementById('case_run_id').value = 1;
-  } else {
-    await saveScenario();
-    await createCase();
-    setTimeout(() => location.reload(), 1500);
+  if (j.topology) {
+    renderGraph(j.topology);
   }
 }
-
-autoLoadDemo();
+function paintHistorical(j){
+  document.getElementById('historicalPanel').innerHTML = `
+    <div><strong>${j.scenario.title}</strong></div>
+    <div class="small" style="margin:8px 0 12px 0">${j.conclusion}</div>
+    ${(j.windows || []).map(w => `
+      <div class="card" style="margin:10px 0;padding:12px;background:#0a1326">
+        <div><strong>${w.phase}</strong> · ${w.period}</div>
+        <div class="small" style="margin:6px 0 8px 0">${w.narrative}</div>
+        <div class="bar"><div style="width:${Math.min(100,w.SCR || 0)}%"></div></div>
+        <pre>${JSON.stringify(w, null, 2)}</pre>
+      </div>`).join('')}
+  `;
+}
+async function loadProfile(){
+  const profile = document.getElementById('profileSelect').value;
+  const j = await (await fetch('/api/profile/' + profile)).json();
+  paintProfile(j);
+}
+async function loadHistorical(){
+  const hist = document.getElementById('historicalSelect').value;
+  const j = await (await fetch('/api/historical/' + hist)).json();
+  paintHistorical(j);
+}
+loadProfile();
 </script>
 </body>
 </html>
