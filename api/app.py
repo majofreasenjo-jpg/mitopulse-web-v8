@@ -11,6 +11,7 @@ from core.fraud_evolution_engine import FraudEvolutionEngine
 from core.guardian_swarm import GuardianSwarm
 from core.relational_dark_matter import RelationalDarkMatter
 from core.relational_wave_engine import RelationalWaveEngine
+from core.rfdc import RelationalFieldDynamicsCore
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 app = FastAPI(title="MitoPulse Final Modular Prototype v13")
@@ -124,6 +125,34 @@ def systemic_run():
         'dataset': str(target),
         'metrics': metrics
     }
+
+@app.get('/api/rfdc/run')
+def rfdc_run():
+    import pandas as pd
+    from pathlib import Path
+
+    candidate_dirs = [
+        Path('live_output/yahoo_live_market'),
+        Path('live_output/binance_live_crypto'),
+        Path('data/afp_systemic_realistic_v1'),
+        Path('data/bank_medium_realistic_v1'),
+    ]
+    target = next((p for p in candidate_dirs if p.exists()), None)
+    if target is None:
+        return {'error': 'no dataset found in live_output or mapped data folders'}
+
+    events_fp = target / 'events.csv'
+    signals_fp = target / 'signals.csv'
+    if not events_fp.exists():
+        return {'error': f'events.csv not found in {target}'}
+
+    events = pd.read_csv(events_fp)
+    signals = pd.read_csv(signals_fp) if signals_fp.exists() else pd.DataFrame(columns=['entity_id','signal_type','severity','source','timestamp'])
+
+    engine = RelationalFieldDynamicsCore()
+    result = engine.run(events, signals)
+    result['dataset'] = str(target)
+    return result
 
 @app.get('/api/v18/run')
 def v18_run():
