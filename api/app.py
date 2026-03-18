@@ -10,9 +10,11 @@ from core.systemic_collapse_predictor import SystemicCollapsePredictor
 from core.rfdc import RelationalFieldDynamicsCore
 from core.rfdc_visualizer import build_graph_payload, build_demo_story
 from core.sandbox_action_executor import SandboxActionExecutor
+from core.policy_service import load_policies, save_policies
+from core.playback_graph_builder import build_playback_frames
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-app = FastAPI(title="MitoPulse Final Modular Prototype v26")
+app = FastAPI(title="MitoPulse Final Modular Prototype v27")
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 @app.get("/", response_class=HTMLResponse)
@@ -219,12 +221,14 @@ def demo_run(demo_id: str):
 
 
 
+
 @app.get('/api/simulation/playback')
 def simulation_playback():
     import pandas as pd
     from pathlib import Path
     from core.simulation_playback import SimulationPlayback
     from core.rfdc import RelationalFieldDynamicsCore
+    from core.rfdc_visualizer import build_graph_payload
 
     candidate_dirs = [
         Path('live_output/yahoo_live_market'),
@@ -260,15 +264,19 @@ def simulation_playback():
 
     engine = SimulationPlayback()
     steps = engine.run_steps(events, rfdc_result=rfdc_result)
+    graph = build_graph_payload(events, rfdc_result)
+    frames = build_playback_frames(graph, steps)
 
     return {
         "dataset": str(target),
         "client_type": client_type,
         "steps": steps,
+        "frames": frames,
         "decision": rfdc_result.get("decision", {}),
         "summary": rfdc_result.get("summary", {}),
         "metrics": rfdc_result.get("metrics", {})
     }
+
 
 
 
@@ -281,3 +289,12 @@ def action_sandbox(entity_id: str, action: str):
 def action_sandbox_state():
     executor = SandboxActionExecutor()
     return executor._load()
+
+
+@app.get('/api/policies')
+def policies_get():
+    return load_policies()
+
+@app.post('/api/policies')
+def policies_save(payload: dict):
+    return save_policies(payload)

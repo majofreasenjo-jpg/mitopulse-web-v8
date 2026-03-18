@@ -2,67 +2,48 @@
 <html>
 <head>
 <meta charset="utf-8">
-<!-- Cache busting deployment V26 -->
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>MitoPulse Final Modular Prototype v26</title>
+<title>MitoPulse Final Modular Prototype v27</title>
 <style>
 :root{
-  --bg:#07111f;--card:#101d34;--line:#223454;--text:#eef4ff;--muted:#9bb0d1;
+  --bg:#08101f;--bg2:#0d1830;--card:#13223c;--line:#29466f;--text:#eaf2ff;--muted:#9eb6d8;
   --identity:#3B82F6;--interaction:#2563EB;--propagation:#38BDF8;--collective:#22C55E;--physics:#8B5CF6;
   --dynamics:#F97316;--learning:#EAB308;--defense:#EF4444;--simulation:#94A3B8;--future:#FFFFFF;
 }
-*{box-sizing:border-box} body{background:linear-gradient(180deg,#07111f,#091a2f);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif;margin:0;}
-.top{padding:18px 26px;background:rgba(10,19,35,.96);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10;box-shadow:0 10px 30px rgba(0,0,0,.25);}
-.wrap{padding:22px;max-width:1900px;margin:0 auto}
-.card{background:linear-gradient(180deg,rgba(16,29,52,.96),rgba(10,19,35,.96));border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 10px 18px rgba(0,0,0,.16)}
+*{box-sizing:border-box} body{font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,var(--bg),#060d18);color:var(--text);margin:0}
+.top{padding:18px 26px;background:var(--bg2);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.wrap{padding:22px;max-width:1900px;margin:0 auto}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 10px 18px rgba(0,0,0,.16)}
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
-select,input{background:#0d182b;color:var(--text);border:1px solid #31496f;border-radius:10px;padding:10px 12px}
-button {
-  cursor: pointer;
-  background:linear-gradient(180deg,#1b3b68,#163154);
-  color: #fff;
-  border: 1px solid #35558d;
-  border-radius: 12px;
-  padding: 10px 16px;
-  font-weight: 600;
-  box-shadow: 0 4px 0 #060b18, 0 5px 10px rgba(0,0,0,0.3);
-  transition: all 0.1s ease;
-  position: relative;
-  top: 0;
-}
-button:active {
-  top: 4px;
-  box-shadow: 0 0 0 #060b18, 0 2px 4px rgba(0,0,0,0.3);
-}
-button:hover {
-  background: linear-gradient(180deg, #24406e, #0e1e40);
-}
-.glass-btn {
-  box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 5px 10px rgba(0,0,0,0.3) !important;
-}
-.glass-btn:active {
-  box-shadow: 0 0 0 rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3) !important;
-}
-pre{white-space:pre-wrap;background:#08111f;border:1px solid #1d2e4d;border-radius:14px;padding:12px;overflow:auto;max-height:420px;color:#d6e4ff;}
-.small{font-size:12px;color:var(--muted)}
-.mito-kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:8px 0 4px 0;grid-column:span 12;}
-.mito-kpi{background:linear-gradient(180deg,#10213c,#0a1425);border:1px solid #284067;border-radius:14px;padding:14px}
-.mito-kpi .label{font-size:12px;color:var(--muted);margin-bottom:8px}
-.mito-kpi .value{font-size:28px;font-weight:800}
-.mito-badge{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid #34517f;color:#dbe8ff;background:#10203a;margin-right:6px}
-.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #32557f;background:#0a1326;margin:0 8px 8px 0;font-size:12px}
-.legend{display:flex;flex-wrap:wrap;gap:10px}.legend .item{display:flex;align-items:center;gap:6px;font-size:12px}
+select,button,input{background:#0b1630;color:#fff;border:1px solid #2b4a73;border-radius:12px;padding:10px 12px} button{cursor:pointer}
+pre{white-space:pre-wrap;background:#0a1326;border:1px solid #274164;border-radius:14px;padding:12px;overflow:auto;max-height:420px}.small{font-size:12px;color:var(--muted)}
+.metric{background:#0a1326;border:1px solid #284368;border-radius:14px;padding:14px}.metric .label{font-size:12px;color:var(--muted)}.metric .value{font-size:32px;font-weight:bold;margin-top:4px}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #32557f;background:#0a1326;margin:0 8px 8px 0;font-size:12px}.legend{display:flex;flex-wrap:wrap;gap:10px}.legend .item{display:flex;align-items:center;gap:6px;font-size:12px}
 .dot{width:12px;height:12px;border-radius:50%}.layerbar{display:grid;grid-template-columns:repeat(9,1fr);gap:8px}.layerchip{padding:10px;border-radius:12px;text-align:center;font-size:12px;font-weight:bold;color:#fff}
 svg{width:100%;height:520px;background:#08101f;border-radius:14px;border:1px solid var(--line)} .timeline-step{padding:10px 12px;border-left:3px solid var(--propagation);background:#09162c;border-radius:8px;margin:10px 0}
 code{display:block;background:#09162c;padding:8px 10px;border-radius:10px;margin:8px 0;white-space:pre-wrap}
-@media(max-width:1250px){.c3,.c4,.c5,.c6,.c7,.c8,.c12,.mito-kpi-grid{grid-column:span 12}.mito-kpi-grid{grid-template-columns:repeat(1,minmax(0,1fr))}.layerbar{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:1250px){.c3,.c4,.c5,.c6,.c7,.c8,.c12{grid-column:span 12}.layerbar{grid-template-columns:repeat(3,1fr)}}
 </style>
+
+    <style>
+      :root{
+        --bg:#07111f;--card:#101d34;--line:#223454;--text:#eef4ff;--muted:#9bb0d1;
+      }
+      body{background:linear-gradient(180deg,#07111f,#091a2f);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}
+      .card{background:linear-gradient(180deg,rgba(16,29,52,.96),rgba(10,19,35,.96));border:1px solid var(--line);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+      button{background:linear-gradient(180deg,#1b3b68,#163154);color:var(--text);border:1px solid #35558d;border-radius:12px;padding:10px 14px;font-weight:600}
+      select,input{background:#0d182b;color:var(--text);border:1px solid #31496f;border-radius:10px;padding:10px}
+      pre{background:#08111f;border:1px solid #1d2e4d;border-radius:12px;padding:12px;overflow:auto;max-height:360px;color:#d6e4ff}
+      .mito-kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:8px 0 4px 0}
+      .mito-kpi{background:linear-gradient(180deg,#10213c,#0a1425);border:1px solid #284067;border-radius:14px;padding:14px}
+      .mito-kpi .label{font-size:12px;color:var(--muted);margin-bottom:8px}
+      .mito-kpi .value{font-size:28px;font-weight:800}
+      .mito-badge{display:inline-block;font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid #34517f;color:#dbe8ff;background:#10203a;margin-right:6px}
+      .hero{padding:8px 0 2px 0}.hero .subtitle{color:var(--muted);margin-top:-4px;margin-bottom:8px}.hero-rail{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px 0}.small{color:var(--muted)}
+    </style>
+    
 </head>
 <body>
 <div class="top">
-  <h1 style="margin:0">MitoPulse Final Modular Prototype v23</h1>
+  <h1 style="margin:0">MitoPulse Final Modular Prototype v13</h1>
   <div class="small">Sistema vivo modular · demos killer · datasets por industria/tamaño · crisis históricas · grafo con colores oficiales</div>
 </div>
 <div class="wrap">
@@ -71,53 +52,12 @@ code{display:block;background:#09162c;padding:8px 10px;border-radius:10px;margin
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <select id="profileSelect">{% for p in profiles %}<option value="{{p.name}}">{{p.name}} · {{p.industry}} · {{p.size}} · {{p.mode}}</option>{% endfor %}</select>
       <button onclick="loadProfile()">Cargar perfil modular</button>
-      <select id="historicalSelect">
-          <option value="subprime_pre_12m">Subprime Pre-12M</option>
-          <option value="asian_crisis_1997">Asian Crisis 1997</option>
-          <option value="ftx_collapse">FTX Collapse</option>
-      </select>
+      <select id="historicalSelect">{% for h in historical %}<option value="{{h.name}}">{{h.title}}</option>{% endfor %}</select>
       <button onclick="loadHistorical()">Cargar crisis histórica</button>
       <select id="demoSelect">{% for d in demos %}<option value="{{d.name}}">{{d.title}}</option>{% endfor %}</select>
       <button onclick="loadDemo()">Cargar Demo Killer</button>
       <input type="file" id="fileInput" />
       <button onclick="uploadFile()">Subir dataset</button>
-    </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)">
-      <div class="layerchip" style="background:var(--interaction); margin:0; padding:4px 8px; border-radius:6px; font-weight:bold;">V16 Live Connectors:</div>
-      <select id="liveSelect"><option value="">Cargando conectores VIVO...</option></select>
-      <button onclick="runLiveConnector()" style="background:var(--interaction); color:#fff; border-color:var(--identity)">Ejecutar Motor en Vivo</button>
-      <div id="liveInfo" class="small" style="color:var(--collective); font-family:monospace; margin-left:10px;"></div>
-    </div>
-    <div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)">
-      <div style="font-size:12px; font-weight:bold; margin-bottom:8px; color:var(--muted)">V17 Detection & Systemic Collapse:</div>
-      <button class="glass-btn btn-action" onclick="runDetection()" style="width:100%; margin-bottom:8px; background:#ef4444; color:#fff; border-color:#dc2626">Run Fraud Detection Core</button>
-      <button class="glass-btn btn-action" onclick="runSystemic()" style="width:100%; background:#f97316; color:#fff; border-color:#ea580c">Run Systemic Collapse Predictor</button>
-      <div id="detectionOutput" class="small" style="margin-top:12px; color:var(--collective); font-family:monospace; margin-left:10px; white-space:pre-wrap"></div>
-    </div>
-    <div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)">
-      <div style="font-size:12px; font-weight:bold; margin-bottom:8px; color:var(--muted)">V18 Full Modules (Waves & Dark Matter):</div>
-      <button class="glass-btn btn-action" onclick="runV18Modules()" style="width:100%; background:#8b5cf6; color:#fff; border-color:#7c3aed">Execute V18 Nexus Engines</button>
-      <div id="v18Output" class="small" style="margin-top:12px; color:#a78bfa; font-family:monospace; margin-left:10px; white-space:pre-wrap"></div>
-    </div>
-    <div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)">
-      <div style="font-size:12px; font-weight:bold; margin-bottom:8px; color:var(--muted)">V19 RFDC Studio (Unified Dynamics Core):</div>
-      <button class="glass-btn btn-action" onclick="runRFDC()" style="width:100%; background:linear-gradient(135deg, #10b981, #059669); color:#fff; border-color:#047857">Execute RFDC Framework</button>
-      <div id="rfdcOutput" class="small" style="margin-top:12px; color:#34d399; font-family:monospace; margin-left:10px; white-space:pre-wrap; max-height:220px; overflow:auto;"></div>
-    </div>
-    <div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)">
-      <div style="font-size:12px; font-weight:bold; margin-bottom:8px; color:var(--muted)">V20 RFDC Graph & Demo Killers Studio:</div>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <button class="glass-btn btn-action" onclick="loadRFDCGraph()" style="flex:1; background:#3b82f6; color:#fff; border-color:#2563eb; padding:8px; font-size:12px; border-radius:8px;">Draw Graph</button>
-        <button class="glass-btn btn-action" onclick="runDemoKiller('invisible_network')" style="flex:1; background:#6366f1; color:#fff; border-color:#4f46e5; padding:8px; font-size:12px; border-radius:8px;">Network</button>
-        <button class="glass-btn btn-action" onclick="runDemoKiller('invisible_storm')" style="flex:1; background:#8b5cf6; color:#fff; border-color:#7c3aed; padding:8px; font-size:12px; border-radius:8px;">Storm</button>
-        <button class="glass-btn btn-action" onclick="runDemoKiller('coming_collapse')" style="flex:1; background:#ec4899; color:#fff; border-color:#db2777; padding:8px; font-size:12px; border-radius:8px;">Collapse</button>
-      </div>
-      <pre id="graphInfo" class="small" style="margin-top:8px; color:#60a5fa; font-family:monospace; white-space:pre-wrap; max-height:100px; overflow:auto;"></pre>
-      <pre id="demoOutput" class="small" style="margin-top:4px; color:#d8b4fe; font-family:monospace; white-space:pre-wrap; max-height:220px; overflow:auto;"></pre>
-      <div style="margin-top:12px; background:#08101f; border:1px solid var(--line); border-radius:14px; padding:10px;">
-        <div class="small" style="color:var(--muted); text-align:center; margin-bottom:8px; font-weight:bold;">RFDC Topology Visualizer</div>
-        <svg id="rfdcGraph" viewBox="0 0 900 450" style="width:100%; height:320px; background:#0a1326; border-radius:10px;"></svg>
-      </div>
     </div>
   </div>
 
@@ -138,12 +78,10 @@ code{display:block;background:#09162c;padding:8px 10px;border-radius:10px;margin
   </div>
 
   <div class="grid">
-    <div class="mito-kpi-grid">
-      <div class="mito-kpi"><div class="label">Network Health Index</div><div class="value" id="kpiNHI">-</div></div>
-      <div class="mito-kpi"><div class="label">Threat Pressure Index</div><div class="value" id="kpiTPI">-</div></div>
-      <div class="mito-kpi"><div class="label">Systemic Collapse Radar</div><div class="value" id="kpiSCR">-</div></div>
-      <div class="mito-kpi"><div class="label">Mass Distortion Index (avg)</div><div class="value" id="kpiMDI">-</div></div>
-    </div>
+    <div class="card c3 metric"><div class="label">Network Health Index</div><div class="value" id="nhi">-</div></div>
+    <div class="card c3 metric"><div class="label">Threat Pressure Index</div><div class="value" id="tpi">-</div></div>
+    <div class="card c3 metric"><div class="label">Systemic Collapse Radar</div><div class="value" id="scr">-</div></div>
+    <div class="card c3 metric"><div class="label">Mass Distortion Index (avg)</div><div class="value" id="mdi">-</div></div>
 
     <div class="card c8">
       <h2>3. Grafo vivo del ecosistema</h2>
@@ -195,77 +133,147 @@ code{display:block;background:#09162c;padding:8px 10px;border-radius:10px;margin
       <h2>12. Demo Studio</h2>
       <pre id="demoInfo">Selecciona una Demo Killer para ver actos, focos y KPIs objetivo.</pre>
     </div>
-
-    <div class="card c12">
-      <h2>13. Executive Summary & Actions (V26)</h2>
-      <button class="glass-btn btn-action" onclick="runExecutiveSummary()" style="background:#f59e0b; color:#111827; border-color:#d97706; padding:8px 16px; font-weight:bold; margin-bottom:12px;">Generar Resumen Ejecutivo</button>
-      <pre id="summaryOutput" class="small" style="font-family:monospace; color:#fcd34d; white-space:pre-wrap; max-height:300px; overflow:auto;">[Resumen Pendiente]</pre>
-    </div>
-
-    <div class="card c12">
-      <h2>14. Simulation Playback Timeline (V26)</h2>
-      <div style="display:flex; gap:12px; align-items:center; margin-bottom:16px;">
-        <button class="glass-btn btn-action" onclick="loadPlayback()" style="background:#10b981; color:#fff; border-color:#059669; padding:8px 16px;">Cargar Simulación D3</button>
-        <button class="glass-btn btn-action" onclick="playPlayback()" style="background:#3b82f6; color:#fff; border-color:#2563eb; padding:8px 16px;">▶ Play</button>
-        <button class="glass-btn btn-action" onclick="pausePlayback()" style="background:#64748b; color:#fff; border-color:#475569; padding:8px 16px;">⏸ Pause</button>
-        <input type="range" id="playbackRange" min="1" max="1" value="1" style="flex:1;" oninput="renderPlaybackStep(this.value)" />
-      </div>
-      <div style="background:#0a1326; border:1px solid var(--line); border-radius:14px; padding:10px;">
-        <svg id="playbackGraph" viewBox="0 0 900 450" style="width:100%; height:320px; background:#040b16; border-radius:10px;"></svg>
-      </div>
-      <pre id="playbackOutput" class="small" style="display:none;"></pre>
-    </div>
   </div>
 </div>
-<script src="https://d3js.org/d3.v7.min.js">function roleColor(role){
-  if(role === 'hidden_cluster') return palette.hidden || '#7b61ff';
-  if(role === 'guardian_validated') return palette.guardian || '#00bbf9';
-  if(role === 'alert') return palette.risk || '#ef476f';
-  return palette.neutral || '#adb5bd';
-}
-
-let liveWaveTimer = null;
-function animateWaveRings(){
-  if(liveWaveTimer){ clearInterval(liveWaveTimer); }
-  let tick = 0;
-  liveWaveTimer = setInterval(() => {
-    const rings = document.querySelectorAll('#rfdcGraph .waveRing');
-    rings.forEach((ring, idx) => {
-      const base = 24 + (idx % 3) * 18;
-      ring.setAttribute('r', String(base + (tick % 12)));
-      ring.setAttribute('stroke-opacity', String(Math.max(0.05, 0.25 - ((tick % 12) * 0.015))));
-    });
-    tick += 1;
-  }, 180);
-}
-
-async function runSandboxAction(){
-  const entity = document.getElementById('sandboxEntity').value.trim();
-  const action = document.getElementById('sandboxAction').value;
-  if(!entity){
-    document.getElementById('sandboxOutput').textContent = 'Ingresa un entity id';
-    return;
-  }
-  const res = await fetch('/api/action/sandbox/' + encodeURIComponent(entity) + '/' + encodeURIComponent(action), {method:'POST'});
-  const j = await res.json();
-  document.getElementById('sandboxOutput').textContent = JSON.stringify(j, null, 2);
-}
-
-async function loadSandboxState(){
-  const res = await fetch('/api/action/sandbox/state');
-  const j = await res.json();
-  document.getElementById('sandboxOutput').textContent = JSON.stringify(j, null, 2);
-}
-</script>
 <script>
 function setText(id, value){ document.getElementById(id).textContent = value; }
 function fmt(obj){ return JSON.stringify(obj, null, 2); }
 function badgeList(items){ return (items||[]).map(m => `<span class="badge">${m}</span>`).join(''); }
 function paintLegend(legend){ const el=document.getElementById('graphLegend'); el.innerHTML=''; Object.entries(legend||{}).forEach(([k,v])=>{ el.innerHTML += `<div class="item"><span class="dot" style="background:${v}"></span>${k}</div>`;}); }
 function paintStory(items){ document.getElementById('storyline').innerHTML = (items||[]).map(s => `<div class="timeline-step">${s}</div>`).join(''); }
+function drawGraph(graph){ const svg = document.getElementById('graphSvg'); svg.innerHTML=''; if(!graph || !graph.nodes) return; const W=1100,H=520,cx=W/2,cy=H/2; const nodes=graph.nodes; const edges=graph.edges||[];
+  const pos={}; nodes.forEach((n,i)=>{ const angle=(i/(nodes.length||1))*Math.PI*2; const ring = n.type==='hidden' ? 110 : (n.type==='device' ? 220 : 170 + (i%4)*35); pos[n.id] = {x: cx + Math.cos(angle)*ring, y: cy + Math.sin(angle)*ring}; });
+  edges.forEach(e=>{ const a=pos[e.source], b=pos[e.target]; if(!a||!b) return; const line=document.createElementNS('http://www.w3.org/2000/svg','line'); line.setAttribute('x1',a.x); line.setAttribute('y1',a.y); line.setAttribute('x2',b.x); line.setAttribute('y2',b.y); line.setAttribute('stroke',e.color||'#64748B'); line.setAttribute('stroke-width',String(1+Math.min(4,e.weight||1))); if(e.dashed) line.setAttribute('stroke-dasharray','6 5'); line.setAttribute('opacity','0.75'); svg.appendChild(line); });
+  nodes.forEach(n=>{ const p=pos[n.id]; const g=document.createElementNS('http://www.w3.org/2000/svg','g'); const c=document.createElementNS('http://www.w3.org/2000/svg','circle'); c.setAttribute('cx',p.x); c.setAttribute('cy',p.y); c.setAttribute('r',String(n.size||12)); c.setAttribute('fill',n.color||'#94A3B8'); c.setAttribute('stroke','#fff'); c.setAttribute('stroke-width','1'); const t=document.createElementNS('http://www.w3.org/2000/svg','text'); t.setAttribute('x',p.x); t.setAttribute('y',p.y+4); t.setAttribute('font-size','10'); t.setAttribute('text-anchor','middle'); t.setAttribute('fill','#fff'); t.textContent=n.label; g.appendChild(c); g.appendChild(t); svg.appendChild(g); }); }
+function paintProfile(j){
+  setText('nhi', j.system_indices?.NHI ?? '-'); setText('tpi', j.system_indices?.TPI ?? '-'); setText('scr', j.system_indices?.SCR ?? '-'); setText('mdi', j.technical_metrics?.MDI_avg ?? '-');
+  document.getElementById('modules').innerHTML = badgeList(j.active_modules); setText('dataset', fmt({profile:j.profile, dataset_profile:j.dataset_profile, graph_stats:j.graph_stats, morphogenesis:j.morphogenesis}));
+  setText('nodes', fmt(j.top_nodes)); setText('shadow', fmt({cross_pulse:j.cross_pulse_pairs, shadow_pairs:j.shadow_pairs}));
+  setText('signals', fmt({cross_pulse_pairs:j.cross_pulse_pairs?.slice?.(0,8), wave_amplitude:j.technical_metrics?.wave_amplitude, contagion_rate:j.technical_metrics?.contagion_rate}));
+  setText('physics', fmt({gravity_avg:j.technical_metrics?.gravity_avg, MDI_avg:j.technical_metrics?.MDI_avg, shadow_avg:j.technical_metrics?.shadow_avg}));
+  setText('dynamics', fmt({entropy:j.system_indices?.entropy, criticality:j.system_indices?.criticality, climate_pressure:j.technical_metrics?.climate_pressure, vortex_score:j.technical_metrics?.vortex_score}));
+  setText('runtime', fmt(j.runtime_map));
+  document.getElementById('mathCore').innerHTML = Object.entries(j.math_core||{}).slice(0,10).map(([k,v])=>`<div><strong>${k}</strong><code>${v}</code></div>`).join('');
+  paintStory(j.storyline); drawGraph(j.graph); paintLegend(j.colors?.graph || {});
+  setText('demoInfo','Perfil modular cargado. Usa Demo Killer o crisis histórica para storytelling avanzado.');
+}
+function paintHistorical(j){
+  document.getElementById('historicalPanel').innerHTML = `<div><strong>${j.scenario.title}</strong></div><div class="small" style="margin:8px 0 12px 0">${j.conclusion}</div>${(j.windows||[]).map(w => `<div class="timeline-step"><strong>${w.phase}</strong> · ${w.period}<br>${w.narrative}<br><code>${JSON.stringify(w,null,2)}</code></div>`).join('')}`;
+  setText('demoInfo', `Crisis histórica cargada: ${j.scenario.title}`);
+}
+function paintDemo(j){
+  setText('demoInfo', JSON.stringify({title:j.title, subtitle:j.subtitle, focus:j.focus, acts:j.acts, target_kpis:j.kpis}, null, 2));
+  document.getElementById('historicalPanel').innerHTML = `<div><strong>${j.title}</strong></div><div class="small" style="margin:8px 0 12px 0">${j.subtitle}</div>${(j.acts||[]).map(a => `<div class="timeline-step">${a}</div>`).join('')}`;
+}
+async function loadProfile(){ const v=document.getElementById('profileSelect').value; const j=await (await fetch('/api/profile/'+v)).json(); paintProfile(j); }
+async function loadHistorical(){ const v=document.getElementById('historicalSelect').value; const j=await (await fetch('/api/historical/'+v)).json(); paintHistorical(j); }
+async function loadDemo(){ const v=document.getElementById('demoSelect').value; const j=await (await fetch('/api/demo/'+v)).json(); paintDemo(j); }
+async function uploadFile(){ const file=document.getElementById('fileInput').files[0]; if(!file) return alert('Selecciona un archivo'); const fd = new FormData(); fd.append('file', file); const res=await (await fetch('/api/upload',{method:'POST',body:fd})).json(); alert('Subido: '+res.filename); }
+
+async function loadLiveOptions(){
+  const res = await fetch('/api/live/options');
+  const j = await res.json();
+  const sel = document.getElementById('liveSelect');
+  sel.innerHTML = (j.connectors||[]).map(c => `<option value="${c.config_name}">${c.config_name} · ${c.type} · ${c.source_name}</option>`).join('');
+  document.getElementById('liveInfo').textContent = JSON.stringify(j, null, 2);
+}
+async function runLiveConnector(){
+  const v = document.getElementById('liveSelect').value;
+  if(!v) return;
+  document.getElementById('liveInfo').textContent = 'Ejecutando connector: ' + v + ' ...';
+  const res = await fetch('/api/live/run/' + v, {method:'POST'});
+  const j = await res.json();
+  document.getElementById('liveInfo').textContent = JSON.stringify(j, null, 2);
+}
+
+
+async function runDetection(){
+  const res = await fetch('/api/detection/run');
+  const j = await res.json();
+  document.getElementById('detectionOutput').textContent = JSON.stringify(j, null, 2);
+}
+
+
+function drawRFDCGraph(payload){
+  const svg = document.getElementById('rfdcGraph');
+  if(!svg || !payload || !payload.nodes){ return; }
+  svg.innerHTML = '';
+  const nodes = payload.nodes.slice(0, 18);
+  const links = (payload.links || []).slice(0, 40);
+  const positions = [
+    [90,90],[220,70],[360,90],[500,70],[640,90],[780,80],
+    [120,220],[250,200],[390,230],[520,210],[660,220],[800,210],
+    [90,340],[240,330],[400,340],[560,330],[720,340],[860,330]
+  ];
+  const palette = payload.palette || {};
+  function roleColor(role){
+    if(role === 'hidden_cluster') return palette.hidden || '#7b61ff';
+    if(role === 'guardian_validated') return palette.guardian || '#00bbf9';
+    if(role === 'alert') return palette.risk || '#ef476f';
+    return palette.neutral || '#adb5bd';
+  }
+  function posFor(id){
+    let idx = nodes.findIndex(n => n.id === id);
+    if(idx < 0) idx = 0;
+    return positions[idx % positions.length];
+  }
+
+  links.forEach(l => {
+    const [x1,y1] = posFor(String(l.source));
+    const [x2,y2] = posFor(String(l.target));
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+    line.setAttribute('stroke', l.inferred ? '#7b61ff' : '#4cc9f0');
+    line.setAttribute('stroke-width', l.inferred ? '2' : '1.5');
+    if(l.inferred) line.setAttribute('stroke-dasharray', '6,4');
+    svg.appendChild(line);
+  });
+
+  nodes.forEach((n, i) => {
+    const [x,y] = positions[i % positions.length];
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+    // wave halo
+    const halo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    halo.setAttribute('cx', x); halo.setAttribute('cy', y);
+    halo.setAttribute('r', 28);
+    halo.setAttribute('fill', 'none');
+    halo.setAttribute('stroke', '#4cc9f0');
+    halo.setAttribute('stroke-opacity', '0.18');
+    halo.setAttribute('stroke-width', '8');
+    group.appendChild(halo);
+
+    // node
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', x); c.setAttribute('cy', y);
+    c.setAttribute('r', 18 + Math.min(10, Number(n.score || 0)));
+    c.setAttribute('fill', roleColor(n.role));
+    c.setAttribute('opacity', '0.95');
+    group.appendChild(c);
+
+    const tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    tx.setAttribute('x', x);
+    tx.setAttribute('y', y + 4);
+    tx.setAttribute('text-anchor', 'middle');
+    tx.setAttribute('font-size', '10');
+    tx.setAttribute('fill', '#ffffff');
+    tx.textContent = String(n.label).slice(0,10);
+    group.appendChild(tx);
+
+    svg.appendChild(group);
+  });
+}
+
+async function loadRFDCGraph(){
+  const res = await fetch('/api/rfdc/graph');
+  const j = await res.json();
+  document.getElementById('graphInfo').textContent = JSON.stringify(j, null, 2);
+  drawRFDCGraph(j);
+}
+
 
 let playbackData = [];
-let playbackMeta = {};
 let playbackTimer = null;
 
 async function runExecutiveSummary(){
@@ -275,14 +283,177 @@ async function runExecutiveSummary(){
     summary: j.summary,
     decision: j.decision
   }, null, 2);
-  if (j.metrics){
-    const m = j.metrics;
+  if (j.summary && j.summary.key_metrics){
+    const m = j.summary.key_metrics;
+    const nhi = document.getElementById('kpiNHI'); if (nhi) nhi.textContent = m.NHI;
+    const tpi = document.getElementById('kpiTPI'); if (tpi) tpi.textContent = m.TPI;
+    const scr = document.getElementById('kpiSCR'); if (scr) scr.textContent = m.SCR;
+    const mdi = document.getElementById('kpiMDI'); if (mdi) mdi.textContent = m.MDI;
+  }
+}
+
+async function loadPlayback(){
+  const res = await fetch('/api/simulation/playback');
+  const j = await res.json();
+  playbackData = j.steps || [];
+  const range = document.getElementById('playbackRange');
+  range.max = Math.max(1, playbackData.length);
+  range.value = 1;
+  document.getElementById('playbackOutput').textContent = JSON.stringify(j, null, 2);
+  renderPlaybackStep(1);
+}
+
+function drawPlaybackFrame(stepObj){
+  const svg = document.getElementById('playbackGraph');
+  if (!svg || !stepObj){ return; }
+  svg.innerHTML = '';
+
+  const phaseColor = stepObj.phase === 'emergence' ? '#ffd166' : (stepObj.phase === 'propagation' ? '#00bbf9' : '#ef476f');
+
+  const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  title.setAttribute('x', 30); title.setAttribute('y', 36);
+  title.setAttribute('fill', '#ffffff'); title.setAttribute('font-size', '20');
+  title.textContent = `Step ${stepObj.step} · ${stepObj.phase}`;
+  svg.appendChild(title);
+
+  const subtitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  subtitle.setAttribute('x', 30); subtitle.setAttribute('y', 62);
+  subtitle.setAttribute('fill', '#9bb0d1'); subtitle.setAttribute('font-size', '12');
+  subtitle.textContent = `${stepObj.timestamp} · events=${stepObj.events_processed} · active_nodes=${stepObj.active_nodes} · cumulative_amount=${stepObj.cumulative_amount}`;
+  svg.appendChild(subtitle);
+
+  const centerX = 460, centerY = 220;
+  const nodeCount = Math.max(4, Math.min(18, stepObj.active_nodes || 4));
+  const radius = Math.min(150, 30 + (stepObj.events_processed || 1) * 2.5);
+
+  for (let i = 0; i < nodeCount; i++){
+    const angle = (Math.PI * 2 * i) / nodeCount;
+    const x = centerX + Math.cos(angle) * radius;
+    const y = centerY + Math.sin(angle) * radius;
+
+    const halo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    halo.setAttribute('cx', x); halo.setAttribute('cy', y);
+    halo.setAttribute('r', 24 + (stepObj.step % 5));
+    halo.setAttribute('fill', 'none');
+    halo.setAttribute('stroke', '#4cc9f0');
+    halo.setAttribute('stroke-opacity', '0.12');
+    halo.setAttribute('stroke-width', '8');
+    svg.appendChild(halo);
+
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', x); c.setAttribute('cy', y);
+    c.setAttribute('r', 12 + Math.min(10, stepObj.step / 5));
+    c.setAttribute('fill', phaseColor);
+    c.setAttribute('opacity', '0.95');
+    svg.appendChild(c);
+  }
+
+  const pressureBarBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  pressureBarBg.setAttribute('x', 30); pressureBarBg.setAttribute('y', 370);
+  pressureBarBg.setAttribute('width', 860); pressureBarBg.setAttribute('height', 18);
+  pressureBarBg.setAttribute('rx', 9); pressureBarBg.setAttribute('fill', '#13233f');
+  svg.appendChild(pressureBarBg);
+
+  const width = Math.min(860, (stepObj.events_processed || 1) * 12);
+  const pressureBar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  pressureBar.setAttribute('x', 30); pressureBar.setAttribute('y', 370);
+  pressureBar.setAttribute('width', width); pressureBar.setAttribute('height', 18);
+  pressureBar.setAttribute('rx', 9); pressureBar.setAttribute('fill', phaseColor);
+  svg.appendChild(pressureBar);
+
+  if (stepObj.phase === 'criticality'){
+    const alert = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    alert.setAttribute('x', 660); alert.setAttribute('y', 115);
+    alert.setAttribute('fill', '#ef476f'); alert.setAttribute('font-size', '18');
+    alert.textContent = 'Action threshold reached';
+    svg.appendChild(alert);
+  }
+}
+
+function renderPlaybackStep(step){
+  if (!playbackData.length) return;
+  const idx = Math.max(1, Math.min(step, playbackData.length)) - 1;
+  drawPlaybackFrame(playbackData[idx]);
+}
+
+function playPlayback(){
+  if (!playbackData.length) return;
+  pausePlayback();
+  let idx = parseInt(document.getElementById('playbackRange').value || '1', 10);
+  playbackTimer = setInterval(() => {
+    if (idx > playbackData.length){
+      pausePlayback();
+      return;
+    }
+    document.getElementById('playbackRange').value = idx;
+    renderPlaybackStep(idx);
+    idx += 1;
+  }, 450);
+}
+
+function pausePlayback(){
+  if (playbackTimer){
+    clearInterval(playbackTimer);
+    playbackTimer = null;
+  }
+}
+
+async function runDemoKiller(demoId){
+  const res = await fetch('/api/demo/run/' + demoId);
+  const j = await res.json();
+  document.getElementById('demoOutput').textContent = JSON.stringify(j.story || j, null, 2);
+  if(j.graph){ drawRFDCGraph(j.graph); }
+  if(j.result && j.result.metrics){
+    const m = j.result.metrics;
     const nhi = document.getElementById('kpiNHI'); if (nhi) nhi.textContent = m.nhi;
     const tpi = document.getElementById('kpiTPI'); if (tpi) tpi.textContent = m.tpi;
     const scr = document.getElementById('kpiSCR'); if (scr) scr.textContent = m.scr;
     const mdi = document.getElementById('kpiMDI'); if (mdi) mdi.textContent = m.mdi;
   }
 }
+
+async function runRFDC(){
+  const res = await fetch('/api/rfdc/run');
+  const j = await res.json();
+  document.getElementById('rfdcOutput').textContent = JSON.stringify(j, null, 2);
+  // Optional KPI sync if payload available
+  if (j.metrics){
+    const nhi = document.getElementById('kpiNHI'); if (nhi) nhi.textContent = j.metrics.nhi;
+    const tpi = document.getElementById('kpiTPI'); if (tpi) tpi.textContent = j.metrics.tpi;
+    const scr = document.getElementById('kpiSCR'); if (scr) scr.textContent = j.metrics.scr;
+    const mdi = document.getElementById('kpiMDI'); if (mdi) mdi.textContent = j.metrics.mdi;
+  }
+}
+
+async function runSystemic(){
+  const res = await fetch('/api/systemic/run');
+  const j = await res.json();
+  document.getElementById('detectionOutput').textContent = JSON.stringify(j, null, 2);
+}
+
+loadLiveOptions();
+loadProfile();
+</script>
+<script>
+async function runExecutiveSummary(){
+  const res = await fetch('/api/rfdc/run');
+  const j = await res.json();
+  document.getElementById('summaryOutput').textContent = JSON.stringify({
+    summary: j.summary,
+    decision: j.decision
+  }, null, 2);
+  if (j.summary && j.summary.key_metrics){
+    const m = j.summary.key_metrics;
+    const nhi = document.getElementById('kpiNHI'); if (nhi) nhi.textContent = m.NHI;
+    const tpi = document.getElementById('kpiTPI'); if (tpi) tpi.textContent = m.TPI;
+    const scr = document.getElementById('kpiSCR'); if (scr) scr.textContent = m.SCR;
+    const mdi = document.getElementById('kpiMDI'); if (mdi) mdi.textContent = m.MDI;
+  }
+}
+
+let playbackData = [];
+let playbackMeta = {};
+let playbackTimer = null;
 
 async function loadPlayback(){
   const res = await fetch('/api/simulation/playback');
@@ -425,19 +596,17 @@ function pausePlayback(){
     playbackTimer = null;
   }
 }
+</script>
+<script>
+let liveWaveTimer = null;
 
-let simulation;
-function drawGraph(graph){
-  const svg = d3.select("#graphSvg");
-  svg.selectAll("*").remove();
-  if(!graph || !graph.nodes || graph.nodes.length === 0) return;
-
-  const width = svg.node().clientWidth || 1100;
-  const height = svg.node().clientHeight || 520;
-
-  const g = svg.append("g");
-  const zoom = d3.zoom().on("zoom", (e) => g.attr("transform", e.transform));
-  svg.call(zoom);
+function drawRFDCGraph(payload){
+  const svg = document.getElementById('rfdcGraph');
+  if(!svg || !payload || !payload.nodes){ return; }
+  svg.innerHTML = '';
+  const nodes = payload.nodes || [];
+  const links = payload.links || [];
+  const palette = payload.palette || {};
 
   // links
   links.forEach(l => {
@@ -451,7 +620,7 @@ function drawGraph(graph){
     line.setAttribute('stroke-width', l.inferred ? '2' : '1.5');
     if(l.inferred) line.setAttribute('stroke-dasharray', '6,4');
     line.setAttribute('opacity', l.inferred ? '0.85' : '0.5');
-    g.node().appendChild(line);
+    svg.appendChild(line);
   });
 
   // wave rings
@@ -465,7 +634,7 @@ function drawGraph(graph){
       ring.setAttribute('stroke-opacity', String(Math.max(0.08, 0.28 - r*0.06)));
       ring.setAttribute('stroke-width', '4');
       ring.setAttribute('class', 'waveRing');
-      g.node().appendChild(ring);
+      svg.appendChild(ring);
     }
   });
 
@@ -485,14 +654,14 @@ function drawGraph(graph){
     halo.setAttribute('stroke', '#4cc9f0');
     halo.setAttribute('stroke-opacity', '0.10');
     halo.setAttribute('stroke-width', '7');
-    g.node().appendChild(halo);
+    svg.appendChild(halo);
 
     const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     c.setAttribute('cx', n.x); c.setAttribute('cy', n.y);
     c.setAttribute('r', 10 + Math.min(12, Number(n.score || 0)));
     c.setAttribute('fill', roleColor(n.role));
     c.setAttribute('opacity', '0.96');
-    g.node().appendChild(c);
+    svg.appendChild(c);
 
     const tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     tx.setAttribute('x', n.x); tx.setAttribute('y', n.y + 4);
@@ -500,7 +669,7 @@ function drawGraph(graph){
     tx.setAttribute('font-size', '10');
     tx.setAttribute('fill', '#ffffff');
     tx.textContent = String(n.label).slice(0,10);
-    g.node().appendChild(tx);
+    svg.appendChild(tx);
   });
 
   // caption
@@ -514,7 +683,6 @@ function drawGraph(graph){
   animateWaveRings();
 }
 
-let liveWaveTimer = null;
 function animateWaveRings(){
   if(liveWaveTimer){ clearInterval(liveWaveTimer); }
   let tick = 0;
@@ -529,214 +697,17 @@ function animateWaveRings(){
   }, 180);
 }
 
-async function runSandboxAction(){
-  const entity = document.getElementById('sandboxEntity').value.trim();
-  const action = document.getElementById('sandboxAction').value;
-  if(!entity){
-    document.getElementById('sandboxOutput').textContent = 'Ingresa un entity id';
-    return;
-  }
-  const res = await fetch('/api/action/sandbox/' + encodeURIComponent(entity) + '/' + encodeURIComponent(action), {method:'POST'});
-  const j = await res.json();
-  document.getElementById('sandboxOutput').textContent = JSON.stringify(j, null, 2);
-}
-
-async function loadSandboxState(){
-  const res = await fetch('/api/action/sandbox/state');
-  const j = await res.json();
-  document.getElementById('sandboxOutput').textContent = JSON.stringify(j, null, 2);
-}
-function paintProfile(j){
-  setText('kpiNHI', j.system_indices?.NHI ?? '-'); setText('kpiTPI', j.system_indices?.TPI ?? '-'); setText('kpiSCR', j.system_indices?.SCR ?? '-'); setText('kpiMDI', j.technical_metrics?.MDI_avg ?? '-');
-  document.getElementById('modules').innerHTML = badgeList(j.active_modules); setText('dataset', fmt({profile:j.profile, dataset_profile:j.dataset_profile, graph_stats:j.graph_stats, morphogenesis:j.morphogenesis}));
-  setText('nodes', fmt(j.top_nodes)); setText('shadow', fmt({cross_pulse:j.cross_pulse_pairs, shadow_pairs:j.shadow_pairs}));
-  setText('signals', fmt({cross_pulse_pairs:j.cross_pulse_pairs?.slice?.(0,8), wave_amplitude:j.technical_metrics?.wave_amplitude, contagion_rate:j.technical_metrics?.contagion_rate}));
-  setText('physics', fmt({gravity_avg:j.technical_metrics?.gravity_avg, MDI_avg:j.technical_metrics?.MDI_avg, shadow_avg:j.technical_metrics?.shadow_avg}));
-  setText('dynamics', fmt({entropy:j.system_indices?.entropy, criticality:j.system_indices?.criticality, climate_pressure:j.technical_metrics?.climate_pressure, vortex_score:j.technical_metrics?.vortex_score}));
-  setText('runtime', fmt(j.runtime_map));
-  document.getElementById('mathCore').innerHTML = Object.entries(j.math_core||{}).slice(0,10).map(([k,v])=>`<div><strong>${k}</strong><code>${v}</code></div>`).join('');
-  paintStory(j.storyline); drawGraph(j.graph); paintLegend(j.colors?.graph || {});
-  setText('demoInfo','Perfil modular cargado. Usa Demo Killer o crisis histórica para storytelling avanzado.');
-}
-function paintHistorical(j){
-  document.getElementById('historicalPanel').innerHTML = `<div><strong>${j.scenario.title}</strong></div><div class="small" style="margin:8px 0 12px 0">${j.conclusion}</div>${(j.windows||[]).map(w => `<div class="timeline-step"><strong>${w.phase}</strong> · ${w.period}<br>${w.narrative}<br><code>${JSON.stringify(w,null,2)}</code></div>`).join('')}`;
-  setText('demoInfo', `Crisis histórica cargada: ${j.scenario.title}`);
-}
-function paintDemo(j){
-  setText('demoInfo', JSON.stringify({title:j.title, subtitle:j.subtitle, focus:j.focus, acts:j.acts, target_kpis:j.kpis}, null, 2));
-  document.getElementById('historicalPanel').innerHTML = `<div><strong>${j.title}</strong></div><div class="small" style="margin:8px 0 12px 0">${j.subtitle}</div>${(j.acts||[]).map(a => `<div class="timeline-step">${a}</div>`).join('')}`;
-}
-async function loadProfile(){ const v=document.getElementById('profileSelect').value; const j=await (await fetch('/api/profile/'+v)).json(); paintProfile(j); }
-async function loadHistorical(){ const v=document.getElementById('historicalSelect').value; const j=await (await fetch('/api/historical/'+v)).json(); paintHistorical(j); }
-async function loadDemo(){ const v=document.getElementById('demoSelect').value; const j=await (await fetch('/api/demo/'+v)).json(); paintDemo(j); }
-async function uploadFile(){ const file=document.getElementById('fileInput').files[0]; if(!file) return alert('Selecciona un archivo'); const fd = new FormData(); fd.append('file', file); const res=await (await fetch('/api/upload',{method:'POST',body:fd})).json(); alert('Subido: '+res.filename); }
-
-async function loadLiveOptions(){
-  const res = await fetch('/api/live/options');
-  const j = await res.json();
-  const sel = document.getElementById('liveSelect');
-  sel.innerHTML = (j.connectors||[]).map(c => `<option value="${c.config_name}">${c.config_name} · ${c.type} · ${c.source_name}</option>`).join('');
-}
-async function runLiveConnector(){
-  const v = document.getElementById('liveSelect').value;
-  if(!v) return;
-  document.getElementById('liveInfo').textContent = 'Ejecutando connector: ' + v + ' ...';
-  const res = await fetch('/api/live/run/' + v, {method:'POST'});
-  const j = await res.json();
-  document.getElementById('liveInfo').textContent = JSON.stringify(j, null, 2);
-}
-
-async function runDetection(){
-  const res = await fetch('/api/detection/run');
-  const j = await res.json();
-  document.getElementById('detectionOutput').textContent = JSON.stringify(j, null, 2);
-}
-
-async function runSystemic(){
-  const res = await fetch('/api/systemic/run');
-  const j = await res.json();
-  document.getElementById('detectionOutput').textContent = JSON.stringify(j, null, 2);
-}
-
-async function runV18Modules(){
-  document.getElementById('v18Output').textContent = "Inicializando motores V18 (RelationalDarkMatter, Waves, GuardianSwarm)...";
-  const res = await fetch('/api/v18/run');
-  const j = await res.json();
-  document.getElementById('v18Output').textContent = JSON.stringify(j, null, 2);
-}
-
-function drawRFDCGraph(payload){
-  const svg = document.getElementById('rfdcGraph');
-  if(!svg || !payload || !payload.nodes){ return; }
-  svg.innerHTML = '';
-  const nodes = payload.nodes.slice(0, 18);
-  const links = (payload.links || []).slice(0, 40);
-  const positions = [
-    [90,90],[220,70],[360,90],[500,70],[640,90],[780,80],
-    [120,220],[250,200],[390,230],[520,210],[660,220],[800,210],
-    [90,340],[240,330],[400,340],[560,330],[720,340],[860,330]
-  ];
-  const palette = payload.palette || {};
-  function roleColor(role){
-    if(role === 'hidden_cluster') return palette.hidden || '#7b61ff';
-    if(role === 'guardian_validated') return palette.guardian || '#00bbf9';
-    if(role === 'alert') return palette.risk || '#ef476f';
-    return palette.neutral || '#adb5bd';
-  }
-  function posFor(id){
-    let idx = nodes.findIndex(n => n.id === id);
-    if(idx < 0) idx = 0;
-    return positions[idx % positions.length];
-  }
-
-  links.forEach(l => {
-    const [x1,y1] = posFor(String(l.source));
-    const [x2,y2] = posFor(String(l.target));
-    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
-    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-    line.setAttribute('stroke', l.inferred ? '#7b61ff' : '#4cc9f0');
-    line.setAttribute('stroke-width', l.inferred ? '2' : '1.5');
-    if(l.inferred) line.setAttribute('stroke-dasharray', '6,4');
-    svg.appendChild(line);
-  });
-
-  nodes.forEach((n, i) => {
-    const [x,y] = positions[i % positions.length];
-    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-
-    // wave halo
-    const halo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    halo.setAttribute('cx', x); halo.setAttribute('cy', y);
-    halo.setAttribute('r', 28);
-    halo.setAttribute('fill', 'none');
-    halo.setAttribute('stroke', '#4cc9f0');
-    halo.setAttribute('stroke-opacity', '0.18');
-    halo.setAttribute('stroke-width', '8');
-    group.appendChild(halo);
-
-    // node
-    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    c.setAttribute('cx', x); c.setAttribute('cy', y);
-    c.setAttribute('r', 18 + Math.min(10, Number(n.score || 0)));
-    c.setAttribute('fill', roleColor(n.role));
-    c.setAttribute('opacity', '0.95');
-    group.appendChild(c);
-
-    const tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    tx.setAttribute('x', x);
-    tx.setAttribute('y', y + 4);
-    tx.setAttribute('text-anchor', 'middle');
-    tx.setAttribute('font-size', '10');
-    tx.setAttribute('fill', '#ffffff');
-    tx.textContent = String(n.label).slice(0,10);
-    group.appendChild(tx);
-
-    svg.appendChild(group);
-  });
-}
-
 async function loadRFDCGraph(){
-  document.getElementById('demoOutput').textContent = "";
-  document.getElementById('graphInfo').textContent = "Consultando malla de nodos...";
   const res = await fetch('/api/rfdc/graph');
   const j = await res.json();
   document.getElementById('graphInfo').textContent = JSON.stringify(j, null, 2);
   drawRFDCGraph(j);
 }
 
-async function runDemoKiller(demoId){
-  document.getElementById('graphInfo').textContent = "";
-  document.getElementById('demoOutput').textContent = "Evaluando Demo Killer: " + demoId + " ...";
-  const res = await fetch('/api/demo/run/' + demoId);
-  const j = await res.json();
-  document.getElementById('demoOutput').textContent = JSON.stringify(j.story || j, null, 2);
-  if(j.graph){ drawRFDCGraph(j.graph); }
-  if(j.result && j.result.metrics){
-    const m = j.result.metrics;
-    const nhi = document.getElementById('nhi'); if (nhi) nhi.textContent = m.nhi || m.NHI;
-    const tpi = document.getElementById('tpi'); if (tpi) tpi.textContent = m.tpi || m.TPI;
-    const scr = document.getElementById('scr'); if (scr) scr.textContent = m.scr || m.SCR;
-  }
-}
-
-loadLiveOptions();
-
-async function autoLoadDemo() {
-  const profileSelect = document.getElementById('profileSelect');
-  if (profileSelect && profileSelect.options.length > 0) {
-    profileSelect.value = 'bank_medium_mule'; // Default demo value
-    await loadProfile();
-  }
-}
-
-autoLoadDemo();
-function roleColor(role){
-  if(role === 'hidden_cluster') return palette.hidden || '#7b61ff';
-  if(role === 'guardian_validated') return palette.guardian || '#00bbf9';
-  if(role === 'alert') return palette.risk || '#ef476f';
-  return palette.neutral || '#adb5bd';
-}
-
-let liveWaveTimer = null;
-function animateWaveRings(){
-  if(liveWaveTimer){ clearInterval(liveWaveTimer); }
-  let tick = 0;
-  liveWaveTimer = setInterval(() => {
-    const rings = document.querySelectorAll('#rfdcGraph .waveRing');
-    rings.forEach((ring, idx) => {
-      const base = 24 + (idx % 3) * 18;
-      ring.setAttribute('r', String(base + (tick % 12)));
-      ring.setAttribute('stroke-opacity', String(Math.max(0.05, 0.25 - ((tick % 12) * 0.015))));
-    });
-    tick += 1;
-  }, 180);
-}
-
 async function runSandboxAction(){
   const entity = document.getElementById('sandboxEntity').value.trim();
   const action = document.getElementById('sandboxAction').value;
-  if(!entity){
+  if(!entity){ 
     document.getElementById('sandboxOutput').textContent = 'Ingresa un entity id';
     return;
   }
@@ -751,5 +722,233 @@ async function loadSandboxState(){
   document.getElementById('sandboxOutput').textContent = JSON.stringify(j, null, 2);
 }
 </script>
+<script>
+async function loadPolicies(){
+  const res = await fetch('/api/policies');
+  const j = await res.json();
+  document.getElementById('policyEditor').value = JSON.stringify(j, null, 2);
+  document.getElementById('policyOutput').textContent = 'Policies loaded';
+}
+async function savePolicies(){
+  const raw = document.getElementById('policyEditor').value;
+  let payload = {};
+  try{
+    payload = JSON.parse(raw);
+  }catch(e){
+    document.getElementById('policyOutput').textContent = 'JSON inválido';
+    return;
+  }
+  const res = await fetch('/api/policies', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+  const j = await res.json();
+  document.getElementById('policyOutput').textContent = JSON.stringify(j, null, 2);
+}
+
+let playbackFrames = [];
+let playbackTimer2 = null;
+
+async function loadPlayback(){
+  const res = await fetch('/api/simulation/playback');
+  const j = await res.json();
+  playbackData = j.steps || [];
+  playbackFrames = j.frames || [];
+  playbackMeta = j;
+  const range = document.getElementById('playbackRange');
+  range.max = Math.max(1, playbackFrames.length || playbackData.length);
+  range.value = 1;
+  document.getElementById('playbackOutput').textContent = JSON.stringify(j.summary || j, null, 2);
+  renderPlaybackStep(1);
+}
+
+function drawFrameGraph(frame){
+  const svg = document.getElementById('playbackGraph');
+  svg.innerHTML = '';
+  if(!frame) return;
+
+  const nodes = frame.nodes || [];
+  const links = frame.links || [];
+  const waves = frame.wave_centers || [];
+
+  links.forEach(l => {
+    const s = nodes.find(n => String(n.id) === String(l.source));
+    const t = nodes.find(n => String(n.id) === String(l.target));
+    if(!s || !t) return;
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', s.x); line.setAttribute('y1', s.y);
+    line.setAttribute('x2', t.x); line.setAttribute('y2', t.y);
+    line.setAttribute('stroke', l.inferred ? '#7b61ff' : '#34517f');
+    line.setAttribute('stroke-width', l.inferred ? '2' : '1.5');
+    if(l.inferred) line.setAttribute('stroke-dasharray','6,4');
+    line.setAttribute('opacity','0.7');
+    svg.appendChild(line);
+  });
+
+  waves.forEach(w => {
+    for(let r=1; r<=3; r++){
+      const ring = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      ring.setAttribute('cx', w.x); ring.setAttribute('cy', w.y);
+      ring.setAttribute('r', 14 + r*16);
+      ring.setAttribute('fill','none');
+      ring.setAttribute('stroke','#4cc9f0');
+      ring.setAttribute('stroke-opacity', String(Math.max(0.07, 0.25 - r*0.05)));
+      ring.setAttribute('stroke-width','4');
+      ring.setAttribute('class','playbackWaveRing');
+      svg.appendChild(ring);
+    }
+  });
+
+  nodes.forEach(n => {
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx', n.x); c.setAttribute('cy', n.y);
+    c.setAttribute('r', 10 + Math.min(12, Number(n.score || 0)));
+    let fill = '#adb5bd';
+    if(n.role === 'hidden_cluster') fill = '#7b61ff';
+    if(n.role === 'guardian_validated') fill = '#00bbf9';
+    if(n.role === 'alert') fill = '#ef476f';
+    c.setAttribute('fill', fill);
+    svg.appendChild(c);
+  });
+
+  const title = document.createElementNS('http://www.w3.org/2000/svg','text');
+  title.setAttribute('x', 20); title.setAttribute('y', 24);
+  title.setAttribute('fill', '#d6e4ff'); title.setAttribute('font-size','14');
+  title.textContent = `${frame.phase || ''} · ${frame.timestamp || ''}`;
+  svg.appendChild(title);
+
+  const metrics = frame.metrics || {};
+  const mtx = document.createElementNS('http://www.w3.org/2000/svg','text');
+  mtx.setAttribute('x', 20); mtx.setAttribute('y', 44);
+  mtx.setAttribute('fill', '#9bb0d1'); mtx.setAttribute('font-size','12');
+  mtx.textContent = `NHI=${metrics.nhi || '-'} · TPI=${metrics.tpi || '-'} · SCR=${metrics.scr || '-'} · MDI=${metrics.mdi || '-'}`;
+  svg.appendChild(mtx);
+
+  if(frame.action_triggered){
+    const act = document.createElementNS('http://www.w3.org/2000/svg','text');
+    act.setAttribute('x', 620); act.setAttribute('y', 42);
+    act.setAttribute('fill', '#ef476f'); act.setAttribute('font-size','16');
+    act.textContent = `Action: ${frame.recommended_action}`;
+    svg.appendChild(act);
+  }
+
+  animatePlaybackWaves();
+}
+
+function animatePlaybackWaves(){
+  if(playbackTimer2){ clearInterval(playbackTimer2); }
+  let tick = 0;
+  playbackTimer2 = setInterval(() => {
+    const rings = document.querySelectorAll('#playbackGraph .playbackWaveRing');
+    rings.forEach((ring, idx) => {
+      const base = 14 + (idx % 3) * 16;
+      ring.setAttribute('r', String(base + (tick % 10)));
+      ring.setAttribute('stroke-opacity', String(Math.max(0.05, 0.24 - ((tick % 10) * 0.016))));
+    });
+    tick += 1;
+  }, 160);
+}
+
+function renderPlaybackStep(step){
+  if (!playbackFrames.length && !playbackData.length) return;
+  const idx = Math.max(1, Math.min(step, playbackFrames.length || playbackData.length)) - 1;
+  if(playbackFrames.length){
+    drawFrameGraph(playbackFrames[idx]);
+  }
+}
+
+function playPlayback(){
+  if ((!playbackFrames.length) && (!playbackData.length)) return;
+  pausePlayback();
+  let idx = parseInt(document.getElementById('playbackRange').value || '1', 10);
+  const max = playbackFrames.length || playbackData.length;
+  playbackTimer = setInterval(() => {
+    if (idx > max){
+      pausePlayback();
+      return;
+    }
+    document.getElementById('playbackRange').value = idx;
+    renderPlaybackStep(idx);
+    idx += 1;
+  }, 450);
+}
+</script>
 </body>
 </html>
+
+<script>
+
+function drawGraphPlayback(step){
+  const svg = document.getElementById("playbackGraph");
+  svg.innerHTML = "";
+  const nodes = step.nodes || [];
+  const edges = step.edges || [];
+
+  const pos = {};
+  nodes.forEach((n,i)=>{
+    pos[n] = { x: 90 + (i % 10) * 78, y: 80 + Math.floor(i/10) * 90 };
+  });
+
+  edges.slice(0,120).forEach(e=>{
+    const a = pos[e.source_id] || {x:100,y:100};
+    const b = pos[e.target_id] || {x:200,y:200};
+    const line = document.createElementNS("http://www.w3.org/2000/svg","line");
+    line.setAttribute("x1",a.x); line.setAttribute("y1",a.y);
+    line.setAttribute("x2",b.x); line.setAttribute("y2",b.y);
+    line.setAttribute("stroke","#3b5b8f");
+    line.setAttribute("stroke-opacity","0.5");
+    svg.appendChild(line);
+  });
+
+  nodes.slice(0,60).forEach((n,i)=>{
+    const p = pos[n];
+    const halo = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    halo.setAttribute("cx",p.x); halo.setAttribute("cy",p.y);
+    halo.setAttribute("r",18 + (step.step % 4));
+    halo.setAttribute("fill","none");
+    halo.setAttribute("stroke","#4cc9f0");
+    halo.setAttribute("stroke-opacity","0.12");
+    halo.setAttribute("stroke-width","6");
+    svg.appendChild(halo);
+
+    const c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx",p.x); c.setAttribute("cy",p.y);
+    c.setAttribute("r",9);
+    c.setAttribute("fill", step.action_triggered ? "#ef476f" : (step.phase === "propagation" ? "#00bbf9" : "#ffd166"));
+    svg.appendChild(c);
+  });
+
+  const svg = document.getElementById("playbackGraph");
+  svg.innerHTML = "";
+  const nodes = step.nodes || [];
+  const edges = step.edges || [];
+
+  nodes.forEach((n,i)=>{
+    const x = 100 + (i*50 % 800);
+    const y = 100 + (Math.floor(i/10)*60);
+    const c = document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx",x);
+    c.setAttribute("cy",y);
+    c.setAttribute("r",8);
+    c.setAttribute("fill","#00bbf9");
+    svg.appendChild(c);
+  });
+
+  edges.forEach(e=>{
+    const line = document.createElementNS("http://www.w3.org/2000/svg","line");
+    line.setAttribute("x1",100);
+    line.setAttribute("y1",100);
+    line.setAttribute("x2",200);
+    line.setAttribute("y2",200);
+    line.setAttribute("stroke","#888");
+    svg.appendChild(line);
+  });
+}
+
+function renderPlaybackStep(step){
+  if(!playbackData.length) return;
+  const obj = playbackData[step-1];
+  drawGraphPlayback(obj);
+}
+</script>
