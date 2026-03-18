@@ -3,6 +3,8 @@ from core.graph_physics_engine import GraphPhysicsEngine
 from core.wave_engine_visual import WaveEngineVisual
 from core.wave_impact_engine import WaveImpactEngine
 from core.risk_field_engine import RiskFieldEngine
+from core.neural_response_engine import NeuralResponseEngine
+from core.action_trigger_engine import ActionTriggerEngine
 import pandas as pd
 
 def _spring_positions(node_ids, center=(460,210), base_radius=120):
@@ -115,6 +117,12 @@ def build_graph_payload(events_df: pd.DataFrame, rfdc_result: dict) -> dict:
     field_engine = RiskFieldEngine()
     risk_field = field_engine.generate(node_list)
 
+    neural = NeuralResponseEngine()
+    priority_paths = neural.detect_priority_paths(node_list)
+
+    trigger_engine = ActionTriggerEngine()
+    trigger_zones = trigger_engine.detect_zones(node_list)
+
     return {
         "nodes": node_list,
         "links": (links[:240] + inferred[:80]),
@@ -124,6 +132,8 @@ def build_graph_payload(events_df: pd.DataFrame, rfdc_result: dict) -> dict:
         "wave_centers": wave_centers[:8],
         "dynamic_waves": dynamic_waves,
         "risk_field": risk_field,
+        "priority_paths": priority_paths,
+        "trigger_zones": trigger_zones,
     }
 
 def build_demo_story(demo_id: str, rfdc_result: dict) -> dict:

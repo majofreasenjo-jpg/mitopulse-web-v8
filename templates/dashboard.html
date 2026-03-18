@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>MitoPulse Final Modular Prototype v33</title>
+<title>MitoPulse Final Modular Prototype v34</title>
 <style>
 :root{
   --bg:#08101f;--bg2:#0d1830;--card:#13223c;--line:#29466f;--text:#eaf2ff;--muted:#9eb6d8;
@@ -272,6 +272,7 @@ async function loadRFDCGraph(){
   drawRFDCGraph(j);
 animateDynamicWaves(j);
 renderRiskField(j);
+renderTriggers(j);
 }
 
 
@@ -706,6 +707,7 @@ async function loadRFDCGraph(){
   drawRFDCGraph(j);
 animateDynamicWaves(j);
 renderRiskField(j);
+renderTriggers(j);
 }
 
 async function runSandboxAction(){
@@ -925,6 +927,22 @@ function renderRiskField(payload){
     dot.setAttribute('fill', 'red');
     dot.setAttribute('opacity', Math.min(0.15, p.intensity));
     svg.appendChild(dot);
+  });
+}
+</script><script>
+function renderTriggers(payload){
+  const svg = document.getElementById('rfdcGraph');
+  if(!payload.trigger_zones) return;
+
+  payload.trigger_zones.forEach(z=>{
+    const marker = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    marker.setAttribute('x', Math.random()*900);
+    marker.setAttribute('y', Math.random()*400);
+    marker.setAttribute('width', 20);
+    marker.setAttribute('height', 20);
+    marker.setAttribute('fill', 'yellow');
+    marker.setAttribute('opacity', 0.5);
+    svg.appendChild(marker);
   });
 }
 </script></body>
