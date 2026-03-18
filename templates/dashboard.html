@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>MitoPulse Final Modular Prototype v29</title>
+<title>MitoPulse Final Modular Prototype v30</title>
 <style>
 :root{
   --bg:#08101f;--bg2:#0d1830;--card:#13223c;--line:#29466f;--text:#eaf2ff;--muted:#9eb6d8;
@@ -878,7 +878,7 @@ function playPlayback(){
 async function runFull(){
   const res = await fetch('/api/run/full?client_type=' + document.getElementById('clientType').value, {method:'POST'});
   const j = await res.json();
-  document.getElementById('fullOutput').textContent = JSON.stringify(j, null, 2);
+  document.getElementById('swarmOutput').textContent = JSON.stringify(j, null, 2);
 }
 
 async function loadWebhook(){

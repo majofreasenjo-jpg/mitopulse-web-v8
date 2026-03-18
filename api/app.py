@@ -14,9 +14,11 @@ from core.policy_service import load_policies, save_policies
 from core.playback_graph_builder import build_playback_frames
 from core.auto_execution_engine import AutoExecutionEngine
 from core.webhook_simulator import send_webhook
+from core.guardian_swarm import GuardianSwarm
+from core.learning_loop import LearningLoop
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-app = FastAPI(title="MitoPulse Final Modular Prototype v28")
+app = FastAPI(title="MitoPulse Final Modular Prototype v30")
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 @app.get("/", response_class=HTMLResponse)
@@ -318,8 +320,14 @@ def run_full_pipeline():
     decision = result.get("decision", {})
     alerts = result.get("alerts", [])
 
+    swarm = GuardianSwarm()
+    validated_alerts = swarm.validate(alerts)
+
+    learner = LearningLoop()
+    mutations = learner.generate_mutations()
+
     auto = AutoExecutionEngine()
-    execution = auto.run(decision, alerts)
+    execution = auto.run(decision, validated_alerts)
 
     webhook = send_webhook({
         "decision": decision,
@@ -327,6 +335,8 @@ def run_full_pipeline():
     })
 
     return {
+        "validated_alerts": validated_alerts,
+        "mutations": mutations,
         "decision": decision,
         "execution": execution,
         "webhook": webhook,
