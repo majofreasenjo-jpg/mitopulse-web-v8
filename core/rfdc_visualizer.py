@@ -5,6 +5,8 @@ from core.wave_impact_engine import WaveImpactEngine
 from core.risk_field_engine import RiskFieldEngine
 from core.neural_response_engine import NeuralResponseEngine
 from core.action_trigger_engine import ActionTriggerEngine
+from core.vortex_engine import detect as detect_vortex
+from core.collapse_radar import probability as detect_collapse
 import pandas as pd
 
 def _spring_positions(node_ids, center=(460,210), base_radius=120):
@@ -123,6 +125,9 @@ def build_graph_payload(events_df: pd.DataFrame, rfdc_result: dict) -> dict:
     trigger_engine = ActionTriggerEngine()
     trigger_zones = trigger_engine.detect_zones(node_list)
 
+    vortex_nodes = detect_vortex(node_list)
+    collapse_prob = detect_collapse(node_list)
+
     return {
         "nodes": node_list,
         "links": (links[:240] + inferred[:80]),
@@ -134,6 +139,8 @@ def build_graph_payload(events_df: pd.DataFrame, rfdc_result: dict) -> dict:
         "risk_field": risk_field,
         "priority_paths": priority_paths,
         "trigger_zones": trigger_zones,
+        "vortex_nodes": vortex_nodes,
+        "collapse_prob": collapse_prob,
     }
 
 def build_demo_story(demo_id: str, rfdc_result: dict) -> dict:

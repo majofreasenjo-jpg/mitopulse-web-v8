@@ -273,6 +273,8 @@ async function loadRFDCGraph(){
 animateDynamicWaves(j);
 renderRiskField(j);
 renderTriggers(j);
+renderVortex(j);
+renderCollapseWarning(j);
 }
 
 
@@ -708,6 +710,8 @@ async function loadRFDCGraph(){
 animateDynamicWaves(j);
 renderRiskField(j);
 renderTriggers(j);
+renderVortex(j);
+renderCollapseWarning(j);
 }
 
 async function runSandboxAction(){
@@ -944,6 +948,41 @@ function renderTriggers(payload){
     marker.setAttribute('opacity', 0.5);
     svg.appendChild(marker);
   });
+}
+function renderVortex(payload){
+  const svg = document.getElementById('rfdcGraph');
+  if(!svg || !payload.vortex_nodes) return;
+  payload.vortex_nodes.forEach(v => {
+    let rx = v.x || (Math.random()*800+50);
+    let ry = v.y || (Math.random()*400+50);
+    const ring = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    ring.setAttribute('cx', rx); ring.setAttribute('cy', ry);
+    ring.setAttribute('r', 45); ring.setAttribute('fill', 'none');
+    ring.setAttribute('stroke', '#9d4edd'); ring.setAttribute('stroke-width', '4');
+    ring.setAttribute('stroke-dasharray', '12,6');
+    const anim = document.createElementNS('http://www.w3.org/2000/svg','animateTransform');
+    anim.setAttribute('attributeName', 'transform'); anim.setAttribute('type', 'rotate');
+    anim.setAttribute('from', '0 ' + rx + ' ' + ry); anim.setAttribute('to', '360 ' + rx + ' ' + ry);
+    anim.setAttribute('dur', '3s'); anim.setAttribute('repeatCount', 'indefinite');
+    ring.appendChild(anim); svg.appendChild(ring);
+  });
+}
+
+function renderCollapseWarning(payload){
+  if(payload.collapse_prob && payload.collapse_prob > 0.80){
+    const svg = document.getElementById('rfdcGraph');
+    if(!svg) return;
+    const banner = document.createElementNS('http://www.w3.org/2000/svg','rect');
+    banner.setAttribute('x', '0'); banner.setAttribute('y', '0'); banner.setAttribute('width', '100%'); banner.setAttribute('height', '100%');
+    banner.setAttribute('fill', 'rgba(255, 0, 0, 0.15)'); banner.setAttribute('pointer-events', 'none');
+    svg.appendChild(banner);
+    
+    let txt = document.createElementNS('http://www.w3.org/2000/svg','text');
+    txt.setAttribute('x', '50%'); txt.setAttribute('y', '50%'); txt.setAttribute('text-anchor', 'middle');
+    txt.setAttribute('fill', '#ff0033'); txt.setAttribute('font-size', '52'); txt.setAttribute('font-weight', 'bold');
+    txt.textContent = 'SYSTEMIC COLLAPSE IMMINENT';
+    svg.appendChild(txt);
+  }
 }
 </script></body>
 </html>

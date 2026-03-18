@@ -18,7 +18,7 @@ from core.guardian_swarm import GuardianSwarm
 from core.learning_loop import LearningLoop
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-app = FastAPI(title="MitoPulse Final Modular Prototype v34")
+app = FastAPI(title="MitoPulse Final Modular Prototype V35_FULL_SYSTEM")
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 @app.get("/", response_class=HTMLResponse)
