@@ -1,5 +1,6 @@
 import math
 from core.graph_physics_engine import GraphPhysicsEngine
+from core.wave_engine_visual import WaveEngineVisual
 import pandas as pd
 
 def _spring_positions(node_ids, center=(460,210), base_radius=120):
@@ -103,6 +104,9 @@ def build_graph_payload(events_df: pd.DataFrame, rfdc_result: dict) -> dict:
         physics = GraphPhysicsEngine()
     node_list = physics.apply(node_list)
 
+        wave_engine = WaveEngineVisual()
+    dynamic_waves = wave_engine.propagate(node_list)
+
     return {
         "nodes": node_list,
         "links": (links[:240] + inferred[:80]),
@@ -110,6 +114,7 @@ def build_graph_payload(events_df: pd.DataFrame, rfdc_result: dict) -> dict:
         "palette": palette,
         "wave_summary": rfdc_result.get("wave_summary", {}),
         "wave_centers": wave_centers[:8],
+        "dynamic_waves": dynamic_waves,
     }
 
 def build_demo_story(demo_id: str, rfdc_result: dict) -> dict:
@@ -117,6 +122,9 @@ def build_demo_story(demo_id: str, rfdc_result: dict) -> dict:
     if demo_id == "invisible_network":
             physics = GraphPhysicsEngine()
     node_list = physics.apply(node_list)
+
+        wave_engine = WaveEngineVisual()
+    dynamic_waves = wave_engine.propagate(node_list)
 
     return {
             "title": "The Invisible Network",
@@ -134,6 +142,9 @@ def build_demo_story(demo_id: str, rfdc_result: dict) -> dict:
             physics = GraphPhysicsEngine()
     node_list = physics.apply(node_list)
 
+        wave_engine = WaveEngineVisual()
+    dynamic_waves = wave_engine.propagate(node_list)
+
     return {
             "title": "The Invisible Storm",
             "subtitle": "Pequeñas anomalías evolucionan en una tormenta relacional",
@@ -148,6 +159,9 @@ def build_demo_story(demo_id: str, rfdc_result: dict) -> dict:
         }
         physics = GraphPhysicsEngine()
     node_list = physics.apply(node_list)
+
+        wave_engine = WaveEngineVisual()
+    dynamic_waves = wave_engine.propagate(node_list)
 
     return {
         "title": "The Coming Collapse",
