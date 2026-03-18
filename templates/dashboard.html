@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>MitoPulse Final Modular Prototype v30</title>
+<title>MitoPulse Final Modular Prototype v31</title>
 <style>
 :root{
   --bg:#08101f;--bg2:#0d1830;--card:#13223c;--line:#29466f;--text:#eaf2ff;--muted:#9eb6d8;
@@ -885,6 +885,12 @@ async function loadWebhook(){
   const res = await fetch('/api/webhook/log');
   const j = await res.json();
   document.getElementById('webhookOutput').textContent = JSON.stringify(j, null, 2);
+}
+</script><script>
+function animatePhysics(){
+  setInterval(()=>{
+    loadRFDCGraph();
+  }, 1200);
 }
 </script></body>
 </html>

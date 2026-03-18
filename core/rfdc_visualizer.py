@@ -1,4 +1,5 @@
 import math
+from core.graph_physics_engine import GraphPhysicsEngine
 import pandas as pd
 
 def _spring_positions(node_ids, center=(460,210), base_radius=120):
@@ -99,6 +100,9 @@ def build_graph_payload(events_df: pd.DataFrame, rfdc_result: dict) -> dict:
         if n["id"] in positions:
             n.update(positions[n["id"]])
 
+        physics = GraphPhysicsEngine()
+    node_list = physics.apply(node_list)
+
     return {
         "nodes": node_list,
         "links": (links[:240] + inferred[:80]),
@@ -111,7 +115,10 @@ def build_graph_payload(events_df: pd.DataFrame, rfdc_result: dict) -> dict:
 def build_demo_story(demo_id: str, rfdc_result: dict) -> dict:
     metrics = rfdc_result.get("metrics", {})
     if demo_id == "invisible_network":
-        return {
+            physics = GraphPhysicsEngine()
+    node_list = physics.apply(node_list)
+
+    return {
             "title": "The Invisible Network",
             "subtitle": "Detectar coordinación oculta en una red aparentemente normal",
             "steps": [
@@ -124,7 +131,10 @@ def build_demo_story(demo_id: str, rfdc_result: dict) -> dict:
             "headline": f"MDI={metrics.get('mdi', 0)} · Hidden clusters={len(rfdc_result.get('hidden_clusters', []))}"
         }
     if demo_id == "invisible_storm":
-        return {
+            physics = GraphPhysicsEngine()
+    node_list = physics.apply(node_list)
+
+    return {
             "title": "The Invisible Storm",
             "subtitle": "Pequeñas anomalías evolucionan en una tormenta relacional",
             "steps": [
@@ -136,6 +146,9 @@ def build_demo_story(demo_id: str, rfdc_result: dict) -> dict:
             ],
             "headline": f"Waves={rfdc_result.get('wave_summary', {}).get('count', 0)} · SCR={metrics.get('scr', 0)}"
         }
+        physics = GraphPhysicsEngine()
+    node_list = physics.apply(node_list)
+
     return {
         "title": "The Coming Collapse",
         "subtitle": "Detectar una crisis antes de que el mercado la vea",
