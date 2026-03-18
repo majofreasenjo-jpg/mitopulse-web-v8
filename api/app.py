@@ -7,15 +7,11 @@ from ingestion.client_data_loader import save_uploaded_file
 from api.live_service import list_live_configs, run_live_config
 from core.fraud_detection_engine import FraudDetectionEngine
 from core.systemic_collapse_predictor import SystemicCollapsePredictor
-from core.fraud_evolution_engine import FraudEvolutionEngine
-from core.guardian_swarm import GuardianSwarm
-from core.relational_dark_matter import RelationalDarkMatter
-from core.relational_wave_engine import RelationalWaveEngine
 from core.rfdc import RelationalFieldDynamicsCore
 from core.rfdc_visualizer import build_graph_payload, build_demo_story
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-app = FastAPI(title="MitoPulse Final Modular Prototype v23")
+app = FastAPI(title="MitoPulse Final Modular Prototype v25")
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 @app.get("/", response_class=HTMLResponse)
@@ -29,10 +25,6 @@ def home(request: Request):
             "demos": list_demo_killers(),
         },
     )
-
-@app.get("/verify", response_class=HTMLResponse)
-def verify_challenge(request: Request):
-    return templates.TemplateResponse("verify.html", {"request": request})
 
 @app.get('/api/options')
 def options():
@@ -58,6 +50,7 @@ def demo(demo_name: str):
 async def upload(file: UploadFile = File(...)):
     return await save_uploaded_file(BASE_DIR / 'uploads', file)
 
+
 @app.get('/api/live/options')
 def live_options():
     return {'connectors': list_live_configs()}
@@ -65,6 +58,7 @@ def live_options():
 @app.post('/api/live/run/{config_name}')
 def live_run(config_name: str):
     return run_live_config(config_name)
+
 
 @app.get('/api/detection/run')
 def detection_run():
@@ -76,6 +70,7 @@ def detection_run():
         Path('live_output/binance_live_crypto'),
         Path('data/bank_medium_realistic_v1'),
         Path('data/afp_systemic_realistic_v1'),
+        Path('data/bank_medium_realistic_v1'),
     ]
     target = next((p for p in candidate_dirs if p.exists()), None)
     if target is None:
@@ -127,6 +122,7 @@ def systemic_run():
         'metrics': metrics
     }
 
+
 @app.get('/api/rfdc/run')
 def rfdc_run():
     import pandas as pd
@@ -154,6 +150,7 @@ def rfdc_run():
     result = engine.run(events, signals)
     result['dataset'] = str(target)
     return result
+
 
 @app.get('/api/rfdc/graph')
 def rfdc_graph():
@@ -219,64 +216,6 @@ def demo_run(demo_id: str):
         'result': result
     }
 
-@app.get('/api/v18/run')
-def v18_run():
-    import pandas as pd
-    from pathlib import Path
-
-    candidate_dirs = [
-        Path('live_output/yahoo_live_market'),
-        Path('live_output/binance_live_crypto'),
-        Path('data/afp_systemic_realistic_v1'),
-        Path('data/bank_medium_realistic_v1'),
-    ]
-    target = next((p for p in candidate_dirs if p.exists()), None)
-    if target is None:
-        return {'error': 'no dataset found in live_output or mapped data folders'}
-
-    events_fp = target / 'events.csv'
-    if not events_fp.exists():
-        return {'error': f'events.csv not found in {target}'}
-
-    events = pd.read_csv(events_fp)
-
-    # V18 Engines
-    rdm = RelationalDarkMatter()
-    mdi = rdm.compute_mdi(events)
-    clusters = rdm.detect_hidden_clusters(events)
-
-    rwe = RelationalWaveEngine()
-    waves = rwe.propagate(events)
-
-    fee = FraudEvolutionEngine()
-    p1 = fee.generate_pattern()
-    p2 = fee.mutate_pattern(fee.generate_pattern())
-
-    gs = GuardianSwarm()
-    alerts_to_validate = [
-        {"id": "A1", "score": 0.8},
-        {"id": "A2", "score": 0.3},
-        {"id": "A3", "score": 0.9}
-    ]
-    validated_alerts = gs.validate(alerts_to_validate)
-
-    return {
-        'dataset': str(target),
-        'relational_dark_matter': {
-            'mdi': mdi,
-            'hidden_clusters_count': len(clusters)
-        },
-        'relational_wave_engine': {
-            'waves_detected': len(waves)
-        },
-        'fraud_evolution_engine': {
-            'generated_pattern': p1,
-            'mutated_pattern': p2
-        },
-        'guardian_swarm': {
-            'validated_alerts': validated_alerts
-        }
-    }
 
 
 @app.get('/api/simulation/playback')
@@ -284,6 +223,7 @@ def simulation_playback():
     import pandas as pd
     from pathlib import Path
     from core.simulation_playback import SimulationPlayback
+    from core.rfdc import RelationalFieldDynamicsCore
 
     candidate_dirs = [
         Path('live_output/yahoo_live_market'),
@@ -296,10 +236,36 @@ def simulation_playback():
         return {'error': 'no dataset found for playback'}
 
     events_fp = target / 'events.csv'
+    signals_fp = target / 'signals.csv'
     if not events_fp.exists():
         return {'error': f'events.csv not found in {target}'}
 
     events = pd.read_csv(events_fp)
+    signals = pd.read_csv(signals_fp) if signals_fp.exists() else pd.DataFrame(columns=['entity_id','signal_type','severity','source','timestamp'])
+
+    client_type = 'generic'
+    target_str = str(target)
+    if 'bank' in target_str:
+        client_type = 'banking'
+    elif 'afp' in target_str:
+        client_type = 'afp'
+    elif 'marketplace' in target_str:
+        client_type = 'marketplace'
+    elif 'crypto' in target_str or 'binance' in target_str:
+        client_type = 'crypto'
+
+    rfdc = RelationalFieldDynamicsCore()
+    rfdc_result = rfdc.run(events, signals, client_type=client_type)
+
     engine = SimulationPlayback()
-    steps = engine.run_steps(events)
-    return {"dataset": str(target), "steps": steps}
+    steps = engine.run_steps(events, rfdc_result=rfdc_result)
+
+    return {
+        "dataset": str(target),
+        "client_type": client_type,
+        "steps": steps,
+        "decision": rfdc_result.get("decision", {}),
+        "summary": rfdc_result.get("summary", {}),
+        "metrics": rfdc_result.get("metrics", {})
+    }
+

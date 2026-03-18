@@ -1,6 +1,6 @@
 from pathlib import Path
 import csv
-from connectors.normalizer import append_rows, ensure_output_dir
+from normalizer import append_rows, ensure_output_dir
 
 def run_file_drop_connector(cfg: dict):
     source = cfg.get("source_name", "file_drop_source")
