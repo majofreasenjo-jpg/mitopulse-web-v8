@@ -2,7 +2,7 @@ import json
 import time
 from datetime import datetime, timezone
 import websocket
-from normalizer import (
+from connectors.normalizer import (
     normalize_market_ticks_to_events,
     normalize_orderflow_to_signals,
     seed_entities_for_symbols
