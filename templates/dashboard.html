@@ -195,6 +195,26 @@ code{display:block;background:#09162c;padding:8px 10px;border-radius:10px;margin
       <h2>12. Demo Studio</h2>
       <pre id="demoInfo">Selecciona una Demo Killer para ver actos, focos y KPIs objetivo.</pre>
     </div>
+
+    <div class="card c12">
+      <h2>13. Executive Summary & Actions (V23)</h2>
+      <button class="glass-btn btn-action" onclick="runExecutiveSummary()" style="background:#f59e0b; color:#111827; border-color:#d97706; padding:8px 16px; font-weight:bold; margin-bottom:12px;">Generar Resumen Ejecutivo</button>
+      <pre id="summaryOutput" class="small" style="font-family:monospace; color:#fcd34d; white-space:pre-wrap; max-height:300px; overflow:auto;">[Resumen Pendiente]</pre>
+    </div>
+
+    <div class="card c12">
+      <h2>14. Simulation Playback Timeline (V23)</h2>
+      <div style="display:flex; gap:12px; align-items:center; margin-bottom:16px;">
+        <button class="glass-btn btn-action" onclick="loadPlayback()" style="background:#10b981; color:#fff; border-color:#059669; padding:8px 16px;">Cargar Simulación D3</button>
+        <button class="glass-btn btn-action" onclick="playPlayback()" style="background:#3b82f6; color:#fff; border-color:#2563eb; padding:8px 16px;">▶ Play</button>
+        <button class="glass-btn btn-action" onclick="pausePlayback()" style="background:#64748b; color:#fff; border-color:#475569; padding:8px 16px;">⏸ Pause</button>
+        <input type="range" id="playbackRange" min="1" max="1" value="1" style="flex:1;" oninput="renderPlaybackStep(this.value)" />
+      </div>
+      <div style="background:#0a1326; border:1px solid var(--line); border-radius:14px; padding:10px;">
+        <svg id="playbackGraph" viewBox="0 0 900 450" style="width:100%; height:320px; background:#040b16; border-radius:10px;"></svg>
+      </div>
+      <pre id="playbackOutput" class="small" style="display:none;"></pre>
+    </div>
   </div>
 </div>
 <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -204,6 +224,131 @@ function fmt(obj){ return JSON.stringify(obj, null, 2); }
 function badgeList(items){ return (items||[]).map(m => `<span class="badge">${m}</span>`).join(''); }
 function paintLegend(legend){ const el=document.getElementById('graphLegend'); el.innerHTML=''; Object.entries(legend||{}).forEach(([k,v])=>{ el.innerHTML += `<div class="item"><span class="dot" style="background:${v}"></span>${k}</div>`;}); }
 function paintStory(items){ document.getElementById('storyline').innerHTML = (items||[]).map(s => `<div class="timeline-step">${s}</div>`).join(''); }
+
+let playbackData = [];
+let playbackTimer = null;
+
+async function runExecutiveSummary(){
+  const res = await fetch('/api/rfdc/run');
+  const j = await res.json();
+  document.getElementById('summaryOutput').textContent = JSON.stringify({
+    summary: j.summary,
+    decision: j.decision
+  }, null, 2);
+  if (j.metrics){
+    const m = j.metrics;
+    const nhi = document.getElementById('kpiNHI'); if (nhi) nhi.textContent = m.nhi;
+    const tpi = document.getElementById('kpiTPI'); if (tpi) tpi.textContent = m.tpi;
+    const scr = document.getElementById('kpiSCR'); if (scr) scr.textContent = m.scr;
+    const mdi = document.getElementById('kpiMDI'); if (mdi) mdi.textContent = m.mdi;
+  }
+}
+
+async function loadPlayback(){
+  const res = await fetch('/api/simulation/playback');
+  const j = await res.json();
+  playbackData = j.steps || [];
+  const range = document.getElementById('playbackRange');
+  range.max = Math.max(1, playbackData.length);
+  range.value = 1;
+  document.getElementById('playbackOutput').textContent = JSON.stringify(j, null, 2);
+  renderPlaybackStep(1);
+}
+
+function drawPlaybackFrame(stepObj){
+  const svg = document.getElementById('playbackGraph');
+  if (!svg || !stepObj){ return; }
+  svg.innerHTML = '';
+
+  const phaseColor = stepObj.phase === 'emergence' ? '#ffd166' : (stepObj.phase === 'propagation' ? '#00bbf9' : '#ef476f');
+
+  const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  title.setAttribute('x', 30); title.setAttribute('y', 36);
+  title.setAttribute('fill', '#ffffff'); title.setAttribute('font-size', '20');
+  title.textContent = `Step ${stepObj.step} · ${stepObj.phase}`;
+  svg.appendChild(title);
+
+  const subtitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  subtitle.setAttribute('x', 30); subtitle.setAttribute('y', 62);
+  subtitle.setAttribute('fill', '#9bb0d1'); subtitle.setAttribute('font-size', '12');
+  subtitle.textContent = `${stepObj.timestamp} · events=${stepObj.events_processed} · active_nodes=${stepObj.active_nodes} · cumulative_amount=${stepObj.cumulative_amount}`;
+  svg.appendChild(subtitle);
+
+  const centerX = 460, centerY = 220;
+  const nodeCount = Math.max(4, Math.min(18, stepObj.active_nodes || 4));
+  const radius = Math.min(150, 30 + (stepObj.events_processed || 1) * 2.5);
+
+  for (let i = 0; i < nodeCount; i++){
+    const angle = (Math.PI * 2 * i) / nodeCount;
+    const x = centerX + Math.cos(angle) * radius;
+    const y = centerY + Math.sin(angle) * radius;
+
+    const halo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    halo.setAttribute('cx', x); halo.setAttribute('cy', y);
+    halo.setAttribute('r', 24 + (stepObj.step % 5));
+    halo.setAttribute('fill', 'none');
+    halo.setAttribute('stroke', '#4cc9f0');
+    halo.setAttribute('stroke-opacity', '0.12');
+    halo.setAttribute('stroke-width', '8');
+    svg.appendChild(halo);
+
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', x); c.setAttribute('cy', y);
+    c.setAttribute('r', 12 + Math.min(10, stepObj.step / 5));
+    c.setAttribute('fill', phaseColor);
+    c.setAttribute('opacity', '0.95');
+    svg.appendChild(c);
+  }
+
+  const pressureBarBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  pressureBarBg.setAttribute('x', 30); pressureBarBg.setAttribute('y', 370);
+  pressureBarBg.setAttribute('width', 860); pressureBarBg.setAttribute('height', 18);
+  pressureBarBg.setAttribute('rx', 9); pressureBarBg.setAttribute('fill', '#13233f');
+  svg.appendChild(pressureBarBg);
+
+  const width = Math.min(860, (stepObj.events_processed || 1) * 12);
+  const pressureBar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  pressureBar.setAttribute('x', 30); pressureBar.setAttribute('y', 370);
+  pressureBar.setAttribute('width', width); pressureBar.setAttribute('height', 18);
+  pressureBar.setAttribute('rx', 9); pressureBar.setAttribute('fill', phaseColor);
+  svg.appendChild(pressureBar);
+
+  if (stepObj.phase === 'criticality'){
+    const alert = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    alert.setAttribute('x', 600); alert.setAttribute('y', 115);
+    alert.setAttribute('fill', '#ef476f'); alert.setAttribute('font-size', '18');
+    alert.textContent = 'Action threshold reached';
+    svg.appendChild(alert);
+  }
+}
+
+function renderPlaybackStep(step){
+  if (!playbackData.length) return;
+  const idx = Math.max(1, Math.min(step, playbackData.length)) - 1;
+  drawPlaybackFrame(playbackData[idx]);
+}
+
+function playPlayback(){
+  if (!playbackData.length) return;
+  pausePlayback();
+  let idx = parseInt(document.getElementById('playbackRange').value || '1', 10);
+  playbackTimer = setInterval(() => {
+    if (idx > playbackData.length){
+      pausePlayback();
+      return;
+    }
+    document.getElementById('playbackRange').value = idx;
+    renderPlaybackStep(idx);
+    idx += 1;
+  }, 450);
+}
+
+function pausePlayback(){
+  if (playbackTimer){
+    clearInterval(playbackTimer);
+    playbackTimer = null;
+  }
+}
 
 let simulation;
 function drawGraph(graph){

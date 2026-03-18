@@ -277,3 +277,29 @@ def v18_run():
             'validated_alerts': validated_alerts
         }
     }
+
+
+@app.get('/api/simulation/playback')
+def simulation_playback():
+    import pandas as pd
+    from pathlib import Path
+    from core.simulation_playback import SimulationPlayback
+
+    candidate_dirs = [
+        Path('live_output/yahoo_live_market'),
+        Path('live_output/binance_live_crypto'),
+        Path('data/bank_medium_realistic_v1'),
+        Path('data/afp_systemic_realistic_v1'),
+    ]
+    target = next((p for p in candidate_dirs if p.exists()), None)
+    if target is None:
+        return {'error': 'no dataset found for playback'}
+
+    events_fp = target / 'events.csv'
+    if not events_fp.exists():
+        return {'error': f'events.csv not found in {target}'}
+
+    events = pd.read_csv(events_fp)
+    engine = SimulationPlayback()
+    steps = engine.run_steps(events)
+    return {"dataset": str(target), "steps": steps}
