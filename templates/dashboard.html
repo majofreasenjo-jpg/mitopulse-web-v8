@@ -88,6 +88,21 @@ code{display:block;background:#09162c;padding:8px 10px;border-radius:10px;margin
       <button class="glass-btn btn-action" onclick="runRFDC()" style="width:100%; background:linear-gradient(135deg, #10b981, #059669); color:#fff; border-color:#047857">Execute RFDC Framework</button>
       <div id="rfdcOutput" class="small" style="margin-top:12px; color:#34d399; font-family:monospace; margin-left:10px; white-space:pre-wrap; max-height:220px; overflow:auto;"></div>
     </div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)">
+      <div style="font-size:12px; font-weight:bold; margin-bottom:8px; color:var(--muted)">V20 RFDC Graph & Demo Killers Studio:</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="glass-btn btn-action" onclick="loadRFDCGraph()" style="flex:1; background:#3b82f6; color:#fff; border-color:#2563eb; padding:8px; font-size:12px; border-radius:8px;">Draw Graph</button>
+        <button class="glass-btn btn-action" onclick="runDemoKiller('invisible_network')" style="flex:1; background:#6366f1; color:#fff; border-color:#4f46e5; padding:8px; font-size:12px; border-radius:8px;">Network</button>
+        <button class="glass-btn btn-action" onclick="runDemoKiller('invisible_storm')" style="flex:1; background:#8b5cf6; color:#fff; border-color:#7c3aed; padding:8px; font-size:12px; border-radius:8px;">Storm</button>
+        <button class="glass-btn btn-action" onclick="runDemoKiller('coming_collapse')" style="flex:1; background:#ec4899; color:#fff; border-color:#db2777; padding:8px; font-size:12px; border-radius:8px;">Collapse</button>
+      </div>
+      <pre id="graphInfo" class="small" style="margin-top:8px; color:#60a5fa; font-family:monospace; white-space:pre-wrap; max-height:100px; overflow:auto;"></pre>
+      <pre id="demoOutput" class="small" style="margin-top:4px; color:#d8b4fe; font-family:monospace; white-space:pre-wrap; max-height:220px; overflow:auto;"></pre>
+      <div style="margin-top:12px; background:#08101f; border:1px solid var(--line); border-radius:14px; padding:10px;">
+        <div class="small" style="color:var(--muted); text-align:center; margin-bottom:8px; font-weight:bold;">RFDC Topology Visualizer</div>
+        <svg id="rfdcGraph" viewBox="0 0 900 450" style="width:100%; height:320px; background:#0a1326; border-radius:10px;"></svg>
+      </div>
+    </div>
   </div>
 
   <div class="card">
@@ -287,6 +302,101 @@ async function runV18Modules(){
   const res = await fetch('/api/v18/run');
   const j = await res.json();
   document.getElementById('v18Output').textContent = JSON.stringify(j, null, 2);
+}
+
+function drawRFDCGraph(payload){
+  const svg = document.getElementById('rfdcGraph');
+  if(!svg || !payload || !payload.nodes){ return; }
+  svg.innerHTML = '';
+  const nodes = payload.nodes.slice(0, 18);
+  const links = (payload.links || []).slice(0, 40);
+  const positions = [
+    [90,90],[220,70],[360,90],[500,70],[640,90],[780,80],
+    [120,220],[250,200],[390,230],[520,210],[660,220],[800,210],
+    [90,340],[240,330],[400,340],[560,330],[720,340],[860,330]
+  ];
+  const palette = payload.palette || {};
+  function roleColor(role){
+    if(role === 'hidden_cluster') return palette.hidden || '#7b61ff';
+    if(role === 'guardian_validated') return palette.guardian || '#00bbf9';
+    if(role === 'alert') return palette.risk || '#ef476f';
+    return palette.neutral || '#adb5bd';
+  }
+  function posFor(id){
+    let idx = nodes.findIndex(n => n.id === id);
+    if(idx < 0) idx = 0;
+    return positions[idx % positions.length];
+  }
+
+  links.forEach(l => {
+    const [x1,y1] = posFor(String(l.source));
+    const [x2,y2] = posFor(String(l.target));
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+    line.setAttribute('stroke', l.inferred ? '#7b61ff' : '#4cc9f0');
+    line.setAttribute('stroke-width', l.inferred ? '2' : '1.5');
+    if(l.inferred) line.setAttribute('stroke-dasharray', '6,4');
+    svg.appendChild(line);
+  });
+
+  nodes.forEach((n, i) => {
+    const [x,y] = positions[i % positions.length];
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+    // wave halo
+    const halo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    halo.setAttribute('cx', x); halo.setAttribute('cy', y);
+    halo.setAttribute('r', 28);
+    halo.setAttribute('fill', 'none');
+    halo.setAttribute('stroke', '#4cc9f0');
+    halo.setAttribute('stroke-opacity', '0.18');
+    halo.setAttribute('stroke-width', '8');
+    group.appendChild(halo);
+
+    // node
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', x); c.setAttribute('cy', y);
+    c.setAttribute('r', 18 + Math.min(10, Number(n.score || 0)));
+    c.setAttribute('fill', roleColor(n.role));
+    c.setAttribute('opacity', '0.95');
+    group.appendChild(c);
+
+    const tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    tx.setAttribute('x', x);
+    tx.setAttribute('y', y + 4);
+    tx.setAttribute('text-anchor', 'middle');
+    tx.setAttribute('font-size', '10');
+    tx.setAttribute('fill', '#ffffff');
+    tx.textContent = String(n.label).slice(0,10);
+    group.appendChild(tx);
+
+    svg.appendChild(group);
+  });
+}
+
+async function loadRFDCGraph(){
+  document.getElementById('demoOutput').textContent = "";
+  document.getElementById('graphInfo').textContent = "Consultando malla de nodos...";
+  const res = await fetch('/api/rfdc/graph');
+  const j = await res.json();
+  document.getElementById('graphInfo').textContent = JSON.stringify(j, null, 2);
+  drawRFDCGraph(j);
+}
+
+async function runDemoKiller(demoId){
+  document.getElementById('graphInfo').textContent = "";
+  document.getElementById('demoOutput').textContent = "Evaluando Demo Killer: " + demoId + " ...";
+  const res = await fetch('/api/demo/run/' + demoId);
+  const j = await res.json();
+  document.getElementById('demoOutput').textContent = JSON.stringify(j.story || j, null, 2);
+  if(j.graph){ drawRFDCGraph(j.graph); }
+  if(j.result && j.result.metrics){
+    const m = j.result.metrics;
+    const nhi = document.getElementById('nhi'); if (nhi) nhi.textContent = m.nhi || m.NHI;
+    const tpi = document.getElementById('tpi'); if (tpi) tpi.textContent = m.tpi || m.TPI;
+    const scr = document.getElementById('scr'); if (scr) scr.textContent = m.scr || m.SCR;
+  }
 }
 
 loadLiveOptions();
