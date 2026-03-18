@@ -15,7 +15,7 @@ from core.rfdc import RelationalFieldDynamicsCore
 from core.rfdc_visualizer import build_graph_payload, build_demo_story
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-app = FastAPI(title="MitoPulse Final Modular Prototype v21")
+app = FastAPI(title="MitoPulse Final Modular Prototype v23")
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 @app.get("/", response_class=HTMLResponse)
