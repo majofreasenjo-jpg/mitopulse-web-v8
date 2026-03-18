@@ -1,354 +1,247 @@
-from pathlib import Path
-from fastapi import FastAPI, Request, UploadFile, File
+from fastapi import FastAPI, Query, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from engine.modular_runner import run_live_profile, run_historical, list_profiles_meta, list_historical_meta, list_demo_killers, run_demo_killer
-from ingestion.client_data_loader import save_uploaded_file
-from api.live_service import list_live_configs, run_live_config
-from core.fraud_detection_engine import FraudDetectionEngine
-from core.systemic_collapse_predictor import SystemicCollapsePredictor
-from core.rfdc import RelationalFieldDynamicsCore
-from core.rfdc_visualizer import build_graph_payload, build_demo_story
-from core.sandbox_action_executor import SandboxActionExecutor
-from core.policy_service import load_policies, save_policies
-from core.playback_graph_builder import build_playback_frames
-from core.auto_execution_engine import AutoExecutionEngine
-from core.webhook_simulator import send_webhook
-from core.guardian_swarm import GuardianSwarm
-from core.learning_loop import LearningLoop
+from starlette.requests import Request
+from pathlib import Path
+import json, math, random
+from connectors.sources import unified_live_feed
 
-BASE_DIR = Path(__file__).resolve().parents[1]
-app = FastAPI(title="MitoPulse Final Modular Prototype V35_FULL_SYSTEM")
-templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+app = FastAPI(title="MitoPulse v35.1 FULL UI")
+templates = Jinja2Templates(directory=str(Path(__file__).parent.parent / "templates"))
+ROOT = Path(__file__).parent.parent
+SANDBOX = {"blocked": [], "limited": [], "events": []}
+
+def load_dataset(name: str):
+    fp = ROOT / "datasets" / f"{name}.json"
+    if not fp.exists():
+        raise HTTPException(status_code=404, detail=f"dataset not found: {name}")
+    return json.loads(fp.read_text(encoding="utf-8"))
+
+def compute_overview(data):
+    vals = [e["value"] for e in data["entities"]]
+    avg = sum(vals)/max(1, len(vals))
+    nhi = round(max(0, 100 - avg * 0.45), 2)
+    tpi = round(min(100, avg * 0.62), 2)
+    scr = round(min(100, (100-nhi)*0.4 + tpi*0.6), 2)
+    mdi = round(min(100, max(vals) * 0.7), 2)
+    return {"NHI": nhi, "TPI": tpi, "SCR": scr, "MDI": mdi}
+
+def compute_brain(data):
+    entities = data["entities"]
+    paths = [e["id"] for e in entities if e["value"] >= 80]
+    hidden_clusters = [e["id"] for e in entities if e["value"] >= 70]
+    wave_nodes = [e["id"] for e in entities if e["value"] >= 60]
+    return {
+        "pulse_inputs": len(data["events"]),
+        "cross_pulse_proxy": round(len(paths) / max(1, len(entities)), 3),
+        "priority_paths": paths,
+        "hidden_clusters": hidden_clusters,
+        "wave_nodes": wave_nodes,
+        "decision_trace": [
+            "Signals ingested",
+            "RFDC metrics updated",
+            "Hidden coordination inferred",
+            "Action threshold evaluated"
+        ]
+    }
+
+def build_graph(data):
+    nodes = []
+    center_x, center_y = 460, 220
+    ents = data["entities"]
+    n = max(1, len(ents))
+    for i, e in enumerate(ents):
+        angle = 2 * math.pi * i / n
+        radius = 150 + (e["value"] * 0.6)
+        x = center_x + math.cos(angle) * radius
+        y = center_y + math.sin(angle) * radius
+        role = "neutral"
+        if e["value"] >= 85:
+            role = "trigger"
+        elif e["value"] >= 70:
+            role = "hidden"
+        elif e["value"] >= 55:
+            role = "wave"
+        nodes.append({
+            "id": e["id"],
+            "label": e["id"],
+            "kind": e["kind"],
+            "x": round(x, 2),
+            "y": round(y, 2),
+            "score": e["value"],
+            "role": role
+        })
+    links = []
+    for ev in data["events"]:
+        links.append({
+            "source": ev["source"],
+            "target": ev["target"],
+            "weight": ev["amount"],
+            "style": "solid"
+        })
+    dynamic_waves = [
+        {
+            "entity": n["id"],
+            "x": n["x"],
+            "y": n["y"],
+            "intensity": round(n["score"] / 100, 2),
+            "direction": "outward" if n["score"] >= 70 else "inward",
+            "speed": round(0.7 + (n["score"]/100), 2)
+        }
+        for n in nodes if n["score"] >= 55
+    ]
+    risk_field = [
+        {"x": n["x"], "y": n["y"], "intensity": round(n["score"]/100, 2)}
+        for n in nodes
+    ]
+    trigger_zones = [n["id"] for n in nodes if n["score"] >= 85]
+    return {
+        "nodes": nodes,
+        "links": links,
+        "dynamic_waves": dynamic_waves,
+        "risk_field": risk_field,
+        "trigger_zones": trigger_zones
+    }
+
+def decide(data, client_type):
+    overview = compute_overview(data)
+    scr = overview["SCR"]
+    if client_type == "marketplace":
+        if scr >= 70:
+            action = "Suspend seller + freeze payouts"
+            channel = "Trust & Safety / Risk Ops"
+        elif scr >= 45:
+            action = "Manual review + payout hold"
+            channel = "Trust & Safety"
+        else:
+            action = "Enhanced monitoring"
+            channel = "Risk Analytics"
+    else:
+        if scr >= 70:
+            action = "Freeze account / block transfer"
+            channel = "Fraud / AML Unit"
+        elif scr >= 45:
+            action = "Manual fraud review + limits"
+            channel = "Fraud Ops"
+        else:
+            action = "Enhanced monitoring"
+            channel = "Risk Monitoring"
+    return {
+        "severity": "critical" if scr >= 70 else ("high" if scr >= 45 else "medium"),
+        "action": action,
+        "recipient": channel,
+        "confidence": round(min(0.99, 0.55 + scr/200), 2)
+    }
+
+def build_report(data_name, client_type):
+    data = load_dataset(data_name)
+    ov = compute_overview(data)
+    dec = decide(data, client_type)
+    return {
+        "client_type": client_type,
+        "dataset": data_name,
+        "summary": f"System detected coordinated risk pattern in {client_type} ecosystem.",
+        "metrics": ov,
+        "recipient": dec["recipient"],
+        "recommended_action": dec["action"],
+        "confidence": dec["confidence"],
+        "alert_format": {
+            "title": "MitoPulse System Alert",
+            "severity": dec["severity"],
+            "body": f"Action recommended: {dec['action']}. Recipient: {dec['recipient']}"
+        }
+    }
+
+def build_demo(demo_id, data_name):
+    data = load_dataset(data_name)
+    ov = compute_overview(data)
+    graph = build_graph(data)
+    story_map = {
+        "invisible_network": [
+            "Normal ecosystem appears stable",
+            "Micro-synchronizations emerge",
+            "Hidden coordination becomes visible",
+            "Action threshold reached"
+        ],
+        "invisible_storm": [
+            "Weak anomalies appear",
+            "Waves propagate through the graph",
+            "Pressure accumulates",
+            "Storm forms and action is triggered"
+        ],
+        "coming_collapse": [
+            "System seems stable",
+            "Pressure and concentration rise",
+            "Collapse radar intensifies",
+            "Critical zone activates intervention"
+        ]
+    }
+    steps = []
+    total = 24
+    for i in range(1, total+1):
+        progress = i / total
+        phase = "emergence" if progress < 0.34 else ("propagation" if progress < 0.67 else "criticality")
+        steps.append({
+            "step": i,
+            "phase": phase,
+            "nhi": round(max(0, ov["NHI"] - progress*12), 2),
+            "tpi": round(min(100, ov["TPI"] + progress*18), 2),
+            "scr": round(min(100, ov["SCR"] + progress*22), 2),
+            "story": story_map[demo_id][min(3, int(progress*4))],
+            "action_triggered": progress > 0.78,
+            "graph": graph
+        })
+    return {"demo_id": demo_id, "steps": steps}
 
 @app.get("/", response_class=HTMLResponse)
 def home(request: Request):
-    return templates.TemplateResponse(
-        "dashboard.html",
-        {
-            "request": request,
-            "profiles": list_profiles_meta(),
-            "historical": list_historical_meta(),
-            "demos": list_demo_killers(),
-        },
-    )
+    return templates.TemplateResponse("index.html", {"request": request})
 
-@app.get('/api/options')
-def options():
+@app.get("/api/overview")
+def api_overview(dataset: str = "marketplace"):
+    data = load_dataset(dataset)
+    return compute_overview(data)
+
+@app.get("/api/brain")
+def api_brain(dataset: str = "marketplace"):
+    data = load_dataset(dataset)
+    return compute_brain(data)
+
+@app.get("/api/dynamics")
+def api_dynamics(dataset: str = "marketplace"):
+    data = load_dataset(dataset)
+    graph = build_graph(data)
     return {
-        'profiles': list_profiles_meta(),
-        'historical': list_historical_meta(),
-        'demos': list_demo_killers(),
+        "graph": graph,
+        "vortex_detected": len(graph["trigger_zones"]) > 0,
+        "collapse_probability": round(compute_overview(data)["SCR"]/100, 3)
     }
 
-@app.get("/api/profile/{profile_name}")
-def profile(profile_name: str):
-    return run_live_profile(profile_name)
-
-@app.get("/api/historical/{scenario_name}")
-def historical(scenario_name: str):
-    return run_historical(scenario_name)
-
-@app.get("/api/demo/{demo_name}")
-def demo(demo_name: str):
-    return run_demo_killer(demo_name)
-
-@app.post('/api/upload')
-async def upload(file: UploadFile = File(...)):
-    return await save_uploaded_file(BASE_DIR / 'uploads', file)
-
-
-@app.get('/api/live/options')
-def live_options():
-    return {'connectors': list_live_configs()}
-
-@app.post('/api/live/run/{config_name}')
-def live_run(config_name: str):
-    return run_live_config(config_name)
-
-
-@app.get('/api/detection/run')
-def detection_run():
-    import pandas as pd
-    from pathlib import Path
-
-    candidate_dirs = [
-        Path('live_output/yahoo_live_market'),
-        Path('live_output/binance_live_crypto'),
-        Path('data/bank_medium_realistic_v1'),
-        Path('data/afp_systemic_realistic_v1'),
-        Path('data/bank_medium_realistic_v1'),
-    ]
-    target = next((p for p in candidate_dirs if p.exists()), None)
-    if target is None:
-        return {'error': 'no dataset found in live_output or mapped data folders'}
-
-    events_fp = target / 'events.csv'
-    signals_fp = target / 'signals.csv'
-    if not events_fp.exists():
-        return {'error': f'events.csv not found in {target}'}
-
-    events = pd.read_csv(events_fp)
-    signals = pd.read_csv(signals_fp) if signals_fp.exists() else pd.DataFrame(columns=['entity_id','signal_type','severity','source','timestamp'])
-
-    engine = FraudDetectionEngine()
-    results = engine.detect(events, signals)
-    return {
-        'dataset': str(target),
-        'count': int(len(results)),
-        'alerts': results.to_dict(orient='records')
-    }
-
-@app.get('/api/systemic/run')
-def systemic_run():
-    import pandas as pd
-    from pathlib import Path
-
-    candidate_dirs = [
-        Path('live_output/yahoo_live_market'),
-        Path('live_output/binance_live_crypto'),
-        Path('data/afp_systemic_realistic_v1'),
-        Path('data/bank_medium_realistic_v1'),
-    ]
-    target = next((p for p in candidate_dirs if p.exists()), None)
-    if target is None:
-        return {'error': 'no dataset found in live_output or mapped data folders'}
-
-    events_fp = target / 'events.csv'
-    signals_fp = target / 'signals.csv'
-    if not events_fp.exists():
-        return {'error': f'events.csv not found in {target}'}
-
-    events = pd.read_csv(events_fp)
-    signals = pd.read_csv(signals_fp) if signals_fp.exists() else pd.DataFrame(columns=['entity_id','signal_type','severity','source','timestamp'])
-
-    engine = SystemicCollapsePredictor()
-    metrics = engine.run(events, signals)
-    return {
-        'dataset': str(target),
-        'metrics': metrics
-    }
-
-
-@app.get('/api/rfdc/run')
-def rfdc_run():
-    import pandas as pd
-    from pathlib import Path
-
-    candidate_dirs = [
-        Path('live_output/yahoo_live_market'),
-        Path('live_output/binance_live_crypto'),
-        Path('data/afp_systemic_realistic_v1'),
-        Path('data/bank_medium_realistic_v1'),
-    ]
-    target = next((p for p in candidate_dirs if p.exists()), None)
-    if target is None:
-        return {'error': 'no dataset found in live_output or mapped data folders'}
-
-    events_fp = target / 'events.csv'
-    signals_fp = target / 'signals.csv'
-    if not events_fp.exists():
-        return {'error': f'events.csv not found in {target}'}
-
-    events = pd.read_csv(events_fp)
-    signals = pd.read_csv(signals_fp) if signals_fp.exists() else pd.DataFrame(columns=['entity_id','signal_type','severity','source','timestamp'])
-
-    engine = RelationalFieldDynamicsCore()
-    result = engine.run(events, signals)
-    result['dataset'] = str(target)
-    return result
-
-
-@app.get('/api/rfdc/graph')
-def rfdc_graph():
-    import pandas as pd
-    from pathlib import Path
-
-    candidate_dirs = [
-        Path('live_output/yahoo_live_market'),
-        Path('live_output/binance_live_crypto'),
-        Path('data/afp_systemic_realistic_v1'),
-        Path('data/bank_medium_realistic_v1'),
-    ]
-    target = next((p for p in candidate_dirs if p.exists()), None)
-    if target is None:
-        return {'error': 'no dataset found in live_output or mapped data folders'}
-
-    events_fp = target / 'events.csv'
-    signals_fp = target / 'signals.csv'
-    if not events_fp.exists():
-        return {'error': f'events.csv not found in {target}'}
-
-    events = pd.read_csv(events_fp)
-    signals = pd.read_csv(signals_fp) if signals_fp.exists() else pd.DataFrame(columns=['entity_id','signal_type','severity','source','timestamp'])
-
-    engine = RelationalFieldDynamicsCore()
-    result = engine.run(events, signals)
-    graph = build_graph_payload(events, result)
-    graph['dataset'] = str(target)
-    return graph
-
-@app.get('/api/demo/run/{demo_id}')
-def demo_run(demo_id: str):
-    import pandas as pd
-    from pathlib import Path
-
-    candidate_dirs = [
-        Path('data/bank_medium_realistic_v1'),
-        Path('data/afp_systemic_realistic_v1'),
-        Path('live_output/yahoo_live_market'),
-        Path('live_output/binance_live_crypto'),
-    ]
-    target = next((p for p in candidate_dirs if p.exists()), None)
-    if target is None:
-        return {'error': 'no dataset found for demo execution'}
-
-    events_fp = target / 'events.csv'
-    signals_fp = target / 'signals.csv'
-    if not events_fp.exists():
-        return {'error': f'events.csv not found in {target}'}
-
-    events = pd.read_csv(events_fp)
-    signals = pd.read_csv(signals_fp) if signals_fp.exists() else pd.DataFrame(columns=['entity_id','signal_type','severity','source','timestamp'])
-
-    engine = RelationalFieldDynamicsCore()
-    result = engine.run(events, signals)
-    story = build_demo_story(demo_id, result)
-    graph = build_graph_payload(events, result)
-    return {
-        'demo_id': demo_id,
-        'dataset': str(target),
-        'story': story,
-        'graph': graph,
-        'result': result
-    }
-
-
-
-
-@app.get('/api/simulation/playback')
-def simulation_playback():
-    import pandas as pd
-    from pathlib import Path
-    from core.simulation_playback import SimulationPlayback
-    from core.rfdc import RelationalFieldDynamicsCore
-    from core.rfdc_visualizer import build_graph_payload
-
-    candidate_dirs = [
-        Path('live_output/yahoo_live_market'),
-        Path('live_output/binance_live_crypto'),
-        Path('data/bank_medium_realistic_v1'),
-        Path('data/afp_systemic_realistic_v1'),
-    ]
-    target = next((p for p in candidate_dirs if p.exists()), None)
-    if target is None:
-        return {'error': 'no dataset found for playback'}
-
-    events_fp = target / 'events.csv'
-    signals_fp = target / 'signals.csv'
-    if not events_fp.exists():
-        return {'error': f'events.csv not found in {target}'}
-
-    events = pd.read_csv(events_fp)
-    signals = pd.read_csv(signals_fp) if signals_fp.exists() else pd.DataFrame(columns=['entity_id','signal_type','severity','source','timestamp'])
-
-    client_type = 'generic'
-    target_str = str(target)
-    if 'bank' in target_str:
-        client_type = 'banking'
-    elif 'afp' in target_str:
-        client_type = 'afp'
-    elif 'marketplace' in target_str:
-        client_type = 'marketplace'
-    elif 'crypto' in target_str or 'binance' in target_str:
-        client_type = 'crypto'
-
-    rfdc = RelationalFieldDynamicsCore()
-    rfdc_result = rfdc.run(events, signals, client_type=client_type)
-
-    engine = SimulationPlayback()
-    steps = engine.run_steps(events, rfdc_result=rfdc_result)
-    graph = build_graph_payload(events, rfdc_result)
-    frames = build_playback_frames(graph, steps)
-
-    return {
-        "dataset": str(target),
-        "client_type": client_type,
-        "steps": steps,
-        "frames": frames,
-        "decision": rfdc_result.get("decision", {}),
-        "summary": rfdc_result.get("summary", {}),
-        "metrics": rfdc_result.get("metrics", {})
-    }
-
-
-
-
-@app.post('/api/action/sandbox/{entity_id}/{action}')
-def action_sandbox(entity_id: str, action: str):
-    executor = SandboxActionExecutor()
-    return executor.execute(entity_id=entity_id, action=action, reason='manual_sandbox_test')
-
-@app.get('/api/action/sandbox/state')
-def action_sandbox_state():
-    executor = SandboxActionExecutor()
-    return executor._load()
-
-
-@app.get('/api/policies')
-def policies_get():
-    return load_policies()
-
-@app.post('/api/policies')
-def policies_save(payload: dict):
-    return save_policies(payload)
-
-
-@app.post('/api/run/full')
-def run_full_pipeline():
-    import pandas as pd
-    from pathlib import Path
-    from core.rfdc import RelationalFieldDynamicsCore
-
-    target = Path('data/bank_medium_realistic_v1')
-    events = pd.read_csv(target / 'events.csv')
-    signals = pd.read_csv(target / 'signals.csv')
-
-    rfdc = RelationalFieldDynamicsCore()
-    result = rfdc.run(events, signals, client_type="banking")
-
-    decision = result.get("decision", {})
-    alerts = result.get("alerts", [])
-
-    swarm = GuardianSwarm()
-    validated_alerts = swarm.validate(alerts)
-
-    learner = LearningLoop()
-    mutations = learner.generate_mutations()
-
-    auto = AutoExecutionEngine()
-    execution = auto.run(decision, validated_alerts)
-
-    webhook = send_webhook({
-        "decision": decision,
-        "execution": execution
-    })
-
-    return {
-        "validated_alerts": validated_alerts,
-        "mutations": mutations,
-        "decision": decision,
-        "execution": execution,
-        "webhook": webhook,
-        "summary": result.get("summary", {})
-    }
-
-
-@app.get('/api/webhook/log')
-def webhook_log():
-    import json
-    from pathlib import Path
-    fp = Path("sandbox/webhook_log.json")
-    if not fp.exists():
-        return []
-    return json.loads(fp.read_text())
+@app.get("/api/reports")
+def api_reports(dataset: str = "marketplace", client_type: str = "marketplace"):
+    report = build_report(dataset, client_type)
+    (ROOT / "reports" / "latest_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    return report
+
+@app.post("/api/action/sandbox")
+def api_action_sandbox(entity_id: str = Query(...), action: str = Query(...), recipient: str = Query("Ops")):
+    SANDBOX["events"].append({"entity_id": entity_id, "action": action, "recipient": recipient})
+    if "freeze" in action.lower() or "block" in action.lower():
+        if entity_id not in SANDBOX["blocked"]:
+            SANDBOX["blocked"].append(entity_id)
+    else:
+        if entity_id not in SANDBOX["limited"]:
+            SANDBOX["limited"].append(entity_id)
+    return {"status": "ok", "sandbox": SANDBOX}
+
+@app.get("/api/action/sandbox/state")
+def api_action_state():
+    return SANDBOX
+
+@app.get("/api/connectors")
+def api_connectors():
+    return unified_live_feed()
+
+@app.get("/api/demo")
+def api_demo(demo_id: str = "invisible_network", dataset: str = "marketplace"):
+    return build_demo(demo_id, dataset)
