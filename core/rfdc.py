@@ -31,7 +31,7 @@ class RelationalFieldDynamicsCore:
         self.swarm = GuardianSwarm()
         self.action_engine = ActionEngine()
 
-    def run(self, events_df: pd.DataFrame, signals_df: pd.DataFrame) -> dict:
+    def run(self, events_df: pd.DataFrame, signals_df: pd.DataFrame, client_type: str = 'generic') -> dict:
         alerts_df = self.detector.detect(events_df, signals_df)
         alerts = alerts_df.to_dict(orient="records") if not alerts_df.empty else []
 
@@ -102,7 +102,7 @@ class RelationalFieldDynamicsCore:
             metrics["band"] = "collapse_risk"
             metrics["message"] = "Cascade / collapse risk elevated."
 
-        decision = self.action_engine.decide(metrics, alerts, validated)
+        decision = self.action_engine.decide(metrics, alerts, validated, client_type=client_type)
         summary = build_summary(metrics, decision, alerts)
 
         return {

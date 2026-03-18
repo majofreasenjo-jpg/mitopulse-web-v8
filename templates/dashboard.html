@@ -226,6 +226,7 @@ function paintLegend(legend){ const el=document.getElementById('graphLegend'); e
 function paintStory(items){ document.getElementById('storyline').innerHTML = (items||[]).map(s => `<div class="timeline-step">${s}</div>`).join(''); }
 
 let playbackData = [];
+let playbackMeta = {};
 let playbackTimer = null;
 
 async function runExecutiveSummary(){
@@ -248,6 +249,7 @@ async function loadPlayback(){
   const res = await fetch('/api/simulation/playback');
   const j = await res.json();
   playbackData = j.steps || [];
+  playbackMeta = j;
   const range = document.getElementById('playbackRange');
   range.max = Math.max(1, playbackData.length);
   range.value = 1;
@@ -255,7 +257,7 @@ async function loadPlayback(){
   renderPlaybackStep(1);
 }
 
-function drawPlaybackFrame(stepObj){
+function drawPlaybackFrame(stepObj, meta){
   const svg = document.getElementById('playbackGraph');
   if (!svg || !stepObj){ return; }
   svg.innerHTML = '';
@@ -263,20 +265,20 @@ function drawPlaybackFrame(stepObj){
   const phaseColor = stepObj.phase === 'emergence' ? '#ffd166' : (stepObj.phase === 'propagation' ? '#00bbf9' : '#ef476f');
 
   const title = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  title.setAttribute('x', 30); title.setAttribute('y', 36);
-  title.setAttribute('fill', '#ffffff'); title.setAttribute('font-size', '20');
+  title.setAttribute('x', 30); title.setAttribute('y', 32);
+  title.setAttribute('fill', '#ffffff'); title.setAttribute('font-size', '22');
   title.textContent = `Step ${stepObj.step} · ${stepObj.phase}`;
   svg.appendChild(title);
 
   const subtitle = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-  subtitle.setAttribute('x', 30); subtitle.setAttribute('y', 62);
+  subtitle.setAttribute('x', 30); subtitle.setAttribute('y', 56);
   subtitle.setAttribute('fill', '#9bb0d1'); subtitle.setAttribute('font-size', '12');
   subtitle.textContent = `${stepObj.timestamp} · events=${stepObj.events_processed} · active_nodes=${stepObj.active_nodes} · cumulative_amount=${stepObj.cumulative_amount}`;
   svg.appendChild(subtitle);
 
-  const centerX = 460, centerY = 220;
+  const centerX = 460, centerY = 210;
   const nodeCount = Math.max(4, Math.min(18, stepObj.active_nodes || 4));
-  const radius = Math.min(150, 30 + (stepObj.events_processed || 1) * 2.5);
+  const radius = Math.min(150, 36 + (stepObj.events_processed || 1) * 2.2);
 
   for (let i = 0; i < nodeCount; i++){
     const angle = (Math.PI * 2 * i) / nodeCount;
@@ -285,7 +287,7 @@ function drawPlaybackFrame(stepObj){
 
     const halo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     halo.setAttribute('cx', x); halo.setAttribute('cy', y);
-    halo.setAttribute('r', 24 + (stepObj.step % 5));
+    halo.setAttribute('r', 24 + (stepObj.step % 6));
     halo.setAttribute('fill', 'none');
     halo.setAttribute('stroke', '#4cc9f0');
     halo.setAttribute('stroke-opacity', '0.12');
@@ -300,32 +302,67 @@ function drawPlaybackFrame(stepObj){
     svg.appendChild(c);
   }
 
-  const pressureBarBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-  pressureBarBg.setAttribute('x', 30); pressureBarBg.setAttribute('y', 370);
-  pressureBarBg.setAttribute('width', 860); pressureBarBg.setAttribute('height', 18);
-  pressureBarBg.setAttribute('rx', 9); pressureBarBg.setAttribute('fill', '#13233f');
-  svg.appendChild(pressureBarBg);
+  const bars = [
+    ["NHI", stepObj.nhi_snapshot || 0, "#20c997", 95],
+    ["TPI", stepObj.tpi_snapshot || 0, "#ffd166", 130],
+    ["SCR", stepObj.scr_snapshot || 0, "#ef476f", 165],
+    ["MDI", stepObj.mdi_snapshot || 0, "#7b61ff", 200],
+  ];
+  bars.forEach(([label, val, color, y]) => {
+    const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    bg.setAttribute('x', 700); bg.setAttribute('y', y);
+    bg.setAttribute('width', 170); bg.setAttribute('height', 14);
+    bg.setAttribute('rx', 7); bg.setAttribute('fill', '#11213d');
+    svg.appendChild(bg);
 
-  const width = Math.min(860, (stepObj.events_processed || 1) * 12);
-  const pressureBar = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-  pressureBar.setAttribute('x', 30); pressureBar.setAttribute('y', 370);
-  pressureBar.setAttribute('width', width); pressureBar.setAttribute('height', 18);
-  pressureBar.setAttribute('rx', 9); pressureBar.setAttribute('fill', phaseColor);
-  svg.appendChild(pressureBar);
+    const fg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    fg.setAttribute('x', 700); fg.setAttribute('y', y);
+    fg.setAttribute('width', Math.min(170, Number(val) * 1.7)); fg.setAttribute('height', 14);
+    fg.setAttribute('rx', 7); fg.setAttribute('fill', color);
+    svg.appendChild(fg);
 
-  if (stepObj.phase === 'criticality'){
+    const tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    tx.setAttribute('x', 620); tx.setAttribute('y', y + 11);
+    tx.setAttribute('fill', '#d6e4ff'); tx.setAttribute('font-size', '12');
+    tx.textContent = `${label}: ${val}`;
+    svg.appendChild(tx);
+  });
+
+  const hiddenTx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  hiddenTx.setAttribute('x', 30); hiddenTx.setAttribute('y', 330);
+  hiddenTx.setAttribute('fill', '#7b61ff'); hiddenTx.setAttribute('font-size', '14');
+  hiddenTx.textContent = `Hidden clusters: ${stepObj.hidden_cluster_snapshot || 0}`;
+  svg.appendChild(hiddenTx);
+
+  if (stepObj.action_triggered){
     const alert = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    alert.setAttribute('x', 600); alert.setAttribute('y', 115);
+    alert.setAttribute('x', 615); alert.setAttribute('y', 250);
     alert.setAttribute('fill', '#ef476f'); alert.setAttribute('font-size', '18');
-    alert.textContent = 'Action threshold reached';
+    alert.textContent = `Action triggered: ${stepObj.recommended_action}`;
     svg.appendChild(alert);
+  }
+
+  if (meta && meta.summary && meta.summary.playbook_actions){
+    const title2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    title2.setAttribute('x', 30); title2.setAttribute('y', 360);
+    title2.setAttribute('fill', '#d6e4ff'); title2.setAttribute('font-size', '14');
+    title2.textContent = 'Recommended playbook actions:';
+    svg.appendChild(title2);
+
+    (meta.summary.playbook_actions || []).slice(0,3).forEach((item, idx) => {
+      const tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      tx.setAttribute('x', 30); tx.setAttribute('y', 382 + idx * 16);
+      tx.setAttribute('fill', '#9bb0d1'); tx.setAttribute('font-size', '12');
+      tx.textContent = `• ${item}`;
+      svg.appendChild(tx);
+    });
   }
 }
 
 function renderPlaybackStep(step){
   if (!playbackData.length) return;
   const idx = Math.max(1, Math.min(step, playbackData.length)) - 1;
-  drawPlaybackFrame(playbackData[idx]);
+  drawPlaybackFrame(playbackData[idx], playbackMeta);
 }
 
 function playPlayback(){
