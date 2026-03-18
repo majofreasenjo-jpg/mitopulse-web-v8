@@ -9,9 +9,10 @@ from core.fraud_detection_engine import FraudDetectionEngine
 from core.systemic_collapse_predictor import SystemicCollapsePredictor
 from core.rfdc import RelationalFieldDynamicsCore
 from core.rfdc_visualizer import build_graph_payload, build_demo_story
+from core.sandbox_action_executor import SandboxActionExecutor
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-app = FastAPI(title="MitoPulse Final Modular Prototype v25")
+app = FastAPI(title="MitoPulse Final Modular Prototype v26")
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 @app.get("/", response_class=HTMLResponse)
@@ -269,3 +270,14 @@ def simulation_playback():
         "metrics": rfdc_result.get("metrics", {})
     }
 
+
+
+@app.post('/api/action/sandbox/{entity_id}/{action}')
+def action_sandbox(entity_id: str, action: str):
+    executor = SandboxActionExecutor()
+    return executor.execute(entity_id=entity_id, action=action, reason='manual_sandbox_test')
+
+@app.get('/api/action/sandbox/state')
+def action_sandbox_state():
+    executor = SandboxActionExecutor()
+    return executor._load()

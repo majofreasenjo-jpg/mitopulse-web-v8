@@ -1,33 +1,39 @@
+import math
 import pandas as pd
-from collections import Counter
+
+def _spring_positions(node_ids, center=(460,210), base_radius=120):
+    positions = {}
+    n = max(1, len(node_ids))
+    for i, node_id in enumerate(node_ids):
+        angle = (2 * math.pi * i) / n
+        ring = 1 + (i // 12)
+        radius = base_radius + (ring-1) * 70
+        x = center[0] + math.cos(angle) * radius
+        y = center[1] + math.sin(angle) * radius
+        positions[str(node_id)] = {"x": round(x,2), "y": round(y,2)}
+    return positions
 
 def build_graph_payload(events_df: pd.DataFrame, rfdc_result: dict) -> dict:
     nodes = {}
     links = []
-
     alerts_by_entity = {}
     for a in rfdc_result.get("alerts", []):
         ent = a.get("entity")
         if ent:
-            alerts_by_entity.setdefault(ent, []).append(a)
+            alerts_by_entity.setdefault(str(ent), []).append(a)
 
-    validated_entities = set()
-    for a in rfdc_result.get("validated_alerts", []):
-        ent = a.get("entity")
-        if ent:
-            validated_entities.add(ent)
-
+    validated_entities = {str(a.get("entity")) for a in rfdc_result.get("validated_alerts", []) if a.get("entity")}
     hidden_entities = set()
     for c in rfdc_result.get("hidden_clusters", []):
         for ent in c.get("entities", []):
             hidden_entities.add(str(ent))
 
     if not events_df.empty:
-        for _, row in events_df.iterrows():
+        trimmed = events_df.tail(180).copy()
+        for _, row in trimmed.iterrows():
             s = str(row.get("source_id", "UNKNOWN"))
             t = str(row.get("target_id", "UNKNOWN"))
             amount = float(row.get("amount", 0) or 0)
-
             for ent in [s, t]:
                 if ent not in nodes:
                     role = "neutral"
@@ -43,7 +49,6 @@ def build_graph_payload(events_df: pd.DataFrame, rfdc_result: dict) -> dict:
                         "role": role,
                         "score": max([float(x.get("score", 0) or 0) for x in alerts_by_entity.get(ent, [])], default=0),
                     }
-
             links.append({
                 "source": s,
                 "target": t,
@@ -51,21 +56,22 @@ def build_graph_payload(events_df: pd.DataFrame, rfdc_result: dict) -> dict:
                 "style": "solid" if s != t else "loop"
             })
 
-    # add inferred links for hidden clusters
+    # inferred links from hidden clusters
     inferred = []
-    for idx, c in enumerate(rfdc_result.get("hidden_clusters", [])[:20], start=1):
+    for c in rfdc_result.get("hidden_clusters", [])[:20]:
         ents = [str(x) for x in c.get("entities", [])[:8]]
-        if len(ents) >= 2:
-            for i in range(len(ents)-1):
-                inferred.append({
-                    "source": ents[i],
-                    "target": ents[i+1],
-                    "weight": c.get("size", 1),
-                    "style": "dashed",
-                    "inferred": True
-                })
+        for i in range(len(ents)-1):
+            inferred.append({
+                "source": ents[i],
+                "target": ents[i+1],
+                "weight": c.get("size", 1),
+                "style": "dashed",
+                "inferred": True
+            })
 
-    metrics = rfdc_result.get("metrics", {})
+    node_list = list(nodes.values())[:40]
+    positions = _spring_positions([n["id"] for n in node_list])
+
     palette = {
         "stable": "#20c997",
         "anomaly": "#ffd166",
@@ -75,14 +81,31 @@ def build_graph_payload(events_df: pd.DataFrame, rfdc_result: dict) -> dict:
         "neutral": "#adb5bd",
         "simulation": "#6c757d",
         "future": "#ffffff",
+        "wave": "#4cc9f0"
     }
 
+    # wave centers based on top alert nodes
+    wave_centers = []
+    for n in node_list:
+        if n["id"] in positions and n["role"] in ["alert", "hidden_cluster", "guardian_validated"]:
+            wave_centers.append({
+                "entity": n["id"],
+                "x": positions[n["id"]]["x"],
+                "y": positions[n["id"]]["y"],
+                "strength": round(min(1.0, float(n.get("score", 0))/100.0 if n.get("score", 0) else 0.35), 3)
+            })
+
+    for n in node_list:
+        if n["id"] in positions:
+            n.update(positions[n["id"]])
+
     return {
-        "nodes": list(nodes.values())[:300],
-        "links": (links[:500] + inferred[:150]),
-        "metrics": metrics,
+        "nodes": node_list,
+        "links": (links[:240] + inferred[:80]),
+        "metrics": rfdc_result.get("metrics", {}),
         "palette": palette,
         "wave_summary": rfdc_result.get("wave_summary", {}),
+        "wave_centers": wave_centers[:8],
     }
 
 def build_demo_story(demo_id: str, rfdc_result: dict) -> dict:
