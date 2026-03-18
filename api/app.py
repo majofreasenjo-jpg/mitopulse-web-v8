@@ -12,9 +12,11 @@ from core.rfdc_visualizer import build_graph_payload, build_demo_story
 from core.sandbox_action_executor import SandboxActionExecutor
 from core.policy_service import load_policies, save_policies
 from core.playback_graph_builder import build_playback_frames
+from core.auto_execution_engine import AutoExecutionEngine
+from core.webhook_simulator import send_webhook
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-app = FastAPI(title="MitoPulse Final Modular Prototype v27")
+app = FastAPI(title="MitoPulse Final Modular Prototype v28")
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
 
 @app.get("/", response_class=HTMLResponse)
@@ -298,3 +300,45 @@ def policies_get():
 @app.post('/api/policies')
 def policies_save(payload: dict):
     return save_policies(payload)
+
+
+@app.post('/api/run/full')
+def run_full_pipeline():
+    import pandas as pd
+    from pathlib import Path
+    from core.rfdc import RelationalFieldDynamicsCore
+
+    target = Path('data/bank_medium_realistic_v1')
+    events = pd.read_csv(target / 'events.csv')
+    signals = pd.read_csv(target / 'signals.csv')
+
+    rfdc = RelationalFieldDynamicsCore()
+    result = rfdc.run(events, signals, client_type="banking")
+
+    decision = result.get("decision", {})
+    alerts = result.get("alerts", [])
+
+    auto = AutoExecutionEngine()
+    execution = auto.run(decision, alerts)
+
+    webhook = send_webhook({
+        "decision": decision,
+        "execution": execution
+    })
+
+    return {
+        "decision": decision,
+        "execution": execution,
+        "webhook": webhook,
+        "summary": result.get("summary", {})
+    }
+
+
+@app.get('/api/webhook/log')
+def webhook_log():
+    import json
+    from pathlib import Path
+    fp = Path("sandbox/webhook_log.json")
+    if not fp.exists():
+        return []
+    return json.loads(fp.read_text())
