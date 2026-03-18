@@ -1,6 +1,8 @@
 import math
 from core.graph_physics_engine import GraphPhysicsEngine
 from core.wave_engine_visual import WaveEngineVisual
+from core.wave_impact_engine import WaveImpactEngine
+from core.risk_field_engine import RiskFieldEngine
 import pandas as pd
 
 def _spring_positions(node_ids, center=(460,210), base_radius=120):
@@ -107,6 +109,12 @@ def build_graph_payload(events_df: pd.DataFrame, rfdc_result: dict) -> dict:
     wave_engine = WaveEngineVisual()
     dynamic_waves = wave_engine.propagate(node_list)
 
+    impact_engine = WaveImpactEngine()
+    node_list = impact_engine.apply(node_list, dynamic_waves)
+
+    field_engine = RiskFieldEngine()
+    risk_field = field_engine.generate(node_list)
+
     return {
         "nodes": node_list,
         "links": (links[:240] + inferred[:80]),
@@ -115,6 +123,7 @@ def build_graph_payload(events_df: pd.DataFrame, rfdc_result: dict) -> dict:
         "wave_summary": rfdc_result.get("wave_summary", {}),
         "wave_centers": wave_centers[:8],
         "dynamic_waves": dynamic_waves,
+        "risk_field": risk_field,
     }
 
 def build_demo_story(demo_id: str, rfdc_result: dict) -> dict:
