@@ -120,12 +120,6 @@ def build_graph_payload(events_df: pd.DataFrame, rfdc_result: dict) -> dict:
 def build_demo_story(demo_id: str, rfdc_result: dict) -> dict:
     metrics = rfdc_result.get("metrics", {})
     if demo_id == "invisible_network":
-        physics = GraphPhysicsEngine()
-        node_list = physics.apply(node_list)
-
-        wave_engine = WaveEngineVisual()
-        dynamic_waves = wave_engine.propagate(node_list)
-
         return {
             "title": "The Invisible Network",
             "subtitle": "Detectar coordinación oculta en una red aparentemente normal",
@@ -139,12 +133,6 @@ def build_demo_story(demo_id: str, rfdc_result: dict) -> dict:
             "headline": f"MDI={metrics.get('mdi', 0)} · Hidden clusters={len(rfdc_result.get('hidden_clusters', []))}"
         }
     if demo_id == "invisible_storm":
-        physics = GraphPhysicsEngine()
-        node_list = physics.apply(node_list)
-
-        wave_engine = WaveEngineVisual()
-        dynamic_waves = wave_engine.propagate(node_list)
-
         return {
             "title": "The Invisible Storm",
             "subtitle": "Pequeñas anomalías evolucionan en una tormenta relacional",
@@ -157,11 +145,6 @@ def build_demo_story(demo_id: str, rfdc_result: dict) -> dict:
             ],
             "headline": f"Waves={rfdc_result.get('wave_summary', {}).get('count', 0)} · SCR={metrics.get('scr', 0)}"
         }
-    physics = GraphPhysicsEngine()
-    node_list = physics.apply(node_list)
-
-    wave_engine = WaveEngineVisual()
-    dynamic_waves = wave_engine.propagate(node_list)
 
     return {
         "title": "The Coming Collapse",
