@@ -217,7 +217,46 @@ code{display:block;background:#09162c;padding:8px 10px;border-radius:10px;margin
     </div>
   </div>
 </div>
-<script src="https://d3js.org/d3.v7.min.js"></script>
+<script src="https://d3js.org/d3.v7.min.js">function roleColor(role){
+  if(role === 'hidden_cluster') return palette.hidden || '#7b61ff';
+  if(role === 'guardian_validated') return palette.guardian || '#00bbf9';
+  if(role === 'alert') return palette.risk || '#ef476f';
+  return palette.neutral || '#adb5bd';
+}
+
+let liveWaveTimer = null;
+function animateWaveRings(){
+  if(liveWaveTimer){ clearInterval(liveWaveTimer); }
+  let tick = 0;
+  liveWaveTimer = setInterval(() => {
+    const rings = document.querySelectorAll('#rfdcGraph .waveRing');
+    rings.forEach((ring, idx) => {
+      const base = 24 + (idx % 3) * 18;
+      ring.setAttribute('r', String(base + (tick % 12)));
+      ring.setAttribute('stroke-opacity', String(Math.max(0.05, 0.25 - ((tick % 12) * 0.015))));
+    });
+    tick += 1;
+  }, 180);
+}
+
+async function runSandboxAction(){
+  const entity = document.getElementById('sandboxEntity').value.trim();
+  const action = document.getElementById('sandboxAction').value;
+  if(!entity){
+    document.getElementById('sandboxOutput').textContent = 'Ingresa un entity id';
+    return;
+  }
+  const res = await fetch('/api/action/sandbox/' + encodeURIComponent(entity) + '/' + encodeURIComponent(action), {method:'POST'});
+  const j = await res.json();
+  document.getElementById('sandboxOutput').textContent = JSON.stringify(j, null, 2);
+}
+
+async function loadSandboxState(){
+  const res = await fetch('/api/action/sandbox/state');
+  const j = await res.json();
+  document.getElementById('sandboxOutput').textContent = JSON.stringify(j, null, 2);
+}
+</script>
 <script>
 function setText(id, value){ document.getElementById(id).textContent = value; }
 function fmt(obj){ return JSON.stringify(obj, null, 2); }
@@ -672,6 +711,45 @@ async function autoLoadDemo() {
 }
 
 autoLoadDemo();
+function roleColor(role){
+  if(role === 'hidden_cluster') return palette.hidden || '#7b61ff';
+  if(role === 'guardian_validated') return palette.guardian || '#00bbf9';
+  if(role === 'alert') return palette.risk || '#ef476f';
+  return palette.neutral || '#adb5bd';
+}
+
+let liveWaveTimer = null;
+function animateWaveRings(){
+  if(liveWaveTimer){ clearInterval(liveWaveTimer); }
+  let tick = 0;
+  liveWaveTimer = setInterval(() => {
+    const rings = document.querySelectorAll('#rfdcGraph .waveRing');
+    rings.forEach((ring, idx) => {
+      const base = 24 + (idx % 3) * 18;
+      ring.setAttribute('r', String(base + (tick % 12)));
+      ring.setAttribute('stroke-opacity', String(Math.max(0.05, 0.25 - ((tick % 12) * 0.015))));
+    });
+    tick += 1;
+  }, 180);
+}
+
+async function runSandboxAction(){
+  const entity = document.getElementById('sandboxEntity').value.trim();
+  const action = document.getElementById('sandboxAction').value;
+  if(!entity){
+    document.getElementById('sandboxOutput').textContent = 'Ingresa un entity id';
+    return;
+  }
+  const res = await fetch('/api/action/sandbox/' + encodeURIComponent(entity) + '/' + encodeURIComponent(action), {method:'POST'});
+  const j = await res.json();
+  document.getElementById('sandboxOutput').textContent = JSON.stringify(j, null, 2);
+}
+
+async function loadSandboxState(){
+  const res = await fetch('/api/action/sandbox/state');
+  const j = await res.json();
+  document.getElementById('sandboxOutput').textContent = JSON.stringify(j, null, 2);
+}
 </script>
 </body>
 </html>
