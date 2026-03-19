@@ -1,0 +1,4 @@
+- banking
+- energy
+- logistics
+- mining
