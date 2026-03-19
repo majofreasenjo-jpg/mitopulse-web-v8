@@ -171,6 +171,60 @@ def forecast(horizon="short"):
         "propagation_path_forecast": [l["source"] + "->" + l["target"] for l in graph["links"] if l["forecast_weight"] >= 0.84]
     }
 
+def unified_physics_biology_layer():
+    graph = build_live_graph()
+    nodes = graph["nodes"]
+    
+    # Extract fundamental parameters
+    total_nodes = len(nodes)
+    if total_nodes == 0: return {}
+    
+    pressure_load = graph.get("external_pressure", 0.0)
+    trigger_count = sum(1 for n in nodes if n["role"] == "trigger")
+    wave_count = sum(1 for n in nodes if n["role"] == "wave")
+    stable_count = sum(1 for n in nodes if n["role"] == "neutral")
+    
+    avg_score = sum(n["score"] for n in nodes) / total_nodes
+    entropy = (trigger_count + wave_count * 0.5) / total_nodes
+    
+    # 1. Biological Layer (SDI, SEI, PMI)
+    # SDI: Systemic Degeneration Index
+    mutation_pressure = avg_score * 0.4
+    reserve_depletion = pressure_load * 0.6
+    regeneration_failure = 0.8 if stable_count < (total_nodes * 0.3) else 0.2
+    sdi = entropy + mutation_pressure + reserve_depletion + regeneration_failure
+    
+    # SEI: Systemic Energy Index
+    useful_capacity = stable_count / total_nodes
+    reserves = max(0, 1.0 - avg_score)
+    sei = useful_capacity + reserves - pressure_load - entropy
+    
+    # PMI: Pathological Mutation Index
+    pmi = mutation_pressure + (entropy * 1.5)
+    
+    # 2. Physics Layer (SSI, FPI)
+    # SSI: Systemic Stress-Strain Index
+    structural_deformation = entropy * 1.2
+    ssi = structural_deformation / max(0.01, pressure_load + 0.1)
+    
+    # FPI: Fracture Probability Index
+    fatigue = avg_score * (1 + pressure_load)
+    redundancy_loss = 1.0 - useful_capacity
+    fpi = fatigue * 0.7 + redundancy_loss * 0.3 + structural_deformation * 0.1
+    
+    return {
+        "bio_layer": {
+            "SDI_systemic_degeneration": round(max(0.0, min(0.99, sdi / 3.0)), 4),
+            "SEI_systemic_energy": round(max(0.0, min(0.99, sei)), 4),
+            "PMI_mutation_index": round(max(0.0, min(0.99, pmi / 2.0)), 4)
+        },
+        "physics_layer": {
+            "SSI_stress_strain": round(min(0.99, ssi / 2.0), 4),
+            "FPI_fracture_probability": round(min(0.99, fpi), 4)
+        },
+        "thermodynamic_state": "critical_fracture_imminent" if fpi > 0.8 else ("high_entropy_phase" if entropy > 0.5 else "stable_equilibrium")
+    }
+
 def system_brain():
     graph = build_live_graph()
     return {

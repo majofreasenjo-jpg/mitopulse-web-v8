@@ -10,9 +10,9 @@ from connectors.live import get_live
 import os
 from api.auth import login
 from api.webhooks import send_webhook
-from api.modules.master_stack import build_live_graph, executive, forecast, system_brain as master_brain, ai_layer, invisible_storm, verify as master_verify, add_action as master_add_action
+from api.modules.master_stack import build_live_graph, executive, forecast, system_brain as master_brain, ai_layer, invisible_storm, verify as master_verify, add_action as master_add_action, unified_physics_biology_layer
 
-app = FastAPI(title="MitoPulse v46.6 Nonlinear/Wave Deep Calculus")
+app = FastAPI(title="MitoPulse v46.7 Unified Physics-Biology Engine")
 templates = Jinja2Templates(directory=str(Path(__file__).parent.parent / "templates"))
 ROOT = Path(__file__).parent.parent
 SANDBOX = {"blocked": [], "limited": [], "events": []}
