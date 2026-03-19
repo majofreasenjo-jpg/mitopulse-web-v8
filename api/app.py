@@ -6,6 +6,7 @@ from pathlib import Path
 import json, math, random, time
 from connectors.sources import unified_live_feed
 from connectors.live_connectors import unified as unified_v35_2
+from connectors.live import get_live
 import os
 from api.auth import login
 from api.webhooks import send_webhook
@@ -263,7 +264,7 @@ def api_demo(demo_id: str = "invisible_network", dataset: str = "marketplace"):
 
 @app.get("/live")
 def live():
-    return unified_v35_2()
+    return get_live()
 
 @app.get("/report")
 def report():
