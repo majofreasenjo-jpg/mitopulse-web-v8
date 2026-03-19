@@ -68,7 +68,7 @@
     <button class="tab-btn" onclick="showTab('reports', this)">Reports & Alerts</button>
     <button class="tab-btn" onclick="showTab('control', this)">Control Center</button>
     <button class="tab-btn" onclick="showTab('ai_layer', this)">AI Layer</button>
-    <button class="tab-btn" onclick="showTab('energy', this)">Energy Engine</button>
+    <button class="tab-btn" onclick="showTab('energy', this)">Vertical Engines</button>
     <button class="tab-btn" onclick="showTab('gtm', this)">Go-To-Market</button>
     <button class="tab-btn" onclick="showTab('memory', this)">Memory & Behavior</button>
   </div>
@@ -203,9 +203,24 @@
   <div id="energy" class="tab">
     <div class="grid">
       <div class="card">
-        <h2>Energy Engine Simulation</h2>
+        <h2>Energy Stability Engine</h2>
         <p class="sub">Invisible Pressure topology running...</p>
         <svg id="energyGraph"></svg>
+      </div>
+      <div class="card">
+        <h2>Marketplace Risk Engine</h2>
+        <p class="sub" style="color:var(--yellow)">Detecting synchronized fraud networks...</p>
+        <div class="kpis" style="margin-top:10px;"><div class="kpi" style="border-left-color:var(--red)"><div class="label">Vendor Collusion</div><div class="value">Active</div></div></div>
+      </div>
+      <div class="card">
+        <h2>Banking / AML Engine</h2>
+        <p class="sub" style="color:var(--green)">Tracking illicit liquidity flows...</p>
+        <div class="kpis" style="margin-top:10px;"><div class="kpi" style="border-left-color:var(--green)"><div class="label">Laundering Index</div><div class="value" style="color:var(--green)">94.2</div></div></div>
+      </div>
+      <div class="card">
+        <h2>Crypto Coordination Engine</h2>
+        <p class="sub" style="color:var(--blue)">Cross-chain wash trading detection...</p>
+        <div class="kpis" style="margin-top:10px;"><div class="kpi" style="border-left-color:var(--blue)"><div class="label">Whale Coordination</div><div class="value" style="color:var(--blue)">Synced</div></div></div>
       </div>
     </div>
   </div>
