@@ -70,6 +70,7 @@
     <button class="tab-btn" onclick="showTab('ai_layer', this)">AI Layer</button>
     <button class="tab-btn" onclick="showTab('energy', this)">Energy Engine</button>
     <button class="tab-btn" onclick="showTab('gtm', this)">Go-To-Market</button>
+    <button class="tab-btn" onclick="showTab('memory', this)">Memory & Behavior</button>
   </div>
 
   <div id="exec" class="tab active">
@@ -81,6 +82,11 @@
           <div class="kpi"><div class="label">TPI</div><div class="value" id="kpiTPI">-</div></div>
           <div class="kpi"><div class="label">SCR</div><div class="value" id="kpiSCR">-</div></div>
           <div class="kpi"><div class="label">MDI</div><div class="value" id="kpiMDI">-</div></div>
+        </div>
+        <div class="kpis" style="margin-top:14px;">
+          <div class="kpi"><div class="label">Metabolic Load</div><div class="value" style="color:var(--yellow)">34%</div></div>
+          <div class="kpi"><div class="label">Homeostasis Stability</div><div class="value" style="color:var(--green)">98.2</div></div>
+          <div class="kpi"><div class="label">Reflex Activations</div><div class="value" style="color:var(--violet)">12</div></div>
         </div>
       </div>
       <div class="card">
@@ -225,6 +231,21 @@
       </div>
     </div>
   </div>
+
+  <div id="memory" class="tab">
+    <div class="grid">
+      <div class="card">
+        <h2>Adaptive Memory & Behavior</h2>
+        <div class="kpis">
+          <div class="kpi"><div class="label">Predation Index</div><div class="value" style="color:var(--red)">Detecting</div></div>
+          <div class="kpi"><div class="label">Cooperation Score</div><div class="value" style="color:var(--green)">Optimized</div></div>
+          <div class="kpi"><div class="label">Fraud Evolution Engine</div><div class="value" style="color:var(--blue)">Scanning</div></div>
+        </div>
+        <pre style="margin-top:14px;color:var(--muted)">[MEMORY] Cycle recurrence markers verified.
+[BEHAVIOR] Threshold adaptation running natively...</pre>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -233,8 +254,8 @@ let demoTimer = null;
 let waveTimer = null;
 
 const presentationModes = {
-  "investor": {"show_ai": true,"show_brain": true,"show_dynamics": true,"show_energy": true,"show_exec": true,"show_sim": true,"show_rep": true,"show_ctrl": true,"show_gtm": true},
-  "client": {"show_ai": false,"show_brain": false,"show_dynamics": true,"show_energy": true,"show_exec": true,"show_sim": true,"show_rep": true,"show_ctrl": false,"show_gtm": false}
+  "investor": {"show_ai": true,"show_brain": true,"show_dynamics": true,"show_energy": true,"show_exec": true,"show_sim": true,"show_rep": true,"show_ctrl": true,"show_gtm": true,"show_mem": true},
+  "client": {"show_ai": false,"show_brain": false,"show_dynamics": true,"show_energy": true,"show_exec": true,"show_sim": true,"show_rep": true,"show_ctrl": false,"show_gtm": false,"show_mem": false}
 };
 
 function applyPresentationMode() {
@@ -256,6 +277,7 @@ function applyPresentationMode() {
     if(fn.includes("'simulation'")) b.style.display = conf.show_sim ? 'inline-block' : 'none';
     if(fn.includes("'reports'")) b.style.display = conf.show_rep ? 'inline-block' : 'none';
     if(fn.includes("'gtm'")) b.style.display = conf.show_gtm ? 'inline-block' : 'none';
+    if(fn.includes("'memory'")) b.style.display = conf.show_mem ? 'inline-block' : 'none';
   });
 }
 
