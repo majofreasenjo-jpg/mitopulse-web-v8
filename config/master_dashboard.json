@@ -1,0 +1,13 @@
+{
+  "version": "v46.3",
+  "integrated_modules": [
+    "executive",
+    "graph_live",
+    "forecast_short_medium_long",
+    "system_brain",
+    "ai_layer",
+    "invisible_storm_improved",
+    "alerts_actions",
+    "mitopulse_verify"
+  ]
+}
