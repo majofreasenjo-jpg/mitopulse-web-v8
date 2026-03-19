@@ -7,6 +7,8 @@ import json, math, random
 from connectors.sources import unified_live_feed
 from connectors.live_connectors import unified as unified_v35_2
 import os
+from api.auth import login
+from api.webhooks import send_webhook
 
 app = FastAPI(title="MitoPulse v35.1 FULL UI")
 templates = Jinja2Templates(directory=str(Path(__file__).parent.parent / "templates"))
@@ -275,3 +277,17 @@ def report():
 @app.get("/history")
 def history():
     return load_db()
+
+@app.post("/login")
+def do_login(username: str, password: str):
+    return login(username, password)
+
+@app.post("/alert")
+def alert(entity: str, risk: int):
+    db = load_db()
+    report = {"entity": entity, "risk": risk}
+    if "reports" not in db: db["reports"] = []
+    db["reports"].append(report)
+    save_db(db)
+    webhook = send_webhook(report)
+    return {"report": report, "webhook": webhook}
