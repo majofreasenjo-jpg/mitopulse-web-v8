@@ -44,14 +44,19 @@ def build_live_graph():
     # HRM Weights (Theoretical weights from V46.1 docs)
     w_n, w_c, w_e, w_f = 0.50, 0.25, 0.10, 0.15
 
-    # 4. Hierarchical Risk Model (HRM) Computation
+    # 4. Nonlinear Hierarchical Risk Model (HRM) Computation
     for n in seed["nodes"]:
         c_id = n.get("kind", "default")
         r_cluster = cluster_accum[c_id] / max(1, cluster_counts[c_id])
         r_node = base_scores[n["id"]]
         
         # True HRM Equation
-        hrm_score = (w_n * r_node) + (w_c * r_cluster) + (w_e * r_ecosystem) + (w_f * r_field)
+        base_hrm_score = (w_n * r_node) + (w_c * r_cluster) + (w_e * r_ecosystem) + (w_f * r_field)
+        
+        # V46.6 Nonlinear Interaction Addition
+        interaction_term = (r_node * r_cluster) ** 1.35 if r_node > 0.5 and r_cluster > 0.5 else 0
+        hrm_score = base_hrm_score + interaction_term
+        
         score = max(0.0, min(0.99, hrm_score * 1.1))
         
         role = "neutral"
@@ -110,23 +115,31 @@ def forecast(horizon="short"):
     graph = build_live_graph()
     steps = {"short": 3, "medium": 7, "long": 14}.get(horizon, 3)
     
-    # Temporal Graph Forecast Engine (TGFE) via Markov-style pressure propagation
+    # Temporal Graph Forecast Engine (TGFE) via Wave Dynamics
     current_scores = {n["id"]: n["score"] for n in graph["nodes"]}
     node_obj = {n["id"]: n for n in graph["nodes"]}
-    memory_drift = 0.95
-    propagation_factor = 0.35
     
     ttc = -1
     critical_threshold = 0.88
     
     for t in range(1, steps + 1):
-        next_scores = {nid: current_scores[nid] * memory_drift for nid in current_scores}
-        # Edge propagation
+        # V46.6 Basic Damping / Memory drift based on node state
+        next_scores = {}
+        for nid in current_scores:
+            damping_base = 0.95 if current_scores[nid] > 0.4 else 0.85
+            next_scores[nid] = current_scores[nid] * damping_base
+
+        # Wave Dynamics Edge propagation
         for l in graph["links"]:
             src = l["source"]
             tgt = l["target"]
             fw = l["forecast_weight"]
-            pressure_wave = current_scores[src] * fw * propagation_factor
+            
+            src_val = current_scores[src]
+            amplification = (src_val ** 1.2) if src_val > 0.65 else 0
+            coupling = fw * 0.42
+            
+            pressure_wave = (src_val + amplification) * coupling
             next_scores[tgt] = min(0.99, next_scores[tgt] + pressure_wave)
         
         current_scores = next_scores

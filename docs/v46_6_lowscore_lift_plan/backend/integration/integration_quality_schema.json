@@ -1,0 +1,8 @@
+{
+  "tenant_id": "tenant_001",
+  "mapping_completeness_score": 0.91,
+  "ingestion_error_rate": 0.02,
+  "timestamp_integrity_score": 0.97,
+  "entity_relation_coverage": 0.88,
+  "connector_health_score": 0.93
+}

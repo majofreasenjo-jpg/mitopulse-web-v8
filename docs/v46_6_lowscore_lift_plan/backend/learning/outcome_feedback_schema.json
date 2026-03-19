@@ -1,0 +1,9 @@
+{
+  "tenant_id": "tenant_001",
+  "entity_id": "entity_123",
+  "recommendation": "review_and_limit",
+  "action_taken": "manual_review",
+  "final_outcome": "confirmed_fraud",
+  "analyst_override": false,
+  "timestamp": "2026-03-17T13:00:00Z"
+}

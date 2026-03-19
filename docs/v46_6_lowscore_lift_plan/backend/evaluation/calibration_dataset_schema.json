@@ -1,0 +1,15 @@
+{
+  "domain": "banking",
+  "tenant_id": "tenant_001",
+  "raw_score": 0.73,
+  "raw_gsi": 0.69,
+  "raw_scr": 0.77,
+  "features": {
+    "node_risk": 0.66,
+    "cluster_risk": 0.72,
+    "ecosystem_risk": 0.68,
+    "field_risk": 0.41
+  },
+  "outcome": 1,
+  "timestamp": "2026-03-17T12:00:00Z"
+}
