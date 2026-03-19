@@ -16,29 +16,62 @@ def save_state(data):
 
 def build_live_graph():
     seed = load_seed()
+    nodes, links = [], []
+    
+    # 1. External Field Risk (R_field)
+    r_field = sum(f["intensity"] for f in seed["external_fields"]) / max(1, len(seed["external_fields"]))
+    
+    # 2. Base Node Risk (R_node) and Ecosystem accumulation
+    base_scores = {}
+    cluster_accum = {}
+    cluster_counts = {}
+    
     incoming = {n["id"]: 0 for n in seed["nodes"]}
     for e in seed["edges"]:
         incoming[e["to"]] += e["weight"] * 0.45
-    ext_pressure = sum(f["intensity"] for f in seed["external_fields"]) / max(1, len(seed["external_fields"]))
-
-    nodes, links = [], []
+        
     for n in seed["nodes"]:
-        score = max(0.0, min(0.99, n["base_risk"] * 0.58 + ext_pressure * 0.22 + incoming[n["id"]] * 0.20))
+        r_node = n["base_risk"] * 0.6 + incoming[n["id"]] * 0.4
+        base_scores[n["id"]] = r_node
+        # Aggregate clusters
+        c_id = n.get("kind", "default")
+        cluster_accum[c_id] = cluster_accum.get(c_id, 0) + r_node
+        cluster_counts[c_id] = cluster_counts.get(c_id, 0) + 1
+        
+    # 3. Ecosystem Risk (R_ecosystem)
+    r_ecosystem = sum(base_scores.values()) / max(1, len(base_scores))
+    
+    # HRM Weights (Theoretical weights from V46.1 docs)
+    w_n, w_c, w_e, w_f = 0.50, 0.25, 0.10, 0.15
+
+    # 4. Hierarchical Risk Model (HRM) Computation
+    for n in seed["nodes"]:
+        c_id = n.get("kind", "default")
+        r_cluster = cluster_accum[c_id] / max(1, cluster_counts[c_id])
+        r_node = base_scores[n["id"]]
+        
+        # True HRM Equation
+        hrm_score = (w_n * r_node) + (w_c * r_cluster) + (w_e * r_ecosystem) + (w_f * r_field)
+        score = max(0.0, min(0.99, hrm_score * 1.1))
+        
         role = "neutral"
         if score >= 0.82: role = "trigger"
         elif score >= 0.70: role = "hidden"
         elif score >= 0.58: role = "wave"
+        
         nodes.append({
             "id": n["id"], "label": n["label"], "kind": n["kind"],
-            "x": n["x_hint"], "y": n["y_hint"], "score": round(score, 3), "role": role
+            "x": n["x_hint"], "y": n["y_hint"], "score": round(score, 3), 
+            "role": role, "cluster_risk": round(r_cluster, 3)
         })
+        
     for e in seed["edges"]:
         links.append({"source": e["from"], "target": e["to"], "weight": e["weight"], "forecast_weight": round(min(1.0, e["weight"]*1.06), 3)})
 
     return {
         "nodes": nodes,
         "links": links,
-        "external_pressure": round(ext_pressure, 3),
+        "external_pressure": round(r_field, 3),
         "risk_field": [{"x": n["x"], "y": n["y"], "intensity": n["score"]} for n in nodes],
         "trigger_zones": [n["id"] for n in nodes if n["role"]=="trigger"],
         "wave_fronts": [{"entity": n["id"], "x": n["x"], "y": n["y"], "intensity": n["score"]} for n in nodes if n["role"] in ("wave","hidden","trigger")]
@@ -75,19 +108,51 @@ def executive():
 
 def forecast(horizon="short"):
     graph = build_live_graph()
-    factor = {"short": 1.08, "medium": 1.18, "long": 1.28}.get(horizon, 1.08)
+    steps = {"short": 3, "medium": 7, "long": 14}.get(horizon, 3)
+    
+    # Temporal Graph Forecast Engine (TGFE) via Markov-style pressure propagation
+    current_scores = {n["id"]: n["score"] for n in graph["nodes"]}
+    node_obj = {n["id"]: n for n in graph["nodes"]}
+    memory_drift = 0.95
+    propagation_factor = 0.35
+    
+    ttc = -1
+    critical_threshold = 0.88
+    
+    for t in range(1, steps + 1):
+        next_scores = {nid: current_scores[nid] * memory_drift for nid in current_scores}
+        # Edge propagation
+        for l in graph["links"]:
+            src = l["source"]
+            tgt = l["target"]
+            fw = l["forecast_weight"]
+            pressure_wave = current_scores[src] * fw * propagation_factor
+            next_scores[tgt] = min(0.99, next_scores[tgt] + pressure_wave)
+        
+        current_scores = next_scores
+        
+        # Calculate TTC (Time-To-Criticality)
+        if ttc == -1:
+            max_risk = max(current_scores.values())
+            if max_risk >= critical_threshold:
+                ttc = t
+                
     nodes = []
     max_score = 0
-    for n in graph["nodes"]:
-        fs = min(0.99, n["score"] * factor + (0.05 if n["role"] == "trigger" else 0))
-        nodes.append({"id": n["id"], "forecast_score": round(fs, 3)})
+    for nid, score in current_scores.items():
+        base_role = node_obj[nid]["role"]
+        fs = min(0.99, score + (0.05 if base_role == "trigger" else 0))
+        nodes.append({"id": nid, "forecast_score": round(fs, 3)})
         max_score = max(max_score, fs)
-    fgsi = round(min(0.99, sum(n["forecast_score"] for n in nodes)/max(1,len(nodes))*1.05), 3)
+        
+    fgsi = round(min(0.99, sum(n["forecast_score"] for n in nodes)/max(1,len(nodes))*1.15), 3)
     fscr = round(min(0.99, max_score*0.92 + fgsi*0.08), 3)
+    
     return {
         "horizon": horizon,
         "forecasted_GSI": fgsi,
         "forecasted_SCR": fscr,
+        "expected_time_to_criticality_steps": ttc if ttc != -1 else "stable beyond horizon",
         "critical_window_probability": round(min(0.99, fscr*0.9), 3),
         "node_forecasts": nodes,
         "propagation_path_forecast": [l["source"] + "->" + l["target"] for l in graph["links"] if l["forecast_weight"] >= 0.84]

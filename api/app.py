@@ -12,7 +12,7 @@ from api.auth import login
 from api.webhooks import send_webhook
 from api.modules.master_stack import build_live_graph, executive, forecast, system_brain as master_brain, ai_layer, invisible_storm, verify as master_verify, add_action as master_add_action
 
-app = FastAPI(title="MitoPulse v46.5 Continuous Improvement System")
+app = FastAPI(title="MitoPulse v46.5 HRM/TGFE Deep Calculus Edition")
 templates = Jinja2Templates(directory=str(Path(__file__).parent.parent / "templates"))
 ROOT = Path(__file__).parent.parent
 SANDBOX = {"blocked": [], "limited": [], "events": []}
