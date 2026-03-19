@@ -5,11 +5,24 @@ from starlette.requests import Request
 from pathlib import Path
 import json, math, random
 from connectors.sources import unified_live_feed
+from connectors.live_connectors import unified as unified_v35_2
+import os
 
 app = FastAPI(title="MitoPulse v35.1 FULL UI")
 templates = Jinja2Templates(directory=str(Path(__file__).parent.parent / "templates"))
 ROOT = Path(__file__).parent.parent
 SANDBOX = {"blocked": [], "limited": [], "events": []}
+DB_PATH = ROOT / "storage" / "db.json"
+
+def load_db():
+    if not DB_PATH.exists():
+        return {"reports": []}
+    with open(DB_PATH) as f:
+        return json.load(f)
+
+def save_db(db):
+    with open(DB_PATH, "w") as f:
+        json.dump(db, f, indent=2)
 
 def load_dataset(name: str):
     fp = ROOT / "datasets" / f"{name}.json"
@@ -245,3 +258,20 @@ def api_connectors():
 @app.get("/api/demo")
 def api_demo(demo_id: str = "invisible_network", dataset: str = "marketplace"):
     return build_demo(demo_id, dataset)
+
+@app.get("/live")
+def live():
+    return unified_v35_2()
+
+@app.get("/report")
+def report():
+    db = load_db()
+    r = {"msg":"system alert","severity":"high"}
+    if "reports" not in db: db["reports"] = []
+    db["reports"].append(r)
+    save_db(db)
+    return r
+
+@app.get("/history")
+def history():
+    return load_db()
