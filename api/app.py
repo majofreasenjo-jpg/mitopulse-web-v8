@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from starlette.requests import Request
 from pathlib import Path
-import json, math, random
+import json, math, random, time
 from connectors.sources import unified_live_feed
 from connectors.live_connectors import unified as unified_v35_2
 import os
@@ -285,9 +285,13 @@ def do_login(username: str, password: str):
 @app.post("/alert")
 def alert(entity: str, risk: int):
     db = load_db()
-    report = {"entity": entity, "risk": risk}
+    report = {"entity": entity, "risk": risk, "ts": time.time()}
     if "reports" not in db: db["reports"] = []
     db["reports"].append(report)
     save_db(db)
     webhook = send_webhook(report)
     return {"report": report, "webhook": webhook}
+
+@app.get("/reports")
+def reports_list():
+    return load_db().get("reports", [])
