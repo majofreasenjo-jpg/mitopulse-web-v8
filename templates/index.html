@@ -2,503 +2,89 @@
 <html>
 <head>
   <meta charset="utf-8"/>
-  <title>MitoPulse v35.1 FULL UI</title>
+  <title>MitoPulse v46.3 Master Dashboard</title>
   <style>
-    :root{
-      --bg:#07111f; --bg2:#0d1a2f; --card:#101d34; --line:#223454; --text:#eef4ff; --muted:#9bb0d1;
-      --green:#20c997; --yellow:#ffd166; --red:#ef476f; --violet:#7b61ff; --blue:#00bbf9;
-    }
-    body{margin:0;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}
-    .wrap{max-width:1440px;margin:0 auto;padding:18px}
-    h1,h2,h3{margin:0 0 10px 0}
-    .sub{color:var(--muted);margin:6px 0 16px 0}
-    .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
-    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-    .tab-btn{background:#10203a;border:1px solid #34517f;color:#dbe8ff;border-radius:10px;padding:10px 14px;cursor:pointer}
-    .tab-btn.active{background:#1b3b68}
-    .tab{display:none}
-    .tab.active{display:block}
-    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}
-    .card{grid-column:span 12;background:linear-gradient(180deg,rgba(16,29,52,.96),rgba(10,19,35,.96));border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-    .kpi{background:linear-gradient(180deg,#10213c,#0a1425);border:1px solid #284067;border-radius:14px;padding:14px}
-    .kpi .label{font-size:12px;color:var(--muted)} .kpi .value{font-size:28px;font-weight:800;margin-top:6px}
-    button,select,input{background:#10203a;border:1px solid #34517f;color:#dbe8ff;border-radius:10px;padding:10px 12px}
-    textarea,pre{width:100%;background:#08111f;border:1px solid #1d2e4d;color:#d6e4ff;border-radius:12px;padding:12px;box-sizing:border-box}
-    pre{max-height:360px;overflow:auto}
-    svg{width:100%;height:500px;background:#0b1320;border:1px solid #1f2a44;border-radius:12px}
-    .half{grid-column:span 6}
-    .third{grid-column:span 4}
-    .small{color:var(--muted);font-size:12px}
+    body{margin:0;background:linear-gradient(180deg,#07111f,#0d1a2f);color:#eef4ff;font-family:Arial,sans-serif}
+    .wrap{max-width:1500px;margin:0 auto;padding:18px}
+    .tabs,.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .btn{background:#10203a;border:1px solid #34517f;color:#dbe8ff;border-radius:10px;padding:10px 12px;cursor:pointer}
+    .btn.active{background:#1b3b68}
+    .tab{display:none}.tab.active{display:block}
+    .card{background:linear-gradient(180deg,#101d34,#0a1425);border:1px solid #223454;border-radius:14px;padding:14px;margin-bottom:12px}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .kpi{background:#10213c;border:1px solid #284067;border-radius:12px;padding:12px}
+    .label{font-size:12px;color:#9bb0d1}.value{font-size:26px;font-weight:800;margin-top:6px}
+    pre{background:#08111f;border:1px solid #1d2e4d;color:#d6e4ff;border-radius:12px;padding:12px;overflow:auto;max-height:340px}
+    svg{width:100%;height:560px;background:#0b1320;border:1px solid #1f2a44;border-radius:12px}
+    input{background:#10203a;border:1px solid #34517f;color:#dbe8ff;border-radius:10px;padding:10px 12px}
   </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>MitoPulse v44 — Universal System Closure</h1>
-  <div class="sub">Universal System Intelligence Layer · Morphogenesis · Reserve Economy · Nested Systems · AI</div>
-
-  <div class="toolbar">
-    <label>Dataset</label>
-    <select id="dataset">
-      <option value="marketplace">marketplace</option>
-      <option value="banking">banking</option>
-    </select>
-    <label>Client Mode</label>
-    <select id="clientType">
-      <option value="marketplace">marketplace</option>
-      <option value="banking">banking</option>
-      <option value="crypto">crypto</option>
-      <option value="afp">afp</option>
-      <option value="generic">generic</option>
-    </select>
-    <label>Presentation</label>
-    <select id="presentationMode" onchange="applyPresentationMode()">
-      <option value="full">Full UI (Default)</option>
-      <option value="investor">Investor Pitch</option>
-      <option value="client">Client Pitch</option>
-    </select>
-    <button onclick="refreshExecutive()">Refresh Executive</button>
-  </div>
-
+  <h1>MitoPulse v46.3 — Master Dashboard Integrated</h1>
   <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('exec', this)">Executive View</button>
-    <button class="tab-btn" onclick="showTab('brain', this)">System Brain</button>
-    <button class="tab-btn" onclick="showTab('dynamics', this)">System Dynamics</button>
-    <button class="tab-btn" onclick="showTab('simulation', this)">Simulation & Demo Killers</button>
-    <button class="tab-btn" onclick="showTab('reports', this)">Reports & Alerts</button>
-    <button class="tab-btn" onclick="showTab('control', this)">Control Center</button>
-    <button class="tab-btn" onclick="showTab('ai_layer', this)">AI Layer</button>
-    <button class="tab-btn" onclick="showTab('energy', this)">Vertical Engines</button>
-    <button class="tab-btn" onclick="showTab('gtm', this)">Go-To-Market</button>
-    <button class="tab-btn" onclick="showTab('memory', this)">Memory & Behavior</button>
+    <button class="btn active" onclick="showTab('exec', this)">Executive</button>
+    <button class="btn" onclick="showTab('graph', this)">Graph Live</button>
+    <button class="btn" onclick="showTab('forecast', this)">Forecast</button>
+    <button class="btn" onclick="showTab('brain', this)">System Brain</button>
+    <button class="btn" onclick="showTab('ai', this)">AI Layer</button>
+    <button class="btn" onclick="showTab('storm', this)">Invisible Storm</button>
+    <button class="btn" onclick="showTab('actions', this)">Alerts & Actions</button>
+    <button class="btn" onclick="showTab('verify', this)">MitoPulse Verify</button>
   </div>
 
   <div id="exec" class="tab active">
-    <div class="grid">
-      <div class="card">
-        <h2>Executive KPIs</h2>
-        <div class="kpis">
-          <div class="kpi"><div class="label">NHI</div><div class="value" id="kpiNHI">-</div></div>
-          <div class="kpi"><div class="label">TPI</div><div class="value" id="kpiTPI">-</div></div>
-          <div class="kpi"><div class="label">SCR</div><div class="value" id="kpiSCR">-</div></div>
-          <div class="kpi"><div class="label">MDI</div><div class="value" id="kpiMDI">-</div></div>
-        </div>
-        <div class="kpis" style="margin-top:14px;">
-          <div class="kpi"><div class="label">Metabolic Load</div><div class="value" style="color:var(--yellow)">34%</div></div>
-          <div class="kpi"><div class="label">Homeostasis Stability</div><div class="value" style="color:var(--green)">98.2</div></div>
-          <div class="kpi"><div class="label">Reflex Activations</div><div class="value" style="color:var(--violet)">12</div></div>
-        </div>
+    <div class="card">
+      <div class="toolbar"><button class="btn" onclick="loadExecutive()">Refresh</button></div>
+      <div class="grid">
+        <div class="kpi"><div class="label">GSI</div><div class="value" id="gsi">-</div></div>
+        <div class="kpi"><div class="label">NHI</div><div class="value" id="nhi">-</div></div>
+        <div class="kpi"><div class="label">TPI</div><div class="value" id="tpi">-</div></div>
+        <div class="kpi"><div class="label">SCR</div><div class="value" id="scr">-</div></div>
       </div>
-      <div class="card">
-        <h2>Executive Graph</h2>
-        <svg id="graph"></svg>
-      </div>
+      <pre id="execOut">Sin ejecutar.</pre>
     </div>
   </div>
 
-  <div id="brain" class="tab">
-    <div class="grid">
-      <div class="card half">
-        <h2>RFDC / Brain Output</h2>
-        <pre id="brainOut">Sin ejecutar.</pre>
-      </div>
-      <div class="card half">
-        <h2>Live Connectors</h2>
-        <button onclick="loadConnectors()">Load Connectors</button>
-        <pre id="connectorsOut">Sin ejecutar.</pre>
-      </div>
-    </div>
-  </div>
-
-  <div id="dynamics" class="tab">
-    <div class="grid">
-      <div class="card">
-        <h2>Graphbook — Waves, Risk Field, Trigger Zones</h2>
-        <button onclick="loadDynamics()">Load Dynamics</button>
-        <svg id="dynamicsGraph"></svg>
-      </div>
-      <div class="card">
-        <pre id="dynamicsOut">Sin ejecutar.</pre>
-      </div>
-    </div>
-  </div>
-
-  <div id="simulation" class="tab">
-    <div class="grid">
-      <div class="card">
-        <h2>Demo Killers</h2>
-        <div class="toolbar">
-          <select id="demoId">
-            <option value="invisible_network">The Invisible Network</option>
-            <option value="invisible_storm">The Invisible Storm</option>
-            <option value="coming_collapse">The Coming Collapse</option>
-          </select>
-          <button onclick="loadDemo()">Load Demo</button>
-          <button onclick="playDemo()">Play</button>
-          <button onclick="pauseDemo()">Pause</button>
-          <input id="demoRange" type="range" min="1" max="24" value="1" oninput="renderDemoStep(parseInt(this.value))" style="width:320px"/>
-        </div>
-        <svg id="demoGraph"></svg>
-      </div>
-      <div class="card">
-        <pre id="demoOut">Sin ejecutar.</pre>
-      </div>
-    </div>
-  </div>
-
-  <div id="reports" class="tab">
-    <div class="grid">
-      <div class="card half">
-        <h2>Client Report / Alert</h2>
-        <button onclick="loadReport()">Build Report</button>
-        <pre id="reportOut">Sin ejecutar.</pre>
-      </div>
-      <div class="card half">
-        <h2>Sandbox Actions</h2>
-        <div class="toolbar">
-          <input id="entityId" placeholder="entity id"/>
-          <input id="actionName" placeholder="action"/>
-          <button onclick="sendSandboxAction()">Send Action</button>
-          <button onclick="loadSandboxState()">Load Sandbox State</button>
-        </div>
-        <pre id="sandboxOut">Sin ejecutar.</pre>
-      </div>
-    </div>
-  </div>
-
-  <div id="control" class="tab">
-    <div class="grid">
-      <div class="card">
-        <h2>Modular Control</h2>
-        <div class="small">v35 is built full-size. Use these modes later to hide or show layers for demos and client-specific pitches.</div>
-        <textarea id="controlConfig">{
-  "mode": "full",
-  "show_brain": true,
-  "show_dynamics": true,
-  "show_reports": true,
-  "show_simulation": true
-}</textarea>
-      </div>
-    </div>
-  </div>
-
-  <div id="ai_layer" class="tab">
-    <div class="grid">
-      <div class="card">
-        <h2>AI Layer Diagnostics</h2>
-        <div class="kpis">
-          <div class="kpi"><div class="label">Normalization</div><div class="value" style="color:var(--green)">Active</div></div>
-          <div class="kpi"><div class="label">Anomaly Detection</div><div class="value" style="color:var(--yellow)">Scanning</div></div>
-          <div class="kpi"><div class="label">Pattern Mutation</div><div class="value" style="color:var(--blue)">Online</div></div>
-          <div class="kpi"><div class="label">Explainability</div><div class="value" style="color:var(--violet)">Standby</div></div>
-        </div>
-        <pre style="margin-top:14px;color:var(--muted)">[AI ENGINE] Injecting real-time heuristic filters across 14,000 data nodes.
-[AI ENGINE] Isolating fraudulent mutations prior to network propagation.
-[AI ENGINE] Relational memory matrix verified.
-[AI ENGINE] Amplifying structural decision arrays...</pre>
-      </div>
-    </div>
-  </div>
-
-  <div id="energy" class="tab">
-    <div class="grid">
-      <div class="card">
-        <h2>Energy Stability Engine</h2>
-        <p class="sub">Invisible Pressure topology running...</p>
-        <svg id="energyGraph"></svg>
-      </div>
-      <div class="card">
-        <h2>Marketplace Risk Engine</h2>
-        <p class="sub" style="color:var(--yellow)">Detecting synchronized fraud networks...</p>
-        <div class="kpis" style="margin-top:10px;"><div class="kpi" style="border-left-color:var(--red)"><div class="label">Vendor Collusion</div><div class="value">Active</div></div></div>
-      </div>
-      <div class="card">
-        <h2>Banking / AML Engine</h2>
-        <p class="sub" style="color:var(--green)">Tracking illicit liquidity flows...</p>
-        <div class="kpis" style="margin-top:10px;"><div class="kpi" style="border-left-color:var(--green)"><div class="label">Laundering Index</div><div class="value" style="color:var(--green)">94.2</div></div></div>
-      </div>
-      <div class="card">
-        <h2>Crypto Coordination Engine</h2>
-        <p class="sub" style="color:var(--blue)">Cross-chain wash trading detection...</p>
-        <div class="kpis" style="margin-top:10px;"><div class="kpi" style="border-left-color:var(--blue)"><div class="label">Whale Coordination</div><div class="value" style="color:var(--blue)">Synced</div></div></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="gtm" class="tab">
-    <div class="grid">
-      <div class="card third">
-        <h2>Core Pitch</h2>
-        <p class="sub" style="color:var(--blue)">Living Risk Intelligence Engine</p>
-        <p>Detects, simulates and prevents systemic collapse.</p>
-      </div>
-      <div class="card third">
-        <h2>Target ICP</h2>
-        <p class="sub" style="color:var(--violet)">Marketplace / Bank / Energy</p>
-        <p>Strategic deployment across critical operations.</p>
-      </div>
-      <div class="card third">
-        <h2>Pricing Strategy</h2>
-        <div class="kpis">
-          <div class="kpi"><div class="label">Pilot Phase</div><div class="value" style="color:var(--yellow)">$50K-150K</div></div>
-          <div class="kpi"><div class="label">Enterprise</div><div class="value" style="color:var(--green)">$250K-1M+</div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="memory" class="tab">
-    <div class="grid">
-      <div class="card">
-        <h2>Adaptive Memory & Behavior</h2>
-        <div class="kpis">
-          <div class="kpi"><div class="label">Predation Index</div><div class="value" style="color:var(--red)">Detecting</div></div>
-          <div class="kpi"><div class="label">Cooperation Score</div><div class="value" style="color:var(--green)">Optimized</div></div>
-          <div class="kpi"><div class="label">Fraud Evolution Engine</div><div class="value" style="color:var(--blue)">Scanning</div></div>
-        </div>
-        <pre style="margin-top:14px;color:var(--muted)">[MEMORY] Cycle recurrence markers verified.
-[BEHAVIOR] Threshold adaptation running natively...</pre>
-      </div>
-    </div>
-  </div>
+  <div id="graph" class="tab"><div class="card"><button class="btn" onclick="loadGraph()">Load Live Graph</button><svg id="graphSvg"></svg><pre id="graphOut">Sin ejecutar.</pre></div></div>
+  <div id="forecast" class="tab"><div class="card"><div class="toolbar"><button class="btn" onclick="loadForecast('short')">Short</button><button class="btn" onclick="loadForecast('medium')">Medium</button><button class="btn" onclick="loadForecast('long')">Long</button></div><pre id="forecastOut">Sin ejecutar.</pre></div></div>
+  <div id="brain" class="tab"><div class="card"><button class="btn" onclick="loadBrain()">Load Brain</button><pre id="brainOut">Sin ejecutar.</pre></div></div>
+  <div id="ai" class="tab"><div class="card"><button class="btn" onclick="loadAI()">Load AI</button><pre id="aiOut">Sin ejecutar.</pre></div></div>
+  <div id="storm" class="tab"><div class="card"><div class="toolbar"><button class="btn" onclick="loadStorm()">Load Demo</button><button class="btn" onclick="playStorm()">Play</button><button class="btn" onclick="pauseStorm()">Pause</button><input id="stormRange" type="range" min="1" max="20" value="1" oninput="renderStormStep(parseInt(this.value))" style="width:320px"/></div><svg id="stormSvg"></svg><pre id="stormOut">Sin ejecutar.</pre></div></div>
+  <div id="actions" class="tab"><div class="card"><div class="toolbar"><input id="entityId" placeholder="entity id"/><input id="actionName" placeholder="action"/><button class="btn" onclick="sendAction()">Send Action</button></div><pre id="actionOut">Sin ejecutar.</pre></div></div>
+  <div id="verify" class="tab"><div class="card"><button class="btn" onclick="loadVerify()">Load Verify</button><pre id="verifyOut">Sin ejecutar.</pre></div></div>
 </div>
 
 <script>
-let demoPayload = null;
-let demoTimer = null;
-let waveTimer = null;
-
-const presentationModes = {
-  "investor": {"show_ai": true,"show_brain": true,"show_dynamics": true,"show_energy": true,"show_exec": true,"show_sim": true,"show_rep": true,"show_ctrl": true,"show_gtm": true,"show_mem": true},
-  "client": {"show_ai": false,"show_brain": false,"show_dynamics": true,"show_energy": true,"show_exec": true,"show_sim": true,"show_rep": true,"show_ctrl": false,"show_gtm": false,"show_mem": false}
-};
-
-function applyPresentationMode() {
-  const mode = document.getElementById('presentationMode').value;
-  const btns = document.querySelectorAll('.tab-btn');
-  if(mode === 'full') {
-    btns.forEach(b => b.style.display = 'inline-block');
-    return;
-  }
-  const conf = presentationModes[mode];
-  btns.forEach(b => {
-    const fn = b.getAttribute('onclick') || '';
-    if(fn.includes("'exec'")) b.style.display = conf.show_exec ? 'inline-block' : 'none';
-    if(fn.includes("'ai_layer'")) b.style.display = conf.show_ai ? 'inline-block' : 'none';
-    if(fn.includes("'brain'")) b.style.display = conf.show_brain ? 'inline-block' : 'none';
-    if(fn.includes("'dynamics'")) b.style.display = conf.show_dynamics ? 'inline-block' : 'none';
-    if(fn.includes("'energy'")) b.style.display = conf.show_energy ? 'inline-block' : 'none';
-    if(fn.includes("'control'")) b.style.display = conf.show_ctrl ? 'inline-block' : 'none';
-    if(fn.includes("'simulation'")) b.style.display = conf.show_sim ? 'inline-block' : 'none';
-    if(fn.includes("'reports'")) b.style.display = conf.show_rep ? 'inline-block' : 'none';
-    if(fn.includes("'gtm'")) b.style.display = conf.show_gtm ? 'inline-block' : 'none';
-    if(fn.includes("'memory'")) b.style.display = conf.show_mem ? 'inline-block' : 'none';
-  });
-}
-
+let waveTimer=null, stormPayload=null, stormTimer=null;
 function showTab(id, btn){
-  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  btn.classList.add('active');
+ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+ document.querySelectorAll('.btn').forEach(x=>x.classList.remove('active'));
+ document.getElementById(id).classList.add('active'); btn.classList.add('active');
 }
-
-function roleColor(role){
-  if(role === 'trigger') return '#ef476f';
-  if(role === 'hidden') return '#7b61ff';
-  if(role === 'wave') return '#00bbf9';
-  return '#adb5bd';
+function roleColor(role){ if(role==='trigger') return '#ef476f'; if(role==='hidden') return '#7b61ff'; if(role==='wave') return '#00bbf9'; return '#8ecae6'; }
+function drawGraph(svgId, graph){
+ const svg=document.getElementById(svgId); svg.innerHTML='';
+ if(!graph||!graph.nodes) return;
+ (graph.risk_field||[]).forEach(p=>{const h=document.createElementNS('http://www.w3.org/2000/svg','circle'); h.setAttribute('cx',p.x); h.setAttribute('cy',p.y); h.setAttribute('r',32); h.setAttribute('fill','#ef476f'); h.setAttribute('opacity',Math.min(0.16,p.intensity)); svg.appendChild(h);});
+ (graph.links||[]).forEach(l=>{const s=graph.nodes.find(n=>n.id===l.source), t=graph.nodes.find(n=>n.id===l.target); if(!s||!t)return; const line=document.createElementNS('http://www.w3.org/2000/svg','line'); line.setAttribute('x1',s.x); line.setAttribute('y1',s.y); line.setAttribute('x2',t.x); line.setAttribute('y2',t.y); line.setAttribute('stroke','#34517f'); line.setAttribute('stroke-width',2); line.setAttribute('opacity',0.75); svg.appendChild(line);});
+ (graph.wave_fronts||[]).forEach(w=>{for(let i=1;i<=3;i++){const c=document.createElementNS('http://www.w3.org/2000/svg','circle'); c.setAttribute('cx',w.x); c.setAttribute('cy',w.y); c.setAttribute('r',10+i*14); c.setAttribute('fill','none'); c.setAttribute('stroke','#4cc9f0'); c.setAttribute('stroke-opacity',Math.max(0.06,0.24-i*0.05)); c.setAttribute('stroke-width',4); c.setAttribute('class',svgId+'-wave'); svg.appendChild(c);}});
+ graph.nodes.forEach(n=>{const c=document.createElementNS('http://www.w3.org/2000/svg','circle'); c.setAttribute('cx',n.x); c.setAttribute('cy',n.y); c.setAttribute('r',14+Math.min(12,n.score*12)); c.setAttribute('fill',roleColor(n.role)); svg.appendChild(c); const tx=document.createElementNS('http://www.w3.org/2000/svg','text'); tx.setAttribute('x',n.x); tx.setAttribute('y',n.y+4); tx.setAttribute('text-anchor','middle'); tx.setAttribute('fill','#ffffff'); tx.setAttribute('font-size','10'); tx.textContent=n.label; svg.appendChild(tx);});
+ if(waveTimer) clearInterval(waveTimer); let tick=0;
+ waveTimer=setInterval(()=>{svg.querySelectorAll('.'+svgId+'-wave').forEach((ring, idx)=>{const base=14+(idx%3)*14; ring.setAttribute('r', String(base + (tick % 12)));}); tick++;},160);
 }
-
-function drawGraph(svgId, payload){
-  const svg = document.getElementById(svgId);
-  svg.innerHTML = '';
-  if(!payload || !payload.nodes) return;
-
-  // risk field
-  (payload.risk_field || []).forEach(p => {
-    const heat = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    heat.setAttribute('cx', p.x);
-    heat.setAttribute('cy', p.y);
-    heat.setAttribute('r', 28);
-    heat.setAttribute('fill', '#ef476f');
-    heat.setAttribute('opacity', Math.min(0.16, p.intensity));
-    svg.appendChild(heat);
-  });
-
-  // links
-  (payload.links || []).forEach(l => {
-    const s = payload.nodes.find(n => n.id === l.source);
-    const t = payload.nodes.find(n => n.id === l.target);
-    if(!s || !t) return;
-    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-    line.setAttribute('x1', s.x); line.setAttribute('y1', s.y);
-    line.setAttribute('x2', t.x); line.setAttribute('y2', t.y);
-    line.setAttribute('stroke', '#34517f');
-    line.setAttribute('stroke-width', 1.6);
-    line.setAttribute('opacity', 0.65);
-    svg.appendChild(line);
-  });
-
-  // waves
-  (payload.dynamic_waves || []).forEach(w => {
-    for(let i=1;i<=3;i++){
-      const ring = document.createElementNS('http://www.w3.org/2000/svg','circle');
-      ring.setAttribute('cx', w.x);
-      ring.setAttribute('cy', w.y);
-      ring.setAttribute('r', 12 + i*14);
-      ring.setAttribute('fill', 'none');
-      ring.setAttribute('stroke', '#4cc9f0');
-      ring.setAttribute('stroke-opacity', Math.max(0.06, 0.24 - i*0.05));
-      ring.setAttribute('stroke-width', 4);
-      ring.setAttribute('class', 'wave-ring');
-      svg.appendChild(ring);
-    }
-  });
-
-  // trigger zones
-  (payload.trigger_zones || []).forEach(id => {
-    const n = payload.nodes.find(x => x.id === id);
-    if(!n) return;
-    const r = document.createElementNS('http://www.w3.org/2000/svg','rect');
-    r.setAttribute('x', n.x - 14); r.setAttribute('y', n.y - 14);
-    r.setAttribute('width', 28); r.setAttribute('height', 28);
-    r.setAttribute('fill', '#ffd166'); r.setAttribute('opacity', 0.38);
-    svg.appendChild(r);
-  });
-
-  // nodes
-  payload.nodes.forEach(n => {
-    const halo = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    halo.setAttribute('cx', n.x); halo.setAttribute('cy', n.y);
-    halo.setAttribute('r', 22);
-    halo.setAttribute('fill', 'none');
-    halo.setAttribute('stroke', '#4cc9f0');
-    halo.setAttribute('stroke-opacity', 0.11);
-    halo.setAttribute('stroke-width', 7);
-    svg.appendChild(halo);
-
-    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
-    c.setAttribute('cx', n.x); c.setAttribute('cy', n.y);
-    c.setAttribute('r', 10 + Math.min(14, n.score/10));
-    c.setAttribute('fill', roleColor(n.role));
-    svg.appendChild(c);
-
-    const tx = document.createElementNS('http://www.w3.org/2000/svg','text');
-    tx.setAttribute('x', n.x); tx.setAttribute('y', n.y + 4);
-    tx.setAttribute('text-anchor', 'middle');
-    tx.setAttribute('fill', '#fff');
-    tx.setAttribute('font-size', '10');
-    tx.textContent = String(n.label).slice(0,10);
-    svg.appendChild(tx);
-  });
-
-  animateWaves(svg);
-}
-
-function animateWaves(svg){
-  if(waveTimer) clearInterval(waveTimer);
-  let tick = 0;
-  waveTimer = setInterval(() => {
-    svg.querySelectorAll('.wave-ring').forEach((ring, idx) => {
-      const base = 14 + (idx%3)*14;
-      ring.setAttribute('r', String(base + (tick % 12)));
-    });
-    tick += 1;
-  }, 160);
-}
-
-async function refreshExecutive(){
-  const dataset = document.getElementById('dataset').value;
-  const o = await (await fetch('/api/overview?dataset=' + dataset)).json();
-  document.getElementById('kpiNHI').textContent = o.NHI;
-  document.getElementById('kpiTPI').textContent = o.TPI;
-  document.getElementById('kpiSCR').textContent = o.SCR;
-  document.getElementById('kpiMDI').textContent = o.MDI;
-  const d = await (await fetch('/api/dynamics?dataset=' + dataset)).json();
-  drawGraph('graph', d.graph);
-}
-
-async function loadBrain(){
-  const dataset = document.getElementById('dataset').value;
-  const j = await (await fetch('/api/brain?dataset=' + dataset)).json();
-  document.getElementById('brainOut').textContent = JSON.stringify(j, null, 2);
-}
-
-async function loadConnectors(){
-  const j = await (await fetch('/api/connectors')).json();
-  document.getElementById('connectorsOut').textContent = JSON.stringify(j, null, 2);
-}
-
-async function loadDynamics(){
-  const dataset = document.getElementById('dataset').value;
-  const j = await (await fetch('/api/dynamics?dataset=' + dataset)).json();
-  document.getElementById('dynamicsOut').textContent = JSON.stringify(j, null, 2);
-  drawGraph('dynamicsGraph', j.graph);
-}
-
-async function loadReport(){
-  const dataset = document.getElementById('dataset').value;
-  const clientType = document.getElementById('clientType').value;
-  const j = await (await fetch('/api/reports?dataset=' + dataset + '&client_type=' + clientType)).json();
-  document.getElementById('reportOut').textContent = JSON.stringify(j, null, 2);
-}
-
-async function sendSandboxAction(){
-  const entityId = document.getElementById('entityId').value.trim();
-  const action = document.getElementById('actionName').value.trim();
-  const clientType = document.getElementById('clientType').value;
-  if(!entityId || !action){ return; }
-  const report = await (await fetch('/api/reports?dataset=' + document.getElementById('dataset').value + '&client_type=' + clientType)).json();
-  const recipient = encodeURIComponent(report.recipient || 'Ops');
-  const j = await (await fetch('/api/action/sandbox?entity_id=' + encodeURIComponent(entityId) + '&action=' + encodeURIComponent(action) + '&recipient=' + recipient, {method:'POST'})).json();
-  document.getElementById('sandboxOut').textContent = JSON.stringify(j, null, 2);
-}
-
-async function loadSandboxState(){
-  const j = await (await fetch('/api/action/sandbox/state')).json();
-  document.getElementById('sandboxOut').textContent = JSON.stringify(j, null, 2);
-}
-
-async function loadDemo(){
-  const dataset = document.getElementById('dataset').value;
-  const demoId = document.getElementById('demoId').value;
-  demoPayload = await (await fetch('/api/demo?demo_id=' + demoId + '&dataset=' + dataset)).json();
-  document.getElementById('demoRange').max = demoPayload.steps.length;
-  document.getElementById('demoRange').value = 1;
-  document.getElementById('demoOut').textContent = JSON.stringify(demoPayload.steps[0], null, 2);
-  renderDemoStep(1);
-}
-
-function renderDemoStep(step){
-  if(!demoPayload) return;
-  const s = demoPayload.steps[step-1];
-  document.getElementById('demoOut').textContent = JSON.stringify(s, null, 2);
-  drawGraph('demoGraph', s.graph);
-  document.getElementById('kpiNHI').textContent = s.nhi;
-  document.getElementById('kpiTPI').textContent = s.tpi;
-  document.getElementById('kpiSCR').textContent = s.scr;
-  document.getElementById('kpiMDI').textContent = Math.round((s.scr + s.tpi) / 2);
-}
-
-function playDemo(){
-  if(!demoPayload) return;
-  pauseDemo();
-  let idx = parseInt(document.getElementById('demoRange').value || '1', 10);
-  demoTimer = setInterval(() => {
-    if(idx > demoPayload.steps.length){ pauseDemo(); return; }
-    document.getElementById('demoRange').value = idx;
-    renderDemoStep(idx);
-    idx += 1;
-  }, 500);
-}
-
-function pauseDemo(){
-  if(demoTimer) clearInterval(demoTimer);
-}
-
-refreshExecutive();
-loadBrain();
+async function loadExecutive(){ const j=await (await fetch('/api/executive')).json(); document.getElementById('gsi').textContent=j.GSI; document.getElementById('nhi').textContent=j.NHI; document.getElementById('tpi').textContent=j.TPI; document.getElementById('scr').textContent=j.SCR; document.getElementById('execOut').textContent=JSON.stringify(j,null,2);}
+async function loadGraph(){ const j=await (await fetch('/api/live-graph')).json(); drawGraph('graphSvg', j); document.getElementById('graphOut').textContent=JSON.stringify(j,null,2);}
+async function loadForecast(h){ const j=await (await fetch('/api/forecast?horizon='+h)).json(); document.getElementById('forecastOut').textContent=JSON.stringify(j,null,2);}
+async function loadBrain(){ const j=await (await fetch('/api/brain')).json(); document.getElementById('brainOut').textContent=JSON.stringify(j,null,2);}
+async function loadAI(){ const j=await (await fetch('/api/ai')).json(); document.getElementById('aiOut').textContent=JSON.stringify(j,null,2);}
+async function loadVerify(){ const j=await (await fetch('/api/verify')).json(); document.getElementById('verifyOut').textContent=JSON.stringify(j,null,2);}
+async function loadStorm(){ stormPayload=await (await fetch('/api/demo/invisible-storm')).json(); document.getElementById('stormRange').max=stormPayload.steps.length; document.getElementById('stormRange').value=1; renderStormStep(1);}
+function renderStormStep(step){ if(!stormPayload) return; const s=stormPayload.steps[step-1]; drawGraph('stormSvg', s.graph); document.getElementById('stormOut').textContent=JSON.stringify(s,null,2);}
+function playStorm(){ if(!stormPayload) return; pauseStorm(); let idx=parseInt(document.getElementById('stormRange').value||'1',10); stormTimer=setInterval(()=>{ if(idx>stormPayload.steps.length){pauseStorm(); return;} document.getElementById('stormRange').value=idx; renderStormStep(idx); idx++; },520);}
+function pauseStorm(){ if(stormTimer) clearInterval(stormTimer); }
+async function sendAction(){ const entity=document.getElementById('entityId').value; const action=document.getElementById('actionName').value; if(!entity||!action)return; const j=await (await fetch('/api/action?entity_id='+encodeURIComponent(entity)+'&action='+encodeURIComponent(action), {method:'POST'})).json(); document.getElementById('actionOut').textContent=JSON.stringify(j,null,2);}
+loadExecutive(); loadGraph();
 </script>
 </body>
 </html>

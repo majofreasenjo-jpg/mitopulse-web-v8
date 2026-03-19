@@ -10,6 +10,7 @@ from connectors.live import get_live
 import os
 from api.auth import login
 from api.webhooks import send_webhook
+from api.modules.master_stack import build_live_graph, executive, forecast, system_brain as master_brain, ai_layer, invisible_storm, verify as master_verify, add_action as master_add_action
 
 app = FastAPI(title="MitoPulse v46.3 Master Dashboard Integrated")
 templates = Jinja2Templates(directory=str(Path(__file__).parent.parent / "templates"))
@@ -213,31 +214,37 @@ def build_demo(demo_id, data_name):
 def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
-@app.get("/api/overview")
-def api_overview(dataset: str = "marketplace"):
-    data = load_dataset(dataset)
-    return compute_overview(data)
+@app.get("/api/executive")
+def api_executive():
+    return executive()
+
+@app.get("/api/live-graph")
+def api_live_graph():
+    return build_live_graph()
+
+@app.get("/api/forecast")
+def api_forecast(horizon: str = "short"):
+    return forecast(horizon=horizon)
 
 @app.get("/api/brain")
-def api_brain(dataset: str = "marketplace"):
-    data = load_dataset(dataset)
-    return compute_brain(data)
+def api_brain_master():
+    return master_brain()
 
-@app.get("/api/dynamics")
-def api_dynamics(dataset: str = "marketplace"):
-    data = load_dataset(dataset)
-    graph = build_graph(data)
-    return {
-        "graph": graph,
-        "vortex_detected": len(graph["trigger_zones"]) > 0,
-        "collapse_probability": round(compute_overview(data)["SCR"]/100, 3)
-    }
+@app.get("/api/ai")
+def api_ai():
+    return ai_layer()
 
-@app.get("/api/reports")
-def api_reports(dataset: str = "marketplace", client_type: str = "marketplace"):
-    report = build_report(dataset, client_type)
-    (ROOT / "reports" / "latest_report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
-    return report
+@app.get("/api/demo/invisible-storm")
+def api_demo():
+    return invisible_storm()
+
+@app.get("/api/verify")
+def api_verify_master():
+    return master_verify()
+
+@app.post("/api/action")
+def api_action(entity_id: str = Query(...), action: str = Query(...)):
+    return master_add_action(entity_id, action)
 
 @app.post("/api/action/sandbox")
 def api_action_sandbox(entity_id: str = Query(...), action: str = Query(...), recipient: str = Query("Ops")):
