@@ -69,6 +69,7 @@
     <button class="tab-btn" onclick="showTab('control', this)">Control Center</button>
     <button class="tab-btn" onclick="showTab('ai_layer', this)">AI Layer</button>
     <button class="tab-btn" onclick="showTab('energy', this)">Energy Engine</button>
+    <button class="tab-btn" onclick="showTab('gtm', this)">Go-To-Market</button>
   </div>
 
   <div id="exec" class="tab active">
@@ -202,6 +203,28 @@
       </div>
     </div>
   </div>
+
+  <div id="gtm" class="tab">
+    <div class="grid">
+      <div class="card third">
+        <h2>Core Pitch</h2>
+        <p class="sub" style="color:var(--blue)">Living Risk Intelligence Engine</p>
+        <p>Detects, simulates and prevents systemic collapse.</p>
+      </div>
+      <div class="card third">
+        <h2>Target ICP</h2>
+        <p class="sub" style="color:var(--violet)">Marketplace / Bank / Energy</p>
+        <p>Strategic deployment across critical operations.</p>
+      </div>
+      <div class="card third">
+        <h2>Pricing Strategy</h2>
+        <div class="kpis">
+          <div class="kpi"><div class="label">Pilot Phase</div><div class="value" style="color:var(--yellow)">$50K-150K</div></div>
+          <div class="kpi"><div class="label">Enterprise</div><div class="value" style="color:var(--green)">$250K-1M+</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -210,8 +233,8 @@ let demoTimer = null;
 let waveTimer = null;
 
 const presentationModes = {
-  "investor": {"show_ai": true,"show_brain": true,"show_dynamics": true,"show_energy": true,"show_exec": true,"show_sim": true,"show_rep": true,"show_ctrl": true},
-  "client": {"show_ai": false,"show_brain": false,"show_dynamics": true,"show_energy": true,"show_exec": true,"show_sim": true,"show_rep": true,"show_ctrl": false}
+  "investor": {"show_ai": true,"show_brain": true,"show_dynamics": true,"show_energy": true,"show_exec": true,"show_sim": true,"show_rep": true,"show_ctrl": true,"show_gtm": true},
+  "client": {"show_ai": false,"show_brain": false,"show_dynamics": true,"show_energy": true,"show_exec": true,"show_sim": true,"show_rep": true,"show_ctrl": false,"show_gtm": false}
 };
 
 function applyPresentationMode() {
@@ -232,6 +255,7 @@ function applyPresentationMode() {
     if(fn.includes("'control'")) b.style.display = conf.show_ctrl ? 'inline-block' : 'none';
     if(fn.includes("'simulation'")) b.style.display = conf.show_sim ? 'inline-block' : 'none';
     if(fn.includes("'reports'")) b.style.display = conf.show_rep ? 'inline-block' : 'none';
+    if(fn.includes("'gtm'")) b.style.display = conf.show_gtm ? 'inline-block' : 'none';
   });
 }
 
