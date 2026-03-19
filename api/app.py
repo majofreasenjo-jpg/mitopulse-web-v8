@@ -11,7 +11,7 @@ import os
 from api.auth import login
 from api.webhooks import send_webhook
 
-app = FastAPI(title="MitoPulse v46.1 Probabilistic Upgrade System")
+app = FastAPI(title="MitoPulse v46.2 Live Graph Forecast System")
 templates = Jinja2Templates(directory=str(Path(__file__).parent.parent / "templates"))
 ROOT = Path(__file__).parent.parent
 SANDBOX = {"blocked": [], "limited": [], "events": []}

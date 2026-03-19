@@ -1,0 +1,212 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>MitoPulse v46.2 Live Graph Forecast</title>
+  <style>
+    body{margin:0;background:linear-gradient(180deg,#07111f,#0d1a2f);color:#eef4ff;font-family:Arial,sans-serif}
+    .wrap{max-width:1500px;margin:0 auto;padding:18px}
+    .toolbar,.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .btn{background:#10203a;border:1px solid #34517f;color:#dbe8ff;border-radius:10px;padding:10px 12px;cursor:pointer}
+    .btn.active{background:#1b3b68}
+    .tab{display:none}.tab.active{display:block}
+    .card{background:linear-gradient(180deg,#101d34,#0a1425);border:1px solid #223454;border-radius:14px;padding:14px;margin-bottom:12px}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .kpi{background:#10213c;border:1px solid #284067;border-radius:12px;padding:12px}
+    .label{font-size:12px;color:#9bb0d1}.value{font-size:26px;font-weight:800;margin-top:6px}
+    pre{background:#08111f;border:1px solid #1d2e4d;color:#d6e4ff;border-radius:12px;padding:12px;overflow:auto;max-height:340px}
+    svg{width:100%;height:560px;background:#0b1320;border:1px solid #1f2a44;border-radius:12px}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <h1>MitoPulse v46.2 — Live Graph + Forecast + Invisible Storm Improved</h1>
+
+  <div class="tabs">
+    <button class="btn active" onclick="showTab('live', this)">Graph Live</button>
+    <button class="btn" onclick="showTab('forecast', this)">Forecast Short Horizon</button>
+    <button class="btn" onclick="showTab('storm', this)">Invisible Storm Improved</button>
+  </div>
+
+  <div id="live" class="tab active">
+    <div class="card">
+      <div class="toolbar">
+        <button class="btn" onclick="loadLive()">Load Live Graph</button>
+      </div>
+      <div class="grid">
+        <div class="kpi"><div class="label">External Pressure</div><div class="value" id="extPressure">-</div></div>
+        <div class="kpi"><div class="label">Trigger Zones</div><div class="value" id="triggerCount">-</div></div>
+        <div class="kpi"><div class="label">Wave Fronts</div><div class="value" id="waveCount">-</div></div>
+        <div class="kpi"><div class="label">Dominant Path</div><div class="value" id="domPath">-</div></div>
+      </div>
+      <svg id="liveSvg"></svg>
+      <pre id="liveOut">Sin ejecutar.</pre>
+    </div>
+  </div>
+
+  <div id="forecast" class="tab">
+    <div class="card">
+      <div class="toolbar">
+        <button class="btn" onclick="loadForecast('short')">Short</button>
+        <button class="btn" onclick="loadForecast('medium')">Medium</button>
+        <button class="btn" onclick="loadForecast('long')">Long</button>
+      </div>
+      <div class="grid">
+        <div class="kpi"><div class="label">Forecasted GSI</div><div class="value" id="fgsi">-</div></div>
+        <div class="kpi"><div class="label">Forecasted SCR</div><div class="value" id="fscr">-</div></div>
+        <div class="kpi"><div class="label">Critical Window Prob.</div><div class="value" id="fcrit">-</div></div>
+        <div class="kpi"><div class="label">Path Count</div><div class="value" id="fpaths">-</div></div>
+      </div>
+      <pre id="forecastOut">Sin ejecutar.</pre>
+    </div>
+  </div>
+
+  <div id="storm" class="tab">
+    <div class="card">
+      <div class="toolbar">
+        <button class="btn" onclick="loadStorm()">Load Demo</button>
+        <button class="btn" onclick="playStorm()">Play</button>
+        <button class="btn" onclick="pauseStorm()">Pause</button>
+        <input id="stormRange" type="range" min="1" max="20" value="1" oninput="renderStormStep(parseInt(this.value))" style="width:320px"/>
+      </div>
+      <div class="grid">
+        <div class="kpi"><div class="label">GSI</div><div class="value" id="sgsi">-</div></div>
+        <div class="kpi"><div class="label">SCR</div><div class="value" id="sscr">-</div></div>
+        <div class="kpi"><div class="label">Forecasted GSI</div><div class="value" id="sfgsi">-</div></div>
+        <div class="kpi"><div class="label">Recommended Action</div><div class="value" id="saction" style="font-size:16px">-</div></div>
+      </div>
+      <svg id="stormSvg"></svg>
+      <pre id="stormOut">Sin ejecutar.</pre>
+    </div>
+  </div>
+</div>
+
+<script>
+let waveTimer = null, stormPayload = null, stormTimer = null;
+
+function showTab(id, btn){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.btn').forEach(x=>x.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+function roleColor(role){
+  if(role==='trigger') return '#ef476f';
+  if(role==='hidden') return '#7b61ff';
+  if(role==='wave') return '#00bbf9';
+  return '#8ecae6';
+}
+function drawGraph(svgId, graph){
+  const svg = document.getElementById(svgId);
+  svg.innerHTML = '';
+  if(!graph || !graph.nodes) return;
+
+  (graph.risk_field || []).forEach(p => {
+    const h = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    h.setAttribute('cx', p.x); h.setAttribute('cy', p.y); h.setAttribute('r', 32);
+    h.setAttribute('fill', '#ef476f'); h.setAttribute('opacity', Math.min(0.16, p.intensity));
+    svg.appendChild(h);
+  });
+
+  (graph.links || []).forEach(l => {
+    const s = graph.nodes.find(n => n.id === l.source);
+    const t = graph.nodes.find(n => n.id === l.target);
+    if(!s || !t) return;
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1', s.x); line.setAttribute('y1', s.y);
+    line.setAttribute('x2', t.x); line.setAttribute('y2', t.y);
+    line.setAttribute('stroke', '#34517f'); line.setAttribute('stroke-width', 2); line.setAttribute('opacity', 0.75);
+    svg.appendChild(line);
+  });
+
+  (graph.wave_fronts || []).forEach(w => {
+    for(let i=1;i<=3;i++){
+      const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx', w.x); c.setAttribute('cy', w.y);
+      c.setAttribute('r', 10 + i*14);
+      c.setAttribute('fill', 'none');
+      c.setAttribute('stroke', '#4cc9f0');
+      c.setAttribute('stroke-opacity', Math.max(0.06, 0.24 - i*0.05));
+      c.setAttribute('stroke-width', 4);
+      c.setAttribute('class', svgId + '-wave');
+      svg.appendChild(c);
+    }
+  });
+
+  graph.nodes.forEach(n => {
+    const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx', n.x); c.setAttribute('cy', n.y); c.setAttribute('r', 14 + Math.min(12, n.score*12));
+    c.setAttribute('fill', roleColor(n.role));
+    svg.appendChild(c);
+
+    const tx = document.createElementNS('http://www.w3.org/2000/svg','text');
+    tx.setAttribute('x', n.x); tx.setAttribute('y', n.y + 4);
+    tx.setAttribute('text-anchor', 'middle');
+    tx.setAttribute('fill', '#ffffff');
+    tx.setAttribute('font-size', '10');
+    tx.textContent = n.label;
+    svg.appendChild(tx);
+  });
+
+  if(waveTimer) clearInterval(waveTimer);
+  let tick = 0;
+  waveTimer = setInterval(()=>{
+    svg.querySelectorAll('.' + svgId + '-wave').forEach((ring, idx) => {
+      const base = 14 + (idx % 3) * 14;
+      ring.setAttribute('r', String(base + (tick % 12)));
+    });
+    tick++;
+  }, 160);
+}
+
+async function loadLive(){
+  const j = await (await fetch('/api/live-graph')).json();
+  drawGraph('liveSvg', j);
+  document.getElementById('extPressure').textContent = j.external_pressure;
+  document.getElementById('triggerCount').textContent = j.trigger_zones.length;
+  document.getElementById('waveCount').textContent = j.wave_fronts.length;
+  document.getElementById('domPath').textContent = (j.links[0]?.source || '-') + '→' + (j.links[0]?.target || '-');
+  document.getElementById('liveOut').textContent = JSON.stringify(j, null, 2);
+}
+async function loadForecast(horizon){
+  const j = await (await fetch('/api/forecast?horizon=' + horizon)).json();
+  document.getElementById('fgsi').textContent = j.forecasted_GSI;
+  document.getElementById('fscr').textContent = j.forecasted_SCR;
+  document.getElementById('fcrit').textContent = j.critical_window_probability;
+  document.getElementById('fpaths').textContent = j.propagation_path_forecast.length;
+  document.getElementById('forecastOut').textContent = JSON.stringify(j, null, 2);
+}
+async function loadStorm(){
+  stormPayload = await (await fetch('/api/demo/invisible-storm')).json();
+  document.getElementById('stormRange').max = stormPayload.steps.length;
+  document.getElementById('stormRange').value = 1;
+  renderStormStep(1);
+}
+function renderStormStep(step){
+  if(!stormPayload) return;
+  const s = stormPayload.steps[step-1];
+  drawGraph('stormSvg', s.graph);
+  document.getElementById('sgsi').textContent = s.GSI;
+  document.getElementById('sscr').textContent = s.SCR;
+  document.getElementById('sfgsi').textContent = s.forecasted_GSI;
+  document.getElementById('saction').textContent = s.action_recommended;
+  document.getElementById('stormOut').textContent = JSON.stringify(s, null, 2);
+}
+function playStorm(){
+  if(!stormPayload) return;
+  pauseStorm();
+  let idx = parseInt(document.getElementById('stormRange').value || '1', 10);
+  stormTimer = setInterval(()=>{
+    if(idx > stormPayload.steps.length){ pauseStorm(); return; }
+    document.getElementById('stormRange').value = idx;
+    renderStormStep(idx);
+    idx++;
+  }, 520);
+}
+function pauseStorm(){ if(stormTimer) clearInterval(stormTimer); }
+
+loadLive();
+loadForecast('short');
+</script>
+</body>
+</html>

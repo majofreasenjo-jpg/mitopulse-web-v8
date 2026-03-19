@@ -1,0 +1,19 @@
+{
+  "module": "live_graph_forecast_waveengine",
+  "waveengine": {
+    "enabled": true,
+    "mode": "animated"
+  },
+  "forecast_engine": {
+    "enabled": true,
+    "horizons": [
+      "short",
+      "medium",
+      "long"
+    ],
+    "default": "short"
+  },
+  "demo_killer": {
+    "invisible_storm_improved": true
+  }
+}
