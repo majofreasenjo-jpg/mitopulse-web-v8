@@ -1,0 +1,29 @@
+{
+  "pilot_marketplace": {
+    "tenant": "demo_marketplace",
+    "client_mode": "marketplace",
+    "show_ai": false,
+    "show_brain": false,
+    "show_dynamics": true,
+    "show_reports": true,
+    "show_simulation": true
+  },
+  "pilot_bank": {
+    "tenant": "demo_bank",
+    "client_mode": "bank",
+    "show_ai": false,
+    "show_brain": true,
+    "show_dynamics": true,
+    "show_reports": true,
+    "show_simulation": false
+  },
+  "pilot_energy": {
+    "tenant": "demo_energy",
+    "client_mode": "energy",
+    "show_ai": true,
+    "show_brain": true,
+    "show_dynamics": true,
+    "show_reports": true,
+    "show_simulation": true
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "primary": [
+    "NHI",
+    "TPI",
+    "SCR",
+    "MDI"
+  ],
+  "support": [
+    "Metabolic Load",
+    "Homeostasis Stability Score",
+    "Reflex Activation Count",
+    "Behavioral Predation Index",
+    "Cycle Recurrence Risk"
+  ],
+  "pilot_specific": [
+    "hidden_pattern_discovery_count",
+    "intervention_speed_proxy",
+    "avoided_loss_estimate"
+  ]
+}
