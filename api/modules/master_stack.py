@@ -44,20 +44,33 @@ def build_live_graph():
         "wave_fronts": [{"entity": n["id"], "x": n["x"], "y": n["y"], "intensity": n["score"]} for n in nodes if n["role"] in ("wave","hidden","trigger")]
     }
 
+import statistics
+
 def executive():
     graph = build_live_graph()
-    avg = sum(n["score"] for n in graph["nodes"]) / max(1, len(graph["nodes"]))
-    gsi = round(min(0.99, avg * 1.05), 3)
-    nhi = round(max(0.01, 1 - avg*0.72), 3)
-    tpi = round(min(0.99, avg * 0.88), 3)
-    scr = round(min(0.99, max(n["score"] for n in graph["nodes"]) * 0.92 + gsi * 0.08), 3)
+    scores = [n["score"] for n in graph["nodes"]]
+    avg = sum(scores) / max(1, len(scores))
+    
+    # V46.5 Advanced Calibration Logic: Integration of variance to detect hidden clusters
+    variance = statistics.variance(scores) if len(scores) > 1 else 0
+    calibrated_avg = avg + (variance * 1.85)
+
+    gsi = round(min(0.99, calibrated_avg * 1.05), 3)
+    nhi = round(max(0.01, 1 - calibrated_avg*0.72), 3)
+    tpi = round(min(0.99, calibrated_avg * 0.88), 3)
+    scr = round(min(0.99, max(scores) * 0.85 + gsi * 0.15 + variance * 0.4), 3)
+    
+    # Dynamic string logic based on probabilistic thresholds
+    top_risk = "Critical Systemic Propagation Event detected via high variance" if scr >= 0.7 else ("Invisible storm forming around processing core" if scr >= 0.55 else "Elevated propagation pressure")
+    action = "freeze_and_contain" if scr >= 0.75 else ("review_and_limit" if scr >= 0.55 else "enhanced_monitoring")
+
     return {
         "GSI": gsi,
         "NHI": nhi,
         "TPI": tpi,
         "SCR": scr,
-        "top_risk": "Invisible storm forming around processing core" if scr >= 0.7 else "Elevated propagation pressure",
-        "recommended_action": "review_and_limit" if scr >= 0.65 else "enhanced_monitoring"
+        "top_risk": top_risk,
+        "recommended_action": action
     }
 
 def forecast(horizon="short"):
@@ -95,16 +108,33 @@ def system_brain():
 
 def ai_layer():
     ex = executive()
+    gsi_val = ex["GSI"]
+    scr_val = ex["SCR"]
+    
+    # V46.5 Advanced AI Integration: Contextual Semantic Explainability
+    if scr_val > 0.75:
+        ai_behavior = "Defensive Containment"
+        ai_desc = "AI Copilot has identified critical variance across the supply chain cluster. Immediate freeze recommended to prevent downstream systemic collapse."
+        alts = ["freeze_and_contain", "emergency_logistics_reroute"]
+    elif scr_val > 0.55:
+        ai_behavior = "Elevated Flow Risk"
+        ai_desc = "Risk concentration is intensifying. AI observes hidden coordination forming around priority nodes. Manual review thresholds should be escalated."
+        alts = ["review_and_limit", "continuity_protocol", "enhanced_monitoring"]
+    else:
+        ai_behavior = "Opportunistic Optimization"
+        ai_desc = "System health is stable. Propagation paths are contained within expected operational margins."
+        alts = ["enhanced_monitoring", "baseline_operations"]
+
     return {
-        "semantic_ingestion_ai": {"normalized": True, "mapped_entities": 6},
-        "behavioral_ai": [{"id":"unit_fcc","behavior":"opportunistic"},{"id":"dispatch","behavior":"elevated_flow_risk"}],
+        "semantic_ingestion_ai": {"normalized": True, "mapped_entities": 12, "accuracy_variance": round(gsi_val * 0.1, 4)},
+        "behavioral_ai": [{"id":"cluster_alpha","behavior": ai_behavior}, {"id":"dispatch_node","behavior":"predictive_routing"}],
         "explainability_ai": {
             "executive_text": f"Main risk: {ex['top_risk']}.",
-            "technical_text": "Risk concentration and propagation path intensify across supply-process-logistics chain."
+            "technical_text": ai_desc
         },
         "strategy_copilot": {
             "recommended_action": ex["recommended_action"],
-            "alternative_actions": ["enhanced_monitoring","review_and_limit","continuity_protocol"]
+            "alternative_actions": alts
         }
     }
 
