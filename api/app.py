@@ -18,7 +18,7 @@ DB_PATH = ROOT / "storage" / "db.json"
 
 def load_db():
     if not DB_PATH.exists():
-        return {"reports": []}
+        return {"reports": [], "modes": {"current": "client"}}
     with open(DB_PATH) as f:
         return json.load(f)
 
@@ -283,9 +283,9 @@ def do_login(username: str, password: str):
     return login(username, password)
 
 @app.post("/alert")
-def alert(entity: str, risk: int):
+def alert(client: str, entity: str, risk: int):
     db = load_db()
-    report = {"entity": entity, "risk": risk, "ts": time.time()}
+    report = {"client": client, "entity": entity, "risk": risk, "ts": time.time()}
     if "reports" not in db: db["reports"] = []
     db["reports"].append(report)
     save_db(db)
@@ -295,3 +295,16 @@ def alert(entity: str, risk: int):
 @app.get("/reports")
 def reports_list():
     return load_db().get("reports", [])
+
+@app.get("/mode")
+def get_mode():
+    db = load_db()
+    return db.get("modes", {"current": "client"})
+
+@app.post("/mode")
+def set_mode(mode: str):
+    db = load_db()
+    if "modes" not in db: db["modes"] = {"current": "client"}
+    db["modes"]["current"] = mode
+    save_db(db)
+    return db["modes"]
