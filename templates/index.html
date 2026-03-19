@@ -51,6 +51,12 @@
       <option value="afp">afp</option>
       <option value="generic">generic</option>
     </select>
+    <label>Presentation</label>
+    <select id="presentationMode" onchange="applyPresentationMode()">
+      <option value="full">Full UI (Default)</option>
+      <option value="investor">Investor Pitch</option>
+      <option value="client">Client Pitch</option>
+    </select>
     <button onclick="refreshExecutive()">Refresh Executive</button>
   </div>
 
@@ -202,6 +208,32 @@
 let demoPayload = null;
 let demoTimer = null;
 let waveTimer = null;
+
+const presentationModes = {
+  "investor": {"show_ai": true,"show_brain": true,"show_dynamics": true,"show_energy": true,"show_exec": true,"show_sim": true,"show_rep": true,"show_ctrl": true},
+  "client": {"show_ai": false,"show_brain": false,"show_dynamics": true,"show_energy": true,"show_exec": true,"show_sim": true,"show_rep": true,"show_ctrl": false}
+};
+
+function applyPresentationMode() {
+  const mode = document.getElementById('presentationMode').value;
+  const btns = document.querySelectorAll('.tab-btn');
+  if(mode === 'full') {
+    btns.forEach(b => b.style.display = 'inline-block');
+    return;
+  }
+  const conf = presentationModes[mode];
+  btns.forEach(b => {
+    const fn = b.getAttribute('onclick') || '';
+    if(fn.includes("'exec'")) b.style.display = conf.show_exec ? 'inline-block' : 'none';
+    if(fn.includes("'ai_layer'")) b.style.display = conf.show_ai ? 'inline-block' : 'none';
+    if(fn.includes("'brain'")) b.style.display = conf.show_brain ? 'inline-block' : 'none';
+    if(fn.includes("'dynamics'")) b.style.display = conf.show_dynamics ? 'inline-block' : 'none';
+    if(fn.includes("'energy'")) b.style.display = conf.show_energy ? 'inline-block' : 'none';
+    if(fn.includes("'control'")) b.style.display = conf.show_ctrl ? 'inline-block' : 'none';
+    if(fn.includes("'simulation'")) b.style.display = conf.show_sim ? 'inline-block' : 'none';
+    if(fn.includes("'reports'")) b.style.display = conf.show_rep ? 'inline-block' : 'none';
+  });
+}
 
 function showTab(id, btn){
   document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
