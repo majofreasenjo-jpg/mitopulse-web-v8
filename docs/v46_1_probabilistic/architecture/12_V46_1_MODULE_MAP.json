@@ -1,0 +1,19 @@
+{
+  "version": "v46.1",
+  "new_probabilistic_modules": [
+    "Hierarchical Risk Model",
+    "Calibration Engine",
+    "Structured Uncertainty Engine",
+    "Event-Horizon / Hazard Engine",
+    "Temporal Graph Forecast Engine"
+  ],
+  "flow": [
+    "RFDC",
+    "Hierarchical Risk Model",
+    "Calibration Engine",
+    "Structured Uncertainty Engine",
+    "Event-Horizon / Hazard Engine",
+    "Temporal Graph Forecast Engine",
+    "Dashboard / MitoPulse Verify / Decision"
+  ]
+}
