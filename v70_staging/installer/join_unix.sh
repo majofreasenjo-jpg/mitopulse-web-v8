@@ -1,3 +1,0 @@
-#!/bin/bash
-cat MitoPulse_v70_DEFINITIVE_FULL_WORKSPACE_partA.bin MitoPulse_v70_DEFINITIVE_FULL_WORKSPACE_partB.bin > MitoPulse_v70_DEFINITIVE_FULL_WORKSPACE.zip
-echo "Done. Created MitoPulse_v70_DEFINITIVE_FULL_WORKSPACE.zip"

@@ -1,9 +1,0 @@
-{
-  "note": "Illustrative sample; runtime fetch uses live Binance public endpoints.",
-  "symbols": [
-    "BTCUSDT",
-    "ETHUSDT",
-    "BNBUSDT",
-    "SOLUSDT"
-  ]
-}
