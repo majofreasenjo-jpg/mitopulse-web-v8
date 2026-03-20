@@ -1,8 +1,15 @@
-
+import os
+from pathlib import Path
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 app = FastAPI()
+
+# Mount frontend directory for static assets (JS/CSS)
+frontend_path = Path(__file__).resolve().parents[1] / "frontend"
+app.mount("/static", StaticFiles(directory=str(frontend_path)), name="static")
 
 class Event(BaseModel):
     entity: str
@@ -10,6 +17,10 @@ class Event(BaseModel):
 
 @app.get("/")
 def root():
+    return FileResponse(str(frontend_path / "index.html"))
+
+@app.get("/api/status")
+def status_check():
     return {"status": "MitoPulse API Running"}
 
 @app.post("/evaluate")
