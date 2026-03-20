@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>Connectors Live</h1>
+  <p>Conectores modulares listos para alimentar el protocolo con señales normalizadas. Aquí se muestran ejemplos live-like para crypto, markets y banking.</p>
+</section>
+<section class="grid">
+  <div class="card"><h3>Crypto</h3><pre id="cryptoOut"></pre><button class="btn" onclick="runConnector('crypto')">Run</button></div>
+  <div class="card"><h3>Market</h3><pre id="marketOut"></pre><button class="btn" onclick="runConnector('market')">Run</button></div>
+  <div class="card"><h3>Banking</h3><pre id="bankingOut"></pre><button class="btn" onclick="runConnector('banking')">Run</button></div>
+</section>
+<script>
+async function runConnector(kind){
+  const r = await fetch('/api/connector/' + kind);
+  const j = await r.json();
+  document.getElementById(kind + 'Out').textContent = JSON.stringify(j, null, 2);
+}
+</script>
+{% endblock %}

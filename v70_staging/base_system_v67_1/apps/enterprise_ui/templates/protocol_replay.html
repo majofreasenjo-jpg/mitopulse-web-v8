@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero"><h1>Replay for {{entity_id}}</h1><p>Secuencia de eventos para análisis forense y replay.</p></section>
+<section class="card">
+  <table><tr><th>event_id</th><th>type</th><th>ts</th></tr>
+  {% for s in steps %}
+  <tr><td>{{s.event_id}}</td><td>{{s.event_type}}</td><td>{{s.ts}}</td></tr>
+  {% endfor %}
+  </table>
+</section>
+{% endblock %}
