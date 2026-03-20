@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: mitopulse-live
-    runtime: docker
-    plan: starter
-    autoDeploy: true

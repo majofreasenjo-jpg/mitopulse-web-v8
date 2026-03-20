@@ -1,6 +1,0 @@
-Metadata-Version: 2.4
-Name: mitopulse-sdk
-Version: 0.2.0
-Summary: MitoPulse MVP Local-First SDK (index + dynamic identity id)
-Requires-Python: >=3.9
-Requires-Dist: requests>=2.31.0

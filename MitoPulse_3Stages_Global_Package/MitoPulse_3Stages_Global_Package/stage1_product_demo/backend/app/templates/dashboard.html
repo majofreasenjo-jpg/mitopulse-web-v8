@@ -1,6 +1,0 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>MitoPulse Dashboard</title>
-<style>body{font-family:system-ui;background:#0b0f14;color:#e6edf3;padding:20px}.card{background:#111827;border:1px solid #253043;border-radius:14px;padding:16px;margin-bottom:16px}table{width:100%;border-collapse:collapse;font-size:12px}th,td{border-bottom:1px solid #253043;padding:8px;text-align:left}</style>
-</head><body><h1>MitoPulse Product Demo Dashboard</h1>
-<div class="card"><h2>Usuarios</h2><table><tr><th>user</th><th>device</th><th>mean</th><th>std</th><th>samples</th></tr>{% for u in users %}<tr><td>{{u.user_id}}</td><td>{{u.device_id}}</td><td>{{u.baseline_mean}}</td><td>{{u.baseline_std}}</td><td>{{u.samples|length}}</td></tr>{% endfor %}</table></div>
-<div class="card"><h2>Auditoría</h2><table><tr><th>ts</th><th>action</th><th>payload</th></tr>{% for a in audit %}<tr><td>{{a.ts}}</td><td>{{a.action}}</td><td>{{a.payload}}</td></tr>{% endfor %}</table></div>
-</body></html>

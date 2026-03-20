@@ -1,1 +1,0 @@
-# RFDC Core placeholder

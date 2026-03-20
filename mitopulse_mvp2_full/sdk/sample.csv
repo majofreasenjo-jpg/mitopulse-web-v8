@@ -1,4 +1,0 @@
-timestamp,hr,hrv_rmssd,spo2,sleep_score,accel_load,altitude_m,temp_c,humidity_pct
-2026-03-01T00:00:00Z,62,58,97,82,2.1,520,20,45
-2026-03-02T00:00:00Z,65,52,96,78,2.8,520,21,48
-2026-03-03T00:00:00Z,72,35,95,70,3.5,520,24,55

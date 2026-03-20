@@ -1,1 +1,0 @@
-# GSI calculation engine placeholder

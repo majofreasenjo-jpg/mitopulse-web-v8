@@ -1,1 +1,0 @@
-// MitoPulse Verify UI placeholder

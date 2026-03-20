@@ -1,6 +1,0 @@
-{
-  "type": "file_drop",
-  "source_name": "file_drop_bank_demo",
-  "input_dir": "connectors/inbox",
-  "output_dir": "live_output/file_drop_bank_demo"
-}

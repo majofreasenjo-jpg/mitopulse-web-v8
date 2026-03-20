@@ -1,1 +1,0 @@
-print('MitoPulse v43.2 running...')

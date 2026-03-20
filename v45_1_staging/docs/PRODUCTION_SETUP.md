@@ -1,4 +1,0 @@
-- configurar PostgreSQL
-- definir variables de entorno
-- conectar APIs reales
-- habilitar streaming

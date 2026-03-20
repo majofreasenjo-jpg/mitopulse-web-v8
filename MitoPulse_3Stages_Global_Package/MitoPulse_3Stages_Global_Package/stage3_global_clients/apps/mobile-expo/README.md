@@ -1,1 +1,0 @@
-Wrapper móvil React Native + Expo para Android/iOS.

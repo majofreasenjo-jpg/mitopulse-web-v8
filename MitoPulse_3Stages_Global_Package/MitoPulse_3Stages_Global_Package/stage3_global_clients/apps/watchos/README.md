@@ -1,1 +1,0 @@
-Scaffold watchOS. Requiere compilación, firma y Apple Developer.

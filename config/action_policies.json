@@ -1,9 +1,0 @@
-
-{
-  "banking": {
-    "block_or_freeze": ["Freeze account", "Block transfer", "Escalate AML"]
-  },
-  "marketplace": {
-    "block_or_freeze": ["Suspend seller", "Freeze payouts"]
-  }
-}

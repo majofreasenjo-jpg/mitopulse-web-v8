@@ -1,1 +1,0 @@
-Scaffold Wear OS. Requiere compilación, firma y pruebas por fabricante.

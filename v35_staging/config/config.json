@@ -1,9 +1,0 @@
-{
-  "mode": "full",
-  "connectors": [
-    "yahoo_finance",
-    "binance",
-    "macro_mock"
-  ],
-  "modules": "all_active"
-}

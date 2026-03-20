@@ -1,6 +1,0 @@
-{
-  "auth": "jwt",
-  "db": "postgres",
-  "streaming": "enabled",
-  "multi_tenant": true
-}
