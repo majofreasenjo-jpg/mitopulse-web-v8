@@ -1,0 +1,19 @@
+{
+  "tenants": [
+    {
+      "tenant_id": "demo_energy",
+      "name": "Demo Energy",
+      "mode": "energy"
+    },
+    {
+      "tenant_id": "demo_marketplace",
+      "name": "Demo Marketplace",
+      "mode": "marketplace"
+    },
+    {
+      "tenant_id": "demo_bank",
+      "name": "Demo Bank",
+      "mode": "bank"
+    }
+  ]
+}

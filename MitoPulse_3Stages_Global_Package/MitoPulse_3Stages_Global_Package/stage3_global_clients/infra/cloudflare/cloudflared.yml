@@ -1,0 +1,6 @@
+tunnel: YOUR_TUNNEL_ID
+credentials-file: /etc/cloudflared/credentials.json
+ingress:
+  - hostname: mitopulse.example.com
+    service: http://app:8000
+  - service: http_status:404

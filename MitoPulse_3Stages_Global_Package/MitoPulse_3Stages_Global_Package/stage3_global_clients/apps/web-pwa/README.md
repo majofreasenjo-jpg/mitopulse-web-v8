@@ -1,0 +1,1 @@
+PWA instalable para muchos móviles modernos.

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero"><h1>Event Log</h1><p>Persistencia de eventos protocolarios.</p></section>
+<section class="card">
+  <table><tr><th>event_id</th><th>type</th><th>entity</th><th>ts</th></tr>
+  {% for e in events %}
+  <tr><td>{{e.event_id}}</td><td>{{e.event_type}}</td><td>{{e.entity_id}}</td><td>{{e.ts}}</td></tr>
+  {% endfor %}
+  </table>
+</section>
+{% endblock %}

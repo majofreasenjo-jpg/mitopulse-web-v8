@@ -1,0 +1,23 @@
+{
+  "full": {
+    "show_brain": true,
+    "show_dynamics": true,
+    "show_reports": true,
+    "show_simulation": true,
+    "show_controls": true
+  },
+  "marketplace_pitch": {
+    "show_brain": false,
+    "show_dynamics": false,
+    "show_reports": true,
+    "show_simulation": true,
+    "show_controls": false
+  },
+  "banking_pitch": {
+    "show_brain": false,
+    "show_dynamics": false,
+    "show_reports": true,
+    "show_simulation": true,
+    "show_controls": false
+  }
+}

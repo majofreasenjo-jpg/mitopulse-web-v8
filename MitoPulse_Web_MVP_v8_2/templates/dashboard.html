@@ -1,0 +1,15 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>MitoPulse v8.2</title>
+<style>
+body{font-family:Arial;background:#0f172a;color:#fff;margin:0}.wrap{max-width:1360px;margin:auto;padding:24px}.card{background:#1e293b;border-radius:16px;padding:18px;margin-bottom:18px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}.metric{background:#0b1220;border-radius:12px;padding:14px}button,input{padding:10px;border-radius:10px;border:none}.alt{background:#f59e0b;color:white}.stop{background:#ef4444;color:white}button{background:#22c55e;color:white;cursor:pointer}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid #334155;text-align:left;font-size:13px}a{color:#93c5fd}
+</style></head><body><div class="wrap">
+<div class="card"><h1>MitoPulse Web MVP v8.2</h1><p>Nodo persistente + pulsos reales + cross pulses + vista de red clara para socios.</p><p><a href="/app">App</a> · <a href="/node">Nodo móvil</a> · <a href="/network">Mapa de red</a> · <a href="/simulator">Simulador</a> · <a href="/present">Presentación</a></p></div>
+<div class="grid">
+<div class="metric"><b>Usuarios</b><div>{{ metrics.users }}</div></div><div class="metric"><b>Nodos</b><div>{{ metrics.nodes }}</div></div><div class="metric"><b>Cross Pulses</b><div>{{ metrics.cross_pulses }}</div></div><div class="metric"><b>VERIFY</b><div>{{ metrics.verify }}</div></div><div class="metric"><b>BLOCK</b><div>{{ metrics.block }}</div></div><div class="metric"><b>False Positives</b><div>{{ metrics.false_positive }}</div></div><div class="metric"><b>Accuracy</b><div>{{ metrics.accuracy }}%</div></div>
+</div>
+<div class="card"><div class="row">
+<form method="post" action="/seed_demo_network"><button type="submit" class="alt">Poblar red demo</button></form>
+<form method="post" action="/sim/start"><button type="submit">Iniciar auto-demo</button></form>
+<form method="post" action="/sim/stop"><button type="submit" class="stop">Detener auto-demo</button></form>
+<span>{% if metrics.auto_running %}Auto-demo activa{% else %}Auto-demo detenida{% endif %}</span></div></div>
+<div class="card"><h2>Nodos activos</h2><table><thead><tr><th>Node ID</th><th>User ID</th><th>Plataforma</th><th>Pulsos</th><th>Cross Pulses</th></tr></thead><tbody>{% for n in nodes %}<tr><td>{{ n.id }}</td><td>{{ n.user_id }}</td><td>{{ n.platform }}</td><td>{{ n.pulse_count }}</td><td>{{ n.cross_pulse_count }}</td></tr>{% else %}<tr><td colspan="5">Sin nodos</td></tr>{% endfor %}</tbody></table></div>
+</div></body></html>

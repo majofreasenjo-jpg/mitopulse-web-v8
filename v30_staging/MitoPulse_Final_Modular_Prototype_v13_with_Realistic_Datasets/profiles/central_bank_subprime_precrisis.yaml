@@ -1,0 +1,26 @@
+demo_id: central_bank_subprime_precrisis
+industry: central_bank
+size: systemic
+mode: historical_crisis_demo
+scenario: subprime_pre_12m
+dataset: data/bank_large
+modules:
+  relational_identity: true
+  pulse: true
+  cross_pulse: true
+  danger_signals: true
+  trust_propagation: true
+  relational_gravity: true
+  cosmic_network_analysis: true
+  dark_matter_detection: true
+  shadow_coordination: true
+  incomplete_network_inference: true
+  entropy_analysis: true
+  criticality_engine: true
+  quorum_detection: true
+  early_network_formation: true
+  morphogenesis: true
+  NHI: true
+  TPI: true
+  SCR: true
+  ESE: true

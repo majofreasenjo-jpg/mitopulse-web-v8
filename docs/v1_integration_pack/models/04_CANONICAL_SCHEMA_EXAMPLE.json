@@ -1,0 +1,61 @@
+{
+  "nodes": [
+    {
+      "node_id": "asset_001",
+      "node_type": "refinery_unit",
+      "tenant_id": "demo_energy",
+      "industry": "energy",
+      "attributes": {
+        "unit_class": "CDU"
+      },
+      "status": "degraded",
+      "location": "plant_a",
+      "criticality_hint": 0.92
+    }
+  ],
+  "edges": [
+    {
+      "edge_id": "e_001",
+      "from_node": "supplier_01",
+      "to_node": "asset_001",
+      "relation_type": "feeds",
+      "strength": 0.88,
+      "direction": "forward",
+      "confidence": 0.95
+    }
+  ],
+  "events": [
+    {
+      "event_id": "evt_001",
+      "timestamp": "2026-03-17T12:00:00Z",
+      "event_type": "supply_delay",
+      "source_node": "supplier_01",
+      "target_node": "asset_001",
+      "metric_name": "delay_hours",
+      "metric_value": 4.2,
+      "severity": 0.74,
+      "source_system": "sap_procurement"
+    }
+  ],
+  "states": [
+    {
+      "state_id": "st_001",
+      "node_id": "asset_001",
+      "state_type": "temperature",
+      "value": 347.5,
+      "valid_from": "2026-03-17T11:55:00Z",
+      "valid_to": "2026-03-17T12:00:00Z"
+    }
+  ],
+  "labels": [],
+  "external_fields": [
+    {
+      "field_id": "fld_001",
+      "field_type": "weather_port",
+      "region": "coast_a",
+      "intensity": 0.61,
+      "coupling_hint": 0.55,
+      "timestamp": "2026-03-17T12:00:00Z"
+    }
+  ]
+}

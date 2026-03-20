@@ -1,0 +1,2 @@
+MitoPulse = Living Risk Intelligence Engine.
+Detects, simulates and prevents systemic collapse.

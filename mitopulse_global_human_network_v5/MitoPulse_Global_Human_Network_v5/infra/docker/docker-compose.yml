@@ -1,0 +1,32 @@
+services:
+
+  gateway:
+    build: ../../services/gateway
+    ports: ["8080:8080"]
+    depends_on:
+      - presence_engine
+      - risk_engine
+
+  presence_engine:
+    build: ../../services/presence_engine
+    ports: ["8081:8081"]
+
+  risk_engine:
+    build: ../../services/risk_engine
+    ports: ["8082:8082"]
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: mitopulse
+      POSTGRES_PASSWORD: mitopulse
+      POSTGRES_DB: mitopulse
+    ports: ["5432:5432"]
+
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]
+
+  nats:
+    image: nats:2
+    ports: ["4222:4222"]

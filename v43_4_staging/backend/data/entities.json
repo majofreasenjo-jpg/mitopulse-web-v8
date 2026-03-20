@@ -1,0 +1,50 @@
+[
+  {
+    "id": "seller_A",
+    "value": 72,
+    "kind": "seller",
+    "tenant_id": "demo_marketplace"
+  },
+  {
+    "id": "seller_B",
+    "value": 91,
+    "kind": "seller",
+    "tenant_id": "demo_marketplace"
+  },
+  {
+    "id": "buyer_X",
+    "value": 34,
+    "kind": "buyer",
+    "tenant_id": "demo_marketplace"
+  },
+  {
+    "id": "bank_aml_01",
+    "value": 84,
+    "kind": "bank_node",
+    "tenant_id": "demo_bank"
+  },
+  {
+    "id": "bank_wallet_02",
+    "value": 78,
+    "kind": "bank_node",
+    "tenant_id": "demo_bank"
+  },
+  {
+    "id": "refinery_CDU_01",
+    "value": 93,
+    "kind": "energy_node",
+    "tenant_id": "demo_energy"
+  },
+  {
+    "id": "route_port_01",
+    "value": 69,
+    "kind": "logistics_node",
+    "tenant_id": "demo_energy"
+  },
+  {
+    "id": "tank_diesel_02",
+    "value": 74,
+    "kind": "energy_node",
+    "tenant_id": "demo_energy"
+  }
+]

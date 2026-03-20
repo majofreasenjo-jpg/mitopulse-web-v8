@@ -1,0 +1,14 @@
+{
+  "title": "FTX / contagio cripto — demo histórica",
+  "modules": ["Relational Gravity", "Shadow Coordination", "Dark Matter", "SCR", "FEM"],
+  "storyline": [
+    "Se reconstruyen dependencias entre exchange, entidades vinculadas, wallets y flujos externos.",
+    "MitoPulse detecta concentración relacional y coordinación opaca antes del colapso final."
+  ],
+  "windows": [
+    {"phase": "Pre-crisis", "period": "90d antes", "narrative": "Se observa masa relacional excesiva y opacidad creciente.", "NHI": 68, "TPI": 42, "SCR": 38, "MDI": 48},
+    {"phase": "Mid-crisis", "period": "corrida / colapso", "narrative": "La presión de amenaza y el riesgo sistémico del ecosistema cripto se disparan.", "NHI": 31, "TPI": 88, "SCR": 91, "MDI": 90},
+    {"phase": "Post-crisis", "period": "contagio", "narrative": "Se manifiestan efectos de segundo orden y contagio residual.", "NHI": 47, "TPI": 57, "SCR": 61, "MDI": 54}
+  ],
+  "conclusion": "La arquitectura sirve para mostrar que el riesgo opaco y coordinado deja huellas relacionales antes del colapso público."
+}

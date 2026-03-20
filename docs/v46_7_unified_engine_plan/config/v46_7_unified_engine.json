@@ -1,0 +1,39 @@
+{
+  "fast_path": [
+    "RFDC",
+    "GSI",
+    "NHI",
+    "TPI",
+    "SCR",
+    "SEI",
+    "SDI",
+    "AES",
+    "MSI",
+    "FDI",
+    "SSI",
+    "CE",
+    "SUE",
+    "EHE_short",
+    "TGFE_short",
+    "MitoPulse_Verify"
+  ],
+  "deep_path": [
+    "PMI_detailed",
+    "SAI",
+    "IML",
+    "FDE_full",
+    "CFI",
+    "FPI",
+    "FEI",
+    "NEI",
+    "KNI",
+    "SRI",
+    "FGI",
+    "FSI",
+    "ORI",
+    "DTI",
+    "TGFE_medium_long",
+    "Benchmark_Deep_Pack"
+  ],
+  "principle": "near-top mathematics without overloading runtime"
+}

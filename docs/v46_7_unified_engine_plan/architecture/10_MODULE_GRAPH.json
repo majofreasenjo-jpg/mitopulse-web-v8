@@ -1,0 +1,50 @@
+{
+  "version": "v46.7",
+  "core": [
+    "RFDC",
+    "GSI",
+    "NHI",
+    "TPI",
+    "SCR",
+    "MDI"
+  ],
+  "bio_layer": [
+    "SEI",
+    "SDI",
+    "PMI",
+    "AES",
+    "SAI",
+    "IML",
+    "IRI",
+    "MSI",
+    "SII"
+  ],
+  "physics_layer": [
+    "FDE",
+    "FDI",
+    "SSI",
+    "CFI",
+    "FPI",
+    "FEI",
+    "NEI",
+    "KNI",
+    "SRI",
+    "FGI",
+    "FSI",
+    "ORI",
+    "DTI"
+  ],
+  "probabilistic_layer": [
+    "HRM",
+    "CE",
+    "SUE",
+    "EHE",
+    "TGFE"
+  ],
+  "client_layer": [
+    "IGE",
+    "MitoPulse Verify",
+    "Dashboard",
+    "Actions"
+  ]
+}

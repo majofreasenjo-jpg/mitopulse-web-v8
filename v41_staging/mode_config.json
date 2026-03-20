@@ -1,0 +1,17 @@
+
+{
+  "modes": {
+    "investor": {
+      "show_ai": true,
+      "show_brain": true,
+      "show_dynamics": true,
+      "show_energy": true
+    },
+    "client": {
+      "show_ai": false,
+      "show_brain": false,
+      "show_dynamics": true,
+      "show_energy": true
+    }
+  }
+}

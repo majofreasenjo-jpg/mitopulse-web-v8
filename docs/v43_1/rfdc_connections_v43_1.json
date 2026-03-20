@@ -1,0 +1,29 @@
+{
+  "RFDC_inputs": [
+    "Pulse",
+    "Cross-Pulse",
+    "Danger Signals",
+    "Data Metabolism Engine",
+    "Behavioral Layer",
+    "Cycle Intelligence Engine",
+    "Adaptive Memory System"
+  ],
+  "RFDC_outputs": [
+    "NHI",
+    "TPI",
+    "SCR",
+    "MDI",
+    "Wave Dynamics",
+    "Criticality",
+    "Collapse Probability"
+  ],
+  "post_RFDC_modules": [
+    "Guardian Swarm",
+    "Reflex Engine",
+    "Homeostatic Regulation Engine",
+    "Decision Engine",
+    "Action Engine",
+    "Explainability AI",
+    "Strategy Copilot"
+  ]
+}

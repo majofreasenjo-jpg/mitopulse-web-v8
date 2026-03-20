@@ -1,0 +1,20 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Mobile Relay</title>
+<style>
+body{font-family:Arial,sans-serif;background:#0c1220;color:#eef4ff;margin:24px}
+.card{background:#141d31;padding:16px;border-radius:14px;margin-bottom:16px}
+pre{background:#0f1728;padding:12px;border-radius:10px;white-space:pre-wrap}
+a{color:#8dc4ff}
+button,input,select{padding:8px 12px;border-radius:10px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+</style></head><body>
+<h2>Relay Handshake</h2>
+<div class="card"><button onclick="createCode()">Create Code</button><div><b>Current code:</b> <span id="code">—</span></div></div>
+<div class="card"><input id="confirmCode" placeholder="Enter code"><button onclick="confirmCode()">Confirm Code</button></div>
+<pre id="out"></pre><a href="/mobile">Back</a>
+<script>
+function getNodeId(){let n=localStorage.getItem('mitopulse_node_id'); if(!n){n='node_'+Math.random().toString(16).slice(2,10); localStorage.setItem('mitopulse_node_id',n)} return n}
+const nodeId=getNodeId();
+async function createCode(){const r=await fetch('/api/relay/create',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({node_id:nodeId})}); const j=await r.json(); document.getElementById('code').textContent=j.code; document.getElementById('out').textContent=JSON.stringify(j,null,2);}
+async function confirmCode(){const code=document.getElementById('confirmCode').value; const r=await fetch('/api/relay/confirm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({node_id:nodeId,code,shared_reality_boost:8})}); document.getElementById('out').textContent=JSON.stringify(await r.json(),null,2);}
+</script>
+</body></html>

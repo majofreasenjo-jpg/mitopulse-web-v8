@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>Evidence & Case Engine</h1>
+  <p>Casos de prueba, demostración y evidencia por vertical. No son demos sueltas: son evidencia operativa de cómo el protocolo interpreta, valida y actúa.</p>
+</section>
+<section class="grid">
+  {% for c in cases %}
+  <div class="card">
+    <div class="case-pill">{{c.vertical}}</div>
+    <div class="case-pill">{{c.mode}}</div>
+    <h3>{{c.title}}</h3>
+    <p><strong>Event:</strong> {{c.event}}</p>
+    <p><strong>Impact:</strong> {{c.impact}}</p>
+    <p><strong>Protocol Value:</strong> {{c.protocol_value}}</p>
+    <p><strong>States:</strong> {{c.states|join(' → ')}}</p>
+  </div>
+  {% endfor %}
+</section>
+{% endblock %}

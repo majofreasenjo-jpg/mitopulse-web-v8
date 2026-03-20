@@ -1,0 +1,45 @@
+{
+  "hierarchical_risk_model": {
+    "enabled": true,
+    "levels": [
+      "node",
+      "cluster",
+      "ecosystem",
+      "field"
+    ]
+  },
+  "calibration_engine": {
+    "enabled": true,
+    "targets": [
+      "SCR",
+      "GSI",
+      "sector_primary_risk"
+    ]
+  },
+  "structured_uncertainty_engine": {
+    "enabled": true,
+    "outputs": [
+      "p_low",
+      "p_high",
+      "confidence_grade"
+    ]
+  },
+  "event_horizon_hazard_engine": {
+    "enabled": true,
+    "outputs": [
+      "critical_window_probability",
+      "expected_time_to_criticality"
+    ]
+  },
+  "temporal_graph_forecast_engine": {
+    "enabled": true,
+    "fast_path": [
+      "short"
+    ],
+    "deep_path": [
+      "short",
+      "medium",
+      "long"
+    ]
+  }
+}

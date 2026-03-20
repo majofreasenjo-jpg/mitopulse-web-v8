@@ -1,0 +1,292 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MitoPulse Final Modular Prototype v13</title>
+<style>
+:root{
+  --bg:#08101f;--bg2:#0d1830;--card:#13223c;--line:#29466f;--text:#eaf2ff;--muted:#9eb6d8;
+  --identity:#3B82F6;--interaction:#2563EB;--propagation:#38BDF8;--collective:#22C55E;--physics:#8B5CF6;
+  --dynamics:#F97316;--learning:#EAB308;--defense:#EF4444;--simulation:#94A3B8;--future:#FFFFFF;
+}
+*{box-sizing:border-box} body{font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,var(--bg),#060d18);color:var(--text);margin:0}
+.top{padding:18px 26px;background:var(--bg2);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.wrap{padding:22px;max-width:1900px;margin:0 auto}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:0 10px 18px rgba(0,0,0,.16)}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.c3{grid-column:span 3}.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+select,button,input{background:#0b1630;color:#fff;border:1px solid #2b4a73;border-radius:12px;padding:10px 12px} button{cursor:pointer}
+pre{white-space:pre-wrap;background:#0a1326;border:1px solid #274164;border-radius:14px;padding:12px;overflow:auto;max-height:420px}.small{font-size:12px;color:var(--muted)}
+.metric{background:#0a1326;border:1px solid #284368;border-radius:14px;padding:14px}.metric .label{font-size:12px;color:var(--muted)}.metric .value{font-size:32px;font-weight:bold;margin-top:4px}
+.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #32557f;background:#0a1326;margin:0 8px 8px 0;font-size:12px}.legend{display:flex;flex-wrap:wrap;gap:10px}.legend .item{display:flex;align-items:center;gap:6px;font-size:12px}
+.dot{width:12px;height:12px;border-radius:50%}.layerbar{display:grid;grid-template-columns:repeat(9,1fr);gap:8px}.layerchip{padding:10px;border-radius:12px;text-align:center;font-size:12px;font-weight:bold;color:#fff}
+svg{width:100%;height:520px;background:#08101f;border-radius:14px;border:1px solid var(--line)} .timeline-step{padding:10px 12px;border-left:3px solid var(--propagation);background:#09162c;border-radius:8px;margin:10px 0}
+code{display:block;background:#09162c;padding:8px 10px;border-radius:10px;margin:8px 0;white-space:pre-wrap}
+@media(max-width:1250px){.c3,.c4,.c5,.c6,.c7,.c8,.c12{grid-column:span 12}.layerbar{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1 style="margin:0">MitoPulse Final Modular Prototype v13</h1>
+  <div class="small">Sistema vivo modular · demos killer · datasets por industria/tamaño · crisis históricas · grafo con colores oficiales</div>
+</div>
+<div class="wrap">
+  <div class="card">
+    <h2>1. Scenario & Dataset Studio</h2>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <select id="profileSelect">{% for p in profiles %}<option value="{{p.name}}">{{p.name}} · {{p.industry}} · {{p.size}} · {{p.mode}}</option>{% endfor %}</select>
+      <button onclick="loadProfile()">Cargar perfil modular</button>
+      <select id="historicalSelect">{% for h in historical %}<option value="{{h.name}}">{{h.title}}</option>{% endfor %}</select>
+      <button onclick="loadHistorical()">Cargar crisis histórica</button>
+      <select id="demoSelect">{% for d in demos %}<option value="{{d.name}}">{{d.title}}</option>{% endfor %}</select>
+      <button onclick="loadDemo()">Cargar Demo Killer</button>
+      <input type="file" id="fileInput" />
+      <button onclick="uploadFile()">Subir dataset</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. Flow del organismo vivo</h2>
+    <div class="layerbar">
+      <div class="layerchip" style="background:var(--identity)">Identity</div>
+      <div class="layerchip" style="background:var(--interaction)">Interaction</div>
+      <div class="layerchip" style="background:var(--propagation)">Propagation</div>
+      <div class="layerchip" style="background:var(--collective)">Collective</div>
+      <div class="layerchip" style="background:var(--physics)">Physics</div>
+      <div class="layerchip" style="background:var(--dynamics)">Dynamics</div>
+      <div class="layerchip" style="background:var(--learning)">Learning</div>
+      <div class="layerchip" style="background:var(--defense)">Defense</div>
+      <div class="layerchip" style="background:var(--simulation);color:#0b1120">Simulation</div>
+    </div>
+    <div class="small" style="margin-top:12px">Sensar → Propagar → Interpretar → Simular → Defender → Anticipar</div>
+  </div>
+
+  <div class="grid">
+    <div class="card c3 metric"><div class="label">Network Health Index</div><div class="value" id="nhi">-</div></div>
+    <div class="card c3 metric"><div class="label">Threat Pressure Index</div><div class="value" id="tpi">-</div></div>
+    <div class="card c3 metric"><div class="label">Systemic Collapse Radar</div><div class="value" id="scr">-</div></div>
+    <div class="card c3 metric"><div class="label">Mass Distortion Index (avg)</div><div class="value" id="mdi">-</div></div>
+
+    <div class="card c8">
+      <h2>3. Grafo vivo del ecosistema</h2>
+      <svg id="graphSvg" viewBox="0 0 1100 520"></svg>
+      <div class="legend" id="graphLegend" style="margin-top:12px"></div>
+    </div>
+
+    <div class="card c4">
+      <h2>4. Módulos activos</h2>
+      <div id="modules"></div>
+      <h3 style="margin-top:18px">Graph / Dataset</h3>
+      <pre id="dataset"></pre>
+    </div>
+
+    <div class="card c4">
+      <h2>5. Sistema nervioso y señales</h2>
+      <pre id="signals"></pre>
+    </div>
+    <div class="card c4">
+      <h2>6. Física y distorsión</h2>
+      <pre id="physics"></pre>
+    </div>
+    <div class="card c4">
+      <h2>7. Dinámica sistémica</h2>
+      <pre id="dynamics"></pre>
+    </div>
+
+    <div class="card c6">
+      <h2>8. Riesgo por nodo / decisión</h2>
+      <pre id="nodes"></pre>
+    </div>
+    <div class="card c6">
+      <h2>9. Shadow Coordination / Cross-Pulse</h2>
+      <pre id="shadow"></pre>
+    </div>
+
+    <div class="card c6">
+      <h2>10. Timeline / story</h2>
+      <div id="storyline"></div>
+      <div id="historicalPanel" class="small" style="margin-top:12px">Carga una crisis o demo killer.</div>
+    </div>
+    <div class="card c6">
+      <h2>11. Runtime map + núcleo matemático</h2>
+      <pre id="runtime"></pre>
+      <div id="mathCore"></div>
+    </div>
+
+    <div class="card c12">
+      <h2>12. Demo Studio</h2>
+      <pre id="demoInfo">Selecciona una Demo Killer para ver actos, focos y KPIs objetivo.</pre>
+    </div>
+  </div>
+</div>
+<script>
+function setText(id, value){ document.getElementById(id).textContent = value; }
+function fmt(obj){ return JSON.stringify(obj, null, 2); }
+function badgeList(items){ return (items||[]).map(m => `<span class="badge">${m}</span>`).join(''); }
+function paintLegend(legend){ const el=document.getElementById('graphLegend'); el.innerHTML=''; Object.entries(legend||{}).forEach(([k,v])=>{ el.innerHTML += `<div class="item"><span class="dot" style="background:${v}"></span>${k}</div>`;}); }
+function paintStory(items){ document.getElementById('storyline').innerHTML = (items||[]).map(s => `<div class="timeline-step">${s}</div>`).join(''); }
+function drawGraph(graph){ const svg = document.getElementById('graphSvg'); svg.innerHTML=''; if(!graph || !graph.nodes) return; const W=1100,H=520,cx=W/2,cy=H/2; const nodes=graph.nodes; const edges=graph.edges||[];
+  const pos={}; nodes.forEach((n,i)=>{ const angle=(i/(nodes.length||1))*Math.PI*2; const ring = n.type==='hidden' ? 110 : (n.type==='device' ? 220 : 170 + (i%4)*35); pos[n.id] = {x: cx + Math.cos(angle)*ring, y: cy + Math.sin(angle)*ring}; });
+  edges.forEach(e=>{ const a=pos[e.source], b=pos[e.target]; if(!a||!b) return; const line=document.createElementNS('http://www.w3.org/2000/svg','line'); line.setAttribute('x1',a.x); line.setAttribute('y1',a.y); line.setAttribute('x2',b.x); line.setAttribute('y2',b.y); line.setAttribute('stroke',e.color||'#64748B'); line.setAttribute('stroke-width',String(1+Math.min(4,e.weight||1))); if(e.dashed) line.setAttribute('stroke-dasharray','6 5'); line.setAttribute('opacity','0.75'); svg.appendChild(line); });
+  nodes.forEach(n=>{ const p=pos[n.id]; const g=document.createElementNS('http://www.w3.org/2000/svg','g'); const c=document.createElementNS('http://www.w3.org/2000/svg','circle'); c.setAttribute('cx',p.x); c.setAttribute('cy',p.y); c.setAttribute('r',String(n.size||12)); c.setAttribute('fill',n.color||'#94A3B8'); c.setAttribute('stroke','#fff'); c.setAttribute('stroke-width','1'); const t=document.createElementNS('http://www.w3.org/2000/svg','text'); t.setAttribute('x',p.x); t.setAttribute('y',p.y+4); t.setAttribute('font-size','10'); t.setAttribute('text-anchor','middle'); t.setAttribute('fill','#fff'); t.textContent=n.label; g.appendChild(c); g.appendChild(t); svg.appendChild(g); }); }
+function paintProfile(j){
+  setText('nhi', j.system_indices?.NHI ?? '-'); setText('tpi', j.system_indices?.TPI ?? '-'); setText('scr', j.system_indices?.SCR ?? '-'); setText('mdi', j.technical_metrics?.MDI_avg ?? '-');
+  document.getElementById('modules').innerHTML = badgeList(j.active_modules); setText('dataset', fmt({profile:j.profile, dataset_profile:j.dataset_profile, graph_stats:j.graph_stats, morphogenesis:j.morphogenesis}));
+  setText('nodes', fmt(j.top_nodes)); setText('shadow', fmt({cross_pulse:j.cross_pulse_pairs, shadow_pairs:j.shadow_pairs}));
+  setText('signals', fmt({cross_pulse_pairs:j.cross_pulse_pairs?.slice?.(0,8), wave_amplitude:j.technical_metrics?.wave_amplitude, contagion_rate:j.technical_metrics?.contagion_rate}));
+  setText('physics', fmt({gravity_avg:j.technical_metrics?.gravity_avg, MDI_avg:j.technical_metrics?.MDI_avg, shadow_avg:j.technical_metrics?.shadow_avg}));
+  setText('dynamics', fmt({entropy:j.system_indices?.entropy, criticality:j.system_indices?.criticality, climate_pressure:j.technical_metrics?.climate_pressure, vortex_score:j.technical_metrics?.vortex_score}));
+  setText('runtime', fmt(j.runtime_map));
+  document.getElementById('mathCore').innerHTML = Object.entries(j.math_core||{}).slice(0,10).map(([k,v])=>`<div><strong>${k}</strong><code>${v}</code></div>`).join('');
+  paintStory(j.storyline); drawGraph(j.graph); paintLegend(j.colors?.graph || {});
+  setText('demoInfo','Perfil modular cargado. Usa Demo Killer o crisis histórica para storytelling avanzado.');
+}
+function paintHistorical(j){
+  document.getElementById('historicalPanel').innerHTML = `<div><strong>${j.scenario.title}</strong></div><div class="small" style="margin:8px 0 12px 0">${j.conclusion}</div>${(j.windows||[]).map(w => `<div class="timeline-step"><strong>${w.phase}</strong> · ${w.period}<br>${w.narrative}<br><code>${JSON.stringify(w,null,2)}</code></div>`).join('')}`;
+  setText('demoInfo', `Crisis histórica cargada: ${j.scenario.title}`);
+}
+function paintDemo(j){
+  setText('demoInfo', JSON.stringify({title:j.title, subtitle:j.subtitle, focus:j.focus, acts:j.acts, target_kpis:j.kpis}, null, 2));
+  document.getElementById('historicalPanel').innerHTML = `<div><strong>${j.title}</strong></div><div class="small" style="margin:8px 0 12px 0">${j.subtitle}</div>${(j.acts||[]).map(a => `<div class="timeline-step">${a}</div>`).join('')}`;
+}
+async function loadProfile(){ const v=document.getElementById('profileSelect').value; const j=await (await fetch('/api/profile/'+v)).json(); paintProfile(j); }
+async function loadHistorical(){ const v=document.getElementById('historicalSelect').value; const j=await (await fetch('/api/historical/'+v)).json(); paintHistorical(j); }
+async function loadDemo(){ const v=document.getElementById('demoSelect').value; const j=await (await fetch('/api/demo/'+v)).json(); paintDemo(j); }
+async function uploadFile(){ const file=document.getElementById('fileInput').files[0]; if(!file) return alert('Selecciona un archivo'); const fd = new FormData(); fd.append('file', file); const res=await (await fetch('/api/upload',{method:'POST',body:fd})).json(); alert('Subido: '+res.filename); }
+
+async function loadLiveOptions(){
+  const res = await fetch('/api/live/options');
+  const j = await res.json();
+  const sel = document.getElementById('liveSelect');
+  sel.innerHTML = (j.connectors||[]).map(c => `<option value="${c.config_name}">${c.config_name} · ${c.type} · ${c.source_name}</option>`).join('');
+  document.getElementById('liveInfo').textContent = JSON.stringify(j, null, 2);
+}
+async function runLiveConnector(){
+  const v = document.getElementById('liveSelect').value;
+  if(!v) return;
+  document.getElementById('liveInfo').textContent = 'Ejecutando connector: ' + v + ' ...';
+  const res = await fetch('/api/live/run/' + v, {method:'POST'});
+  const j = await res.json();
+  document.getElementById('liveInfo').textContent = JSON.stringify(j, null, 2);
+}
+
+
+async function runDetection(){
+  const res = await fetch('/api/detection/run');
+  const j = await res.json();
+  document.getElementById('detectionOutput').textContent = JSON.stringify(j, null, 2);
+}
+
+
+function drawRFDCGraph(payload){
+  const svg = document.getElementById('rfdcGraph');
+  if(!svg || !payload || !payload.nodes){ return; }
+  svg.innerHTML = '';
+  const nodes = payload.nodes.slice(0, 18);
+  const links = (payload.links || []).slice(0, 40);
+  const positions = [
+    [90,90],[220,70],[360,90],[500,70],[640,90],[780,80],
+    [120,220],[250,200],[390,230],[520,210],[660,220],[800,210],
+    [90,340],[240,330],[400,340],[560,330],[720,340],[860,330]
+  ];
+  const palette = payload.palette || {};
+  function roleColor(role){
+    if(role === 'hidden_cluster') return palette.hidden || '#7b61ff';
+    if(role === 'guardian_validated') return palette.guardian || '#00bbf9';
+    if(role === 'alert') return palette.risk || '#ef476f';
+    return palette.neutral || '#adb5bd';
+  }
+  function posFor(id){
+    let idx = nodes.findIndex(n => n.id === id);
+    if(idx < 0) idx = 0;
+    return positions[idx % positions.length];
+  }
+
+  links.forEach(l => {
+    const [x1,y1] = posFor(String(l.source));
+    const [x2,y2] = posFor(String(l.target));
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+    line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+    line.setAttribute('stroke', l.inferred ? '#7b61ff' : '#4cc9f0');
+    line.setAttribute('stroke-width', l.inferred ? '2' : '1.5');
+    if(l.inferred) line.setAttribute('stroke-dasharray', '6,4');
+    svg.appendChild(line);
+  });
+
+  nodes.forEach((n, i) => {
+    const [x,y] = positions[i % positions.length];
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+
+    // wave halo
+    const halo = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    halo.setAttribute('cx', x); halo.setAttribute('cy', y);
+    halo.setAttribute('r', 28);
+    halo.setAttribute('fill', 'none');
+    halo.setAttribute('stroke', '#4cc9f0');
+    halo.setAttribute('stroke-opacity', '0.18');
+    halo.setAttribute('stroke-width', '8');
+    group.appendChild(halo);
+
+    // node
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', x); c.setAttribute('cy', y);
+    c.setAttribute('r', 18 + Math.min(10, Number(n.score || 0)));
+    c.setAttribute('fill', roleColor(n.role));
+    c.setAttribute('opacity', '0.95');
+    group.appendChild(c);
+
+    const tx = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    tx.setAttribute('x', x);
+    tx.setAttribute('y', y + 4);
+    tx.setAttribute('text-anchor', 'middle');
+    tx.setAttribute('font-size', '10');
+    tx.setAttribute('fill', '#ffffff');
+    tx.textContent = String(n.label).slice(0,10);
+    group.appendChild(tx);
+
+    svg.appendChild(group);
+  });
+}
+
+async function loadRFDCGraph(){
+  const res = await fetch('/api/rfdc/graph');
+  const j = await res.json();
+  document.getElementById('graphInfo').textContent = JSON.stringify(j, null, 2);
+  drawRFDCGraph(j);
+}
+
+async function runDemoKiller(demoId){
+  const res = await fetch('/api/demo/run/' + demoId);
+  const j = await res.json();
+  document.getElementById('demoOutput').textContent = JSON.stringify(j.story || j, null, 2);
+  if(j.graph){ drawRFDCGraph(j.graph); }
+  if(j.result && j.result.metrics){
+    const m = j.result.metrics;
+    const nhi = document.getElementById('kpiNHI'); if (nhi) nhi.textContent = m.nhi;
+    const tpi = document.getElementById('kpiTPI'); if (tpi) tpi.textContent = m.tpi;
+    const scr = document.getElementById('kpiSCR'); if (scr) scr.textContent = m.scr;
+  }
+}
+
+async function runRFDC(){
+  const res = await fetch('/api/rfdc/run');
+  const j = await res.json();
+  document.getElementById('rfdcOutput').textContent = JSON.stringify(j, null, 2);
+  // Optional KPI sync if payload available
+  if (j.metrics){
+    const nhi = document.getElementById('kpiNHI'); if (nhi) nhi.textContent = j.metrics.nhi;
+    const tpi = document.getElementById('kpiTPI'); if (tpi) tpi.textContent = j.metrics.tpi;
+    const scr = document.getElementById('kpiSCR'); if (scr) scr.textContent = j.metrics.scr;
+  }
+}
+
+async function runSystemic(){
+  const res = await fetch('/api/systemic/run');
+  const j = await res.json();
+  document.getElementById('detectionOutput').textContent = JSON.stringify(j, null, 2);
+}
+
+loadLiveOptions();
+loadProfile();
+</script>
+</body>
+</html>

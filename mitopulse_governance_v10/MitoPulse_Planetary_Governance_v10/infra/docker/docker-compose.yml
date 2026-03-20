@@ -1,0 +1,48 @@
+services:
+
+  gateway:
+    build: ../../services/gateway
+    ports: ["8080:8080"]
+    depends_on:
+      - presence_engine
+      - risk_engine
+      - ai_detection
+      - civilization_engine
+      - governance_engine
+      - planetary_monitor
+
+  presence_engine:
+    build: ../../services/presence_engine
+    ports: ["8081:8081"]
+
+  risk_engine:
+    build: ../../services/risk_engine
+    ports: ["8082:8082"]
+
+  ai_detection:
+    build: ../../services/ai_detection
+    ports: ["8083:8083"]
+
+  civilization_engine:
+    build: ../../services/civilization_engine
+    ports: ["8088:8088"]
+
+  governance_engine:
+    build: ../../services/governance_engine
+    ports: ["8089:8089"]
+
+  planetary_monitor:
+    build: ../../services/planetary_monitor
+    ports: ["8090:8090"]
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: mitopulse
+      POSTGRES_PASSWORD: mitopulse
+      POSTGRES_DB: mitopulse
+    ports: ["5432:5432"]
+
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]

@@ -1,0 +1,32 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Huma v4 Admin</title>
+<style>
+body{font-family:system-ui;background:#0b1020;color:#e5e7eb;padding:24px}
+.card{background:#111827;border:1px solid #253043;border-radius:16px;padding:16px;margin-bottom:24px}
+input,textarea,button{padding:10px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#e5e7eb;width:100%}
+pre{white-space:pre-wrap} table{width:100%;border-collapse:collapse} th,td{padding:8px;border-bottom:1px solid #253043;text-align:left;font-size:12px}
+</style></head><body>
+<h1>Huma v4 Admin Panel</h1>
+<div class="card"><h2>Tenants</h2><pre>{{ tenants }}</pre></div>
+<div class="card"><h2>Policies</h2><pre>{{ policies }}</pre>
+<form method="post" action="/policy">
+<input name="action" placeholder="withdrawal" />
+<input name="ok" placeholder="0.82" />
+<input name="review" placeholder="0.60" />
+<button type="submit">Save Policy</button>
+</form></div>
+<div class="card"><h2>Upsert Tenant Feature Flags</h2>
+<form method="post" action="/tenant">
+<input name="tenant_id" placeholder="partner_demo" />
+<textarea name="features_json" rows="10" placeholder='{"presence_engine": true, "risk_engine": true}'></textarea>
+<button type="submit">Save Tenant</button>
+</form></div>
+<div class="card"><h2>Register Webhook</h2>
+<form method="post" action="/webhook">
+<input name="tenant_id" placeholder="enterprise_demo" />
+<input name="url" placeholder="https://example.com/webhook" />
+<input name="event_type" placeholder="human.verification.created" />
+<button type="submit">Register Webhook</button>
+</form></div>
+<div class="card"><h2>Webhook Deliveries</h2><pre>{{ deliveries }}</pre></div>
+</body></html>

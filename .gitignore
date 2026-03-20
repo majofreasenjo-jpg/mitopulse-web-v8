@@ -1,0 +1,15 @@
+node_modules/
+venv/
+.venv/
+__pycache__/
+*.pyc
+.env
+*.zip
+*.bin
+MitoPulse_v67/
+MitoPulse_v70/
+MitoPulse_v70_extracted/
+v46_1_staging/
+v46_5_staging/
+v46_6_staging/
+v46_7_staging/

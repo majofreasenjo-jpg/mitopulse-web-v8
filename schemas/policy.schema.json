@@ -1,0 +1,41 @@
+{
+  "title": "PolicyObject",
+  "type": "object",
+  "properties": {
+    "policy_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "condition_text": {
+      "type": "string"
+    },
+    "action_text": {
+      "type": "string"
+    },
+    "confidence_required": {
+      "type": "number"
+    },
+    "quorum_required": {
+      "type": "number"
+    },
+    "severity_band": {
+      "type": "string"
+    },
+    "enabled": {
+      "type": "integer"
+    },
+    "version": {
+      "type": "integer"
+    },
+    "explanation": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "policy_id",
+    "condition_text",
+    "action_text"
+  ]
+}

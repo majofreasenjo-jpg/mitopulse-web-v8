@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: mitopulse-v43-3-live-real
+    runtime: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: AI_ENABLED
+        value: "true"
+      - key: CLIENT_MODE
+        value: "full"

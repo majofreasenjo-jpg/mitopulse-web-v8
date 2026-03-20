@@ -1,0 +1,17 @@
+sequenceDiagram
+  participant Edge as Edge Node
+  participant GW as API Gateway
+  participant Verify as Verify Service
+  participant State as State Service
+  participant Bus as Event Bus
+  participant Graph as Trust Graph
+  participant Ledger as Audit Ledger
+
+  Edge->>GW: POST /v4/packets (signed raw body)
+  GW->>Verify: forward + idempotency context
+  Verify->>Verify: signature + replay checks
+  Verify->>State: apply derived state (idempotent)
+  Verify->>Ledger: append audit event (async OK)
+  State->>Bus: state.updated
+  Bus->>Graph: state.updated
+  Graph->>Bus: graph.edges.inferred + clusters.snapshot

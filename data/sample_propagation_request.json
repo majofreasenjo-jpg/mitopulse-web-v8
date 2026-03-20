@@ -1,0 +1,5 @@
+{
+  "note": "Runtime fetch uses live Binance Spot klines.",
+  "default_source": "BTCUSDT",
+  "max_assets_demo": 10
+}

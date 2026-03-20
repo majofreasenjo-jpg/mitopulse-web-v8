@@ -1,0 +1,15 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Mapa de red</title>
+<style>
+body{font-family:Arial;background:#0f172a;color:white;margin:0}.wrap{max-width:1200px;margin:auto;padding:24px}.card{background:#1e293b;border-radius:16px;padding:18px;margin-bottom:18px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media (max-width:900px){.grid{grid-template-columns:1fr}}svg{width:100%;height:540px;background:#0b1220;border-radius:12px}.list{background:#0b1220;border-radius:12px;padding:12px;max-height:520px;overflow:auto}
+</style></head><body><div class="wrap">
+<div class="card"><h1>Mapa de red para socios</h1><p>Aquí se ve con claridad cómo vamos armando la red: usuarios, nodos persistentes y pulsos cruzados.</p></div>
+<div class="grid">
+<div class="card"><h2>Grafo de usuarios</h2><svg id="graph"></svg></div>
+<div class="card"><h2>Cross pulses recientes</h2><div id="crosses" class="list">Cargando...</div></div>
+</div></div>
+<script>
+const palette=["#22c55e","#38bdf8","#a78bfa","#fb7185","#f59e0b","#14b8a6","#e879f9","#84cc16"];
+async function renderGraph(){const r=await fetch('/api/graph');const data=await r.json();const svg=document.getElementById('graph');const w=svg.clientWidth||900,h=540;svg.setAttribute('viewBox',`0 0 ${w} ${h}`);while(svg.firstChild)svg.removeChild(svg.firstChild);const cols=4;const nodes=data.nodes.map((n,i)=>({...n,x:120+(i%cols)*((w-240)/Math.max(1,cols-1)),y:120+Math.floor(i/cols)*120}));const map=Object.fromEntries(nodes.map(n=>[n.id,n]));data.links.forEach(l=>{const a=map[l.source],b=map[l.target];if(!a||!b)return;const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',a.x);line.setAttribute('y1',a.y);line.setAttribute('x2',b.x);line.setAttribute('y2',b.y);line.setAttribute('stroke','#64748b');line.setAttribute('stroke-width',String(Math.max(1,l.weight/20)));svg.appendChild(line)});nodes.forEach(n=>{const c=document.createElementNS('http://www.w3.org/2000/svg','circle');const rr=Math.max(12,Math.min(36,n.mass/2.2));c.setAttribute('cx',n.x);c.setAttribute('cy',n.y);c.setAttribute('r',rr);c.setAttribute('fill',palette[n.cluster%palette.length]);c.setAttribute('stroke',n.guardian?'#facc15':'#fff');c.setAttribute('stroke-width',n.guardian?'4':'1');svg.appendChild(c);const t=document.createElementNS('http://www.w3.org/2000/svg','text');t.setAttribute('x',n.x);t.setAttribute('y',n.y+4);t.setAttribute('text-anchor','middle');t.setAttribute('font-size','11');t.setAttribute('fill','#fff');t.textContent=n.label.slice(0,10);svg.appendChild(t);});}
+async function renderCrosses(){const r=await fetch('/api/cross_pulses');const rows=await r.json();const el=document.getElementById('crosses');el.innerHTML=rows.length?rows.map(x=>`<div>${x.node_a} ↔ ${x.node_b} | score ${x.shared_context_score} | Δt ${x.temporal_delta_ms}ms | ${x.source}</div>`).join(''):'Sin cross pulses';}
+renderGraph(); renderCrosses();
+</script></body></html>

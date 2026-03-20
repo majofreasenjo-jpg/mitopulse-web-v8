@@ -1,0 +1,30 @@
+{
+  "full": {
+    "show_ai": true,
+    "show_brain": true,
+    "show_dynamics": true,
+    "show_simulation": true,
+    "show_reports": true
+  },
+  "marketplace": {
+    "show_ai": false,
+    "show_brain": false,
+    "show_dynamics": true,
+    "show_simulation": true,
+    "show_reports": true
+  },
+  "bank": {
+    "show_ai": false,
+    "show_brain": true,
+    "show_dynamics": true,
+    "show_simulation": false,
+    "show_reports": true
+  },
+  "energy": {
+    "show_ai": true,
+    "show_brain": true,
+    "show_dynamics": true,
+    "show_simulation": true,
+    "show_reports": true
+  }
+}

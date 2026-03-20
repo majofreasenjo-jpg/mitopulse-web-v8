@@ -1,0 +1,44 @@
+{
+  "probability_upgrade": {
+    "enabled": true,
+    "domain_specific_hrm": true,
+    "targets": [
+      "GSI",
+      "SCR",
+      "sector_primary_risk",
+      "critical_window_risk"
+    ]
+  },
+  "forecast_upgrade": {
+    "enabled": true,
+    "short_horizon": true,
+    "medium_long_on_demand": true
+  },
+  "real_calibration": {
+    "enabled": true,
+    "domains": [
+      "banking",
+      "marketplace",
+      "energy",
+      "logistics"
+    ]
+  },
+  "benchmark_engine": {
+    "enabled": true,
+    "baselines": [
+      "logistic_regression",
+      "random_forest",
+      "xgboost"
+    ]
+  },
+  "real_learning_loop": {
+    "enabled": true,
+    "capture_outcomes": true,
+    "capture_overrides": true
+  },
+  "real_integration_layer": {
+    "enabled": true,
+    "canonical_validation": true,
+    "connector_hardening": true
+  }
+}

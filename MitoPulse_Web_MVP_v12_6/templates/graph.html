@@ -1,0 +1,18 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Graph</title>
+<style>
+body{font-family:Arial,sans-serif;background:#0c1220;color:#eef4ff;margin:24px}
+.card{background:#141d31;padding:16px;border-radius:14px;margin-bottom:16px}
+pre{background:#0f1728;padding:12px;border-radius:10px;white-space:pre-wrap}
+a{color:#8dc4ff}
+button,input,select{padding:8px 12px;border-radius:10px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+</style></head><body>
+<h1>Interactive Graph</h1>
+<p><a href="/">Home</a></p>
+<svg id="canvas" width="1100" height="650" style="background:#141d31;border-radius:14px;padding:12px"></svg>
+<div id="panel" class="card">Click a node to inspect it.</div>
+<script>
+async function draw(){const data=await (await fetch('/api/graph')).json(); const svg=document.getElementById('canvas'); const panel=document.getElementById('panel'); const nodes=data.nodes.map((n,i)=>({...n,x:120+(i%6)*160,y:90+Math.floor(i/6)*170})); const byId=Object.fromEntries(nodes.map(n=>[n.node_id,n])); data.edges.forEach(e=>{const a=byId[e.source], b=byId[e.target]; const line=document.createElementNS('http://www.w3.org/2000/svg','line'); line.setAttribute('x1',a.x); line.setAttribute('y1',a.y); line.setAttribute('x2',b.x); line.setAttribute('y2',b.y); line.setAttribute('stroke','#45618d'); line.setAttribute('stroke-width',Math.max(1,e.weight/25)); svg.appendChild(line);}); nodes.forEach(n=>{const g=document.createElementNS('http://www.w3.org/2000/svg','g'); const c=document.createElementNS('http://www.w3.org/2000/svg','circle'); c.setAttribute('cx',n.x); c.setAttribute('cy',n.y); c.setAttribute('r',18+(n.nodal_mass/10)); c.setAttribute('fill',n.status==='quarantined'?'#d9534f':n.status==='high_risk'?'#f0ad4e':'#5cb85c'); c.setAttribute('stroke',n.guardian?'#ffd76a':'#9ab0d1'); c.setAttribute('stroke-width',n.guardian?4:2); c.style.cursor='pointer'; c.onclick=async()=>{const res=await fetch('/api/node/'+n.node_id); panel.textContent=JSON.stringify(await res.json(),null,2);}; const t=document.createElementNS('http://www.w3.org/2000/svg','text'); t.setAttribute('x',n.x-28); t.setAttribute('y',n.y+4); t.setAttribute('fill','#eef4ff'); t.setAttribute('font-size','11'); t.textContent=n.node_id; g.appendChild(c); g.appendChild(t); svg.appendChild(g);});}
+draw();
+</script>
+</body></html>

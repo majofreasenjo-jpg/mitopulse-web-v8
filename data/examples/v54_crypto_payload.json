@@ -1,0 +1,16 @@
+{
+  "entity_id": "wallet_cluster_v54",
+  "entity_type": "wallet_cluster",
+  "evidence_score": 0.88,
+  "trust_score": 0.31,
+  "trust_velocity": -0.06,
+  "trust_volatility": 0.19,
+  "load_dev": 69,
+  "entropy_dev": 47,
+  "coordination_signal": 78,
+  "trust_break": 58,
+  "structural_distortion": 52,
+  "confidence": 0.89,
+  "quorum_score": 0.84,
+  "recovery_stability_score": 0.61
+}

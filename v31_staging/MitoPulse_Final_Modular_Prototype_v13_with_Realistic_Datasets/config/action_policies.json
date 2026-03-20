@@ -1,0 +1,32 @@
+{
+  "generic": {
+    "monitor": ["Log event", "Keep entity under observation"],
+    "enhanced_monitoring": ["Increase monitoring window", "Raise analyst visibility"],
+    "review_and_limit": ["Send to review queue", "Reduce limits / privileges"],
+    "block_or_freeze": ["Block transaction / session", "Freeze entity / cluster", "Escalate to incident queue"]
+  },
+  "banking": {
+    "monitor": ["Monitor account flows", "Keep AML watch"],
+    "enhanced_monitoring": ["Require step-up auth", "Reduce transfer thresholds"],
+    "review_and_limit": ["Send to AML/fraud ops", "Hold suspicious transfers", "Limit beneficiaries"],
+    "block_or_freeze": ["Freeze account", "Block transfer", "Escalate AML"]
+  },
+  "marketplace": {
+    "monitor": ["Monitor seller activity", "Watch review velocity"],
+    "enhanced_monitoring": ["Hold payouts", "Flag catalog changes"],
+    "review_and_limit": ["Suspend promotions", "Limit listings", "Manual trust review"],
+    "block_or_freeze": ["Suspend seller", "Freeze payouts"]
+  },
+  "afp": {
+    "monitor": ["Track concentration changes", "Watch liquidity stress"],
+    "enhanced_monitoring": ["Run extra stress test", "Increase portfolio review cadence"],
+    "review_and_limit": ["Limit exposure growth", "Escalate to risk committee"],
+    "block_or_freeze": ["Trigger crisis protocol", "Freeze portfolio action under policy"]
+  },
+  "crypto": {
+    "monitor": ["Watch wallet cluster", "Track on-chain velocity"],
+    "enhanced_monitoring": ["Increase transaction scrutiny", "Restrict withdrawal speed"],
+    "review_and_limit": ["Hold withdrawals", "Require manual review"],
+    "block_or_freeze": ["Freeze wallet/account", "Escalate compliance", "Isolate related wallets"]
+  }
+}

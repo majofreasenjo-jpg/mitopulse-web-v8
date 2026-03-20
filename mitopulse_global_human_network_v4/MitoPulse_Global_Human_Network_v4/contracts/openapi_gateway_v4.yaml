@@ -1,0 +1,25 @@
+openapi: 3.1.0
+info:
+  title: MitoPulse Global Human Network Gateway
+  version: 4.0.0
+paths:
+  /v4/healthcheck:
+    get:
+      summary: Gateway health
+      responses:
+        '200': {description: OK}
+  /v4/presence:
+    post:
+      summary: Submit human presence event
+      parameters:
+        - in: header
+          name: X-API-Key
+          schema: {type: string}
+        - in: header
+          name: X-Region
+          schema: {type: string}
+        - in: header
+          name: Idempotency-Key
+          schema: {type: string}
+      responses:
+        '200': {description: OK}

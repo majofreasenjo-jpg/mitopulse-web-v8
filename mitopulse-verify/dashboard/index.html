@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MitoPulse Verify | Management Dashboard</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --surface: #ffffff;
+            --text-main: #111827;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --font-ui: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-ui);
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        aside {
+            width: 260px;
+            background-color: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand {
+            padding: 24px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .brand span {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .nav-links {
+            padding: 16px 12px;
+            flex: 1;
+        }
+
+        .nav-item {
+            padding: 10px 16px;
+            margin-bottom: 4px;
+            border-radius: 6px;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            background-color: #f3f4f6;
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background-color: #eff6ff;
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        header {
+            height: 70px;
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+        }
+
+        .tenant-selector {
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+        }
+
+        .content {
+            padding: 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        /* API Keys Section */
+        .api-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .key-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: #f9fafb;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .key-value {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-main);
+        }
+
+        .btn {
+            background: #fff;
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--text-main);
+            transition: 0.2s;
+        }
+
+        .btn:hover {
+            background: #f3f4f6;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .metric-title {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        /* Ledger Table */
+        .table-container {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            margin-bottom: 40px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: #f9fafb;
+            padding: 12px 24px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 16px 24px;
+            font-size: 0.85rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .tag {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .tag-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .tag-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .mono {
+            font-family: var(--font-mono);
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside>
+        <div class="brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+            MitoPulse <span>Verify</span>
+        </div>
+        <div class="nav-links">
+            <div class="nav-item active">Overview</div>
+            <div class="nav-item">API Keys</div>
+            <div class="nav-item">Verification Ledger</div>
+            <div class="nav-item">Risk Policies</div>
+            <div class="nav-item">Billing</div>
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <div class="tenant-selector">
+                <span
+                    style="display:inline-block;width:8px;height:8px;background:var(--success);border-radius:50%;"></span>
+                Production Environment
+            </div>
+            <div style="font-weight: 500; font-size: 0.9rem;">Acme Bank Inc.</div>
+        </header>
+
+        <div class="content">
+            <h1 class="page-title">Overview</h1>
+
+            <!-- Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-title">Successful Verifications (30d)</div>
+                    <div class="metric-value">142,894</div>
+                    <div style="color: var(--success); font-size: 0.85rem; font-weight: 500;">↑ 12% vs last month</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Coercion / Replay Blocked</div>
+                    <div class="metric-value" style="color: var(--danger);">1,204</div>
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">Failed crypto or risk check</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title">Current Billing Estimate</div>
+                    <div class="metric-value">$7,144<span
+                            style="font-size:1rem;color:var(--text-muted);font-weight:400">.70</span></div>
+                    <div style="color: var(--text-muted); font-size: 0.85rem;">$0.05 per successful verify</div>
+                </div>
+            </div>
+
+            <!-- API Keys -->
+            <div class="api-card">
+                <h2 style="font-size: 1.1rem; margin-bottom: 8px;">API Credentials</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">Use these keys to
+                    authenticate server-to-server requests.</p>
+
+                <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">TENANT_ID</div>
+                <div class="key-row" style="margin-top: 8px; margin-bottom: 16px;">
+                    <div class="key-value">acme_bank_prod_9Xy2</div>
+                    <button class="btn">Copy</button>
+                </div>
+
+                <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">SECRET API KEY</div>
+                <div class="key-row" style="margin-top: 8px;">
+                    <div class="key-value">pk_live_***********************************</div>
+                    <button class="btn">Reveal</button>
+                </div>
+            </div>
+
+            <!-- Ledger -->
+            <h2 style="font-size: 1.1rem; margin-bottom: 16px; margin-top: 32px;">Immutable Audit Ledger</h2>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Timestamp</th>
+                            <th>Transaction ID (TX)</th>
+                            <th>Device Handle</th>
+                            <th>Risk / Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tag tag-success">VERIFIED</span></td>
+                            <td>Mar 6, 15:42:12</td>
+                            <td class="mono" style="color: var(--primary);">tx_8f92a1b4e6c3d0f1</td>
+                            <td class="mono">node_9185</td>
+                            <td>Confidence: 0.98, Risk: LOW</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-success">VERIFIED</span></td>
+                            <td>Mar 6, 15:40:05</td>
+                            <td class="mono" style="color: var(--primary);">tx_3c4d5e6f7a8b9c0d</td>
+                            <td class="mono">node_2241</td>
+                            <td>Confidence: 0.91, Risk: LOW</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-danger">BLOCKED</span></td>
+                            <td>Mar 6, 15:39:22</td>
+                            <td class="mono" style="color: var(--primary);">tx_1b2c3d4e5f6a7b8c</td>
+                            <td class="mono">node_9185_clone</td>
+                            <td>Cryptographic mismatch</td>
+                        </tr>
+                        <tr>
+                            <td><span class="tag tag-success">VERIFIED</span></td>
+                            <td>Mar 6, 15:35:10</td>
+                            <td class="mono" style="color: var(--primary);">tx_a1b2c3d4e5f6a7b8</td>
+                            <td class="mono">node_7730</td>
+                            <td>Confidence: 0.88, Risk: MEDIUM</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+
+</body>
+
+</html>

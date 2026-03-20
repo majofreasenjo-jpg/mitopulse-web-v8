@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>Visual Core</h1>
+  <p>Grafo vivo, propagación de ondas, activación de señales, presión del sistema y reproducción temporal. Esta pantalla está pensada para impacto visual y demo institucional.</p>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <div class="label">NHI</div>
+    <div class="value">{{kpis.NHI}}</div>
+  </div>
+  <div class="card">
+    <div class="label">TPI</div>
+    <div class="value">{{kpis.TPI}}</div>
+  </div>
+  <div class="card">
+    <div class="label">SCR</div>
+    <div class="value">{{kpis.SCR}}</div>
+  </div>
+  <div class="card">
+    <div class="label">MDI</div>
+    <div class="value">{{kpis.MDI}}</div>
+  </div>
+</section>
+
+<section class="card">
+  <div class="toolbar">
+    <button class="btn" onclick="VC.togglePlay()">Play / Pause</button>
+    <button class="btn" onclick="VC.triggerWave()">Trigger Wave</button>
+    <button class="btn" onclick="VC.toggleHeat()">Toggle Pressure Map</button>
+    <button class="btn" onclick="VC.toggleSignals()">Toggle Signal Routes</button>
+    <button class="btn" onclick="VC.toggleStorm()">Toggle Storm Mode</button>
+    <label class="inline">Intensity <input id="intensity" type="range" min="1" max="100" value="64" oninput="VC.setIntensity(this.value)"></label>
+    <label class="inline">Speed <input id="speed" type="range" min="1" max="100" value="52" oninput="VC.setSpeed(this.value)"></label>
+  </div>
+  <canvas id="visualCoreCanvas" width="1280" height="760"></canvas>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <h3>Playback Timeline</h3>
+    <canvas id="timelineCanvas" width="600" height="160"></canvas>
+  </div>
+  <div class="card">
+    <h3>Entity Focus</h3>
+    <div id="focusPanel" class="focus-panel">Click a node in the graph.</div>
+  </div>
+</section>
+
+<script>
+window.__VISUAL_CORE_SEED__ = {{ seed_json|safe }};
+</script>
+<script src="/static/js/visual_core.js"></script>
+{% endblock %}

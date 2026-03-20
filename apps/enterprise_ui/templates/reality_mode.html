@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <h1>Reality Mode</h1>
+  <p>Conector real Binance + benchmark comparativo + salida protocolar. Esta pantalla está pensada para demostrar superioridad con señales de mercado reales.</p>
+</section>
+
+<section class="grid">
+  <div class="card"><div class="label">Symbol</div><div class="value" id="rmSymbol">BTCUSDT</div></div>
+  <div class="card"><div class="label">Last Price</div><div class="value" id="rmPrice">—</div></div>
+  <div class="card"><div class="label">24h Change %</div><div class="value" id="rmChange">—</div></div>
+  <div class="card"><div class="label">Quote Volume</div><div class="value" id="rmVolume">—</div></div>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <h3>Benchmark Systems</h3>
+    <table>
+      <tr><th>System</th><th>Triggered</th><th>Severity / State</th><th>Reason</th></tr>
+      <tr><td>Baseline Rule</td><td id="bTriggered">—</td><td id="bSeverity">—</td><td id="bReason">—</td></tr>
+      <tr><td>ML Simple</td><td id="mTriggered">—</td><td id="mSeverity">—</td><td id="mReason">—</td></tr>
+      <tr><td>MitoPulse Protocol</td><td id="pTriggered">—</td><td id="pSeverity">—</td><td id="pReason">—</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h3>Benchmark KPIs</h3>
+    <div class="label">Lead Advantage</div>
+    <div class="value" id="leadAdv">—</div>
+    <div class="label">Policy</div>
+    <div id="policyName">—</div>
+    <div class="label" style="margin-top:10px;">Validation</div>
+    <div id="validationLine">—</div>
+  </div>
+</section>
+
+<section class="card">
+  <div class="toolbar">
+    <button class="btn" onclick="RM.refresh()">Refresh Live</button>
+    <button class="btn" onclick="RM.togglePlay()">Play / Pause</button>
+  </div>
+  <canvas id="realityChart" width="1280" height="480"></canvas>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <h3>Propagation Map</h3>
+    <canvas id="propMap" width="620" height="240"></canvas>
+  </div>
+  <div class="card">
+    <h3>Protocol Explanation</h3>
+    <pre id="protoExplain">—</pre>
+  </div>
+</section>
+
+<script src="/static/js/reality_mode.js"></script>
+{% endblock %}

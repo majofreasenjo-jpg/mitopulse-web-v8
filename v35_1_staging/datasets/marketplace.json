@@ -1,0 +1,73 @@
+{
+  "client_type": "marketplace",
+  "entities": [
+    {
+      "id": "seller_A",
+      "kind": "seller",
+      "value": 72
+    },
+    {
+      "id": "seller_B",
+      "kind": "seller",
+      "value": 88
+    },
+    {
+      "id": "buyer_X",
+      "kind": "buyer",
+      "value": 25
+    },
+    {
+      "id": "buyer_Y",
+      "kind": "buyer",
+      "value": 32
+    },
+    {
+      "id": "device_1",
+      "kind": "device",
+      "value": 55
+    },
+    {
+      "id": "wallet_9",
+      "kind": "wallet",
+      "value": 61
+    }
+  ],
+  "events": [
+    {
+      "source": "seller_A",
+      "target": "buyer_X",
+      "amount": 210,
+      "timestamp": "2026-03-01T10:00:00"
+    },
+    {
+      "source": "seller_A",
+      "target": "buyer_Y",
+      "amount": 190,
+      "timestamp": "2026-03-01T10:01:00"
+    },
+    {
+      "source": "seller_B",
+      "target": "buyer_X",
+      "amount": 260,
+      "timestamp": "2026-03-01T10:02:00"
+    },
+    {
+      "source": "seller_B",
+      "target": "buyer_Y",
+      "amount": 245,
+      "timestamp": "2026-03-01T10:03:00"
+    },
+    {
+      "source": "seller_A",
+      "target": "device_1",
+      "amount": 120,
+      "timestamp": "2026-03-01T10:04:00"
+    },
+    {
+      "source": "seller_B",
+      "target": "wallet_9",
+      "amount": 310,
+      "timestamp": "2026-03-01T10:05:00"
+    }
+  ]
+}

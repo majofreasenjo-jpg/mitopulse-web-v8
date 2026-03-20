@@ -1,0 +1,23 @@
+demo_id: afp_systemic_realistic_v1
+industry: pension_fund
+size: systemic
+mode: technical_demo
+scenario: portfolio_fragility_realistic
+dataset: data/afp_systemic_realistic_v1
+modules:
+  relational_identity: true
+  pulse: true
+  cross_pulse: true
+  trust_propagation: true
+  relational_gravity: true
+  dark_matter_detection: true
+  entropy_analysis: true
+  criticality_engine: true
+  climate_dynamics: true
+  vortex_formation: true
+  NHI: true
+  TPI: true
+  SCR: true
+  FSS: true
+  ESE: true
+  decision_engine: true

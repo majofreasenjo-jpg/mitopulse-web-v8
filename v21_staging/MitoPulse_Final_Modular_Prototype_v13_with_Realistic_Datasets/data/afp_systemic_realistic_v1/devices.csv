@@ -1,0 +1,6 @@
+device_id,customer_id,device_hash,channel,risk_hint
+DEV_A,A,dh_598626718472,institutional_terminal,normal
+DEV_B,B,dh_205364650761,institutional_terminal,normal
+DEV_C,C,dh_327510104875,institutional_terminal,normal
+DEV_D,D,dh_131815825054,institutional_terminal,normal
+DEV_E,E,dh_940123879014,institutional_terminal,normal

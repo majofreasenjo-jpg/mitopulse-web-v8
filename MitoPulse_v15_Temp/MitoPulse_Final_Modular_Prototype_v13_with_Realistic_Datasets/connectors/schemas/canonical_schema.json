@@ -1,0 +1,38 @@
+{
+  "customers.csv": [
+    "customer_id",
+    "name_hash",
+    "phone_hash",
+    "email_hash",
+    "segment",
+    "region",
+    "industry",
+    "client_size",
+    "created_at"
+  ],
+  "devices.csv": [
+    "device_id",
+    "customer_id",
+    "device_hash",
+    "channel",
+    "risk_hint"
+  ],
+  "events.csv": [
+    "event_id",
+    "source_id",
+    "target_id",
+    "event_type",
+    "context",
+    "amount",
+    "label",
+    "timestamp"
+  ],
+  "signals.csv": [
+    "signal_id",
+    "entity_id",
+    "signal_type",
+    "severity",
+    "source",
+    "timestamp"
+  ]
+}

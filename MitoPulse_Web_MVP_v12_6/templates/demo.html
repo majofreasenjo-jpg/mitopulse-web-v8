@@ -1,0 +1,19 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Guided Demo</title>
+<style>
+body{font-family:Arial,sans-serif;background:#0c1220;color:#eef4ff;margin:24px}
+.card{background:#141d31;padding:16px;border-radius:14px;margin-bottom:16px}
+pre{background:#0f1728;padding:12px;border-radius:10px;white-space:pre-wrap}
+a{color:#8dc4ff}
+button,input,select{padding:8px 12px;border-radius:10px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+</style></head><body>
+<h1>Guided Demo</h1>
+<p><a href="/">Home</a></p>
+<div class="card"><select id="case"></select><button onclick="runCase()">Run Case</button></div>
+<pre id="out">Choose a case.</pre>
+<script>
+async function init(){const r=await fetch('/api/demo-cases'); const j=await r.json(); document.getElementById('case').innerHTML=Object.keys(j).map(k=>`<option value="${k}">${k}</option>`).join('');}
+async function runCase(){const c=document.getElementById('case').value; const cases=await (await fetch('/api/demo-cases')).json(); const payload=cases[c]; const r=await fetch('/api/evaluate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)}); document.getElementById('out').textContent=JSON.stringify(await r.json(),null,2);}
+init();
+</script>
+</body></html>

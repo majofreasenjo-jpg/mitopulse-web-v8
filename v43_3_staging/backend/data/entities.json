@@ -1,0 +1,32 @@
+[
+  {
+    "id": "seller_A",
+    "value": 72,
+    "kind": "seller"
+  },
+  {
+    "id": "seller_B",
+    "value": 89,
+    "kind": "seller"
+  },
+  {
+    "id": "buyer_X",
+    "value": 34,
+    "kind": "buyer"
+  },
+  {
+    "id": "bank_aml_01",
+    "value": 81,
+    "kind": "bank_node"
+  },
+  {
+    "id": "refinery_CDU_01",
+    "value": 92,
+    "kind": "energy_node"
+  },
+  {
+    "id": "route_port_01",
+    "value": 66,
+    "kind": "logistics_node"
+  }
+]

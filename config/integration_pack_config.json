@@ -1,0 +1,8 @@
+{
+  "principle": "overlay_not_replacement",
+  "canonical_model": true,
+  "industry_connector_map": true,
+  "sap_erp_overlay": true,
+  "technical_onboarding": true,
+  "integration_demos": true
+}

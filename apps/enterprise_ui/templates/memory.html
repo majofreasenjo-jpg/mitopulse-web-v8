@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero"><h1>Memory & Spaces</h1><p>Persistencia de patrones, contexto y espacios por vertical o piloto.</p></section>
+<section class="grid">
+  <div class="card"><h3>Patterns</h3><pre>{{ memory.patterns | tojson(indent=2) }}</pre></div>
+  <div class="card"><h3>Spaces</h3><pre>{{ memory.spaces | tojson(indent=2) }}</pre></div>
+</section>
+{% endblock %}

@@ -1,0 +1,24 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Nodo MitoPulse</title>
+<style>
+body{font-family:Arial;background:#000;color:#fff;margin:0}.wrap{max-width:760px;margin:auto;padding:24px}.status{text-align:center;font-size:32px;color:#6d6cff;letter-spacing:4px;margin-top:40px}.orb{width:280px;height:280px;border-radius:50%;margin:30px auto;background:radial-gradient(circle,#6d6cff 0%,#2d2d66 50%,#111 75%);display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:bold;box-shadow:0 0 80px #4b4bcc}.card{background:rgba(30,41,59,.7);border-radius:24px;padding:20px;margin:20px 0}.muted{color:#94a3b8}.btn{display:block;width:100%;padding:22px;border-radius:18px;border:none;background:#6d6cff;color:#fff;font-size:20px;font-weight:bold}.mono{font-family:monospace;color:#10b981}
+</style></head><body><div class="wrap">
+<div class="status">STATUS: ACTIVE</div>
+<div class="orb">CONNECTED</div>
+<div class="card">
+  <div class="muted">IDENTIDAD NODAL PERSISTENTE</div>
+  <h1 id="nodeId">node_----</h1>
+  <div class="mono" id="log">&gt; Registrando nodo...</div>
+  <div class="mono" id="pulseInfo" style="margin-top:10px;">&gt; Pulsos: 0 | Cross Pulses: 0</div>
+</div>
+<button class="btn" onclick="emitPulse()">EMITIR LATIDO</button>
+<button class="btn" style="margin-top:12px;background:#4f46e5" onclick="emitCrossPulse()">CONECTAR CON NODO</button>
+</div>
+<script>
+function getPersistentNodeId(){let id=localStorage.getItem('mitopulse_node_id'); if(!id){id='node_'+Math.random().toString(16).slice(2,10); localStorage.setItem('mitopulse_node_id',id);} return id;}
+const nodeId=getPersistentNodeId(); document.getElementById('nodeId').textContent=nodeId;
+async function registerNode(){await fetch('/api/register_node',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({node_id:nodeId,platform:'mobile'})}); await refreshStatus();}
+async function refreshStatus(){const r=await fetch(`/api/node_status/${nodeId}`); const d=await r.json(); if(d.error){document.getElementById('log').textContent='> Error de registro'; return;} document.getElementById('log').textContent='> Nodo persistente verificado'; document.getElementById('pulseInfo').textContent=`> Pulsos: ${d.pulse_count} | Cross Pulses: ${d.cross_pulse_count}`;}
+async function emitPulse(){await fetch('/api/pulse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({node_id:nodeId,platform:'mobile'})}); await refreshStatus();}
+async function emitCrossPulse(){const nodes=await (await fetch('/api/nodes')).json(); const other=nodes.find(n=>n.id!==nodeId); if(!other){document.getElementById('log').textContent='> No hay otro nodo disponible'; return;} await fetch('/api/crosspulse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({node_a:nodeId,node_b:other.id,shared_context_score:82,temporal_delta_ms:35,source:'mobile_node'})}); await refreshStatus(); document.getElementById('log').textContent=`> Cross pulse con ${other.id}`;}
+registerNode(); setInterval(()=>emitPulse(),30000);
+</script></body></html>

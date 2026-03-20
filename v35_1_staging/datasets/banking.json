@@ -1,0 +1,56 @@
+{
+  "client_type": "banking",
+  "entities": [
+    {
+      "id": "acct_101",
+      "kind": "account",
+      "value": 65
+    },
+    {
+      "id": "acct_202",
+      "kind": "account",
+      "value": 82
+    },
+    {
+      "id": "acct_303",
+      "kind": "account",
+      "value": 93
+    },
+    {
+      "id": "device_44",
+      "kind": "device",
+      "value": 41
+    },
+    {
+      "id": "beneficiary_2",
+      "kind": "beneficiary",
+      "value": 70
+    }
+  ],
+  "events": [
+    {
+      "source": "acct_101",
+      "target": "beneficiary_2",
+      "amount": 900,
+      "timestamp": "2026-03-01T09:00:00"
+    },
+    {
+      "source": "acct_202",
+      "target": "beneficiary_2",
+      "amount": 1200,
+      "timestamp": "2026-03-01T09:01:00"
+    },
+    {
+      "source": "acct_303",
+      "target": "beneficiary_2",
+      "amount": 1450,
+      "timestamp": "2026-03-01T09:02:00"
+    },
+    {
+      "source": "acct_202",
+      "target": "device_44",
+      "amount": 200,
+      "timestamp": "2026-03-01T09:03:00"
+    }
+  ]
+}

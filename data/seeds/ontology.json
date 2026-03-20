@@ -1,0 +1,47 @@
+{
+  "entities": [
+    "user",
+    "account",
+    "device",
+    "sensor",
+    "mine_zone",
+    "asset",
+    "wallet",
+    "operator"
+  ],
+  "interactions": [
+    "transfer",
+    "login",
+    "movement",
+    "pressure_reading",
+    "alert",
+    "payment",
+    "route_change"
+  ],
+  "signals": [
+    "anomaly",
+    "cluster_emergence",
+    "pressure_accumulation",
+    "trust_break",
+    "structural_shift"
+  ],
+  "states": [
+    "normal",
+    "watch",
+    "elevated",
+    "critical"
+  ],
+  "risk_objects": [
+    "fraud_ring",
+    "collapse_risk",
+    "contagion_risk",
+    "coordination_risk"
+  ],
+  "action_objects": [
+    "monitor",
+    "escalate",
+    "restrict",
+    "block",
+    "simulate"
+  ]
+}
