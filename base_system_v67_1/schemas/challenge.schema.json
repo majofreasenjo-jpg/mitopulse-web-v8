@@ -1,0 +1,27 @@
+{
+  "title": "ChallengeObject",
+  "type": "object",
+  "properties": {
+    "challenge_id": {
+      "type": "string"
+    },
+    "evaluation_id": {
+      "type": "integer"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "challenge_id",
+    "evaluation_id",
+    "reason",
+    "status"
+  ]
+}

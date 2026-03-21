@@ -1,4 +1,4 @@
 @echo off
-copy /b MitoPulse_v67_1_FULL_UNIFIED_partA.bin + MitoPulse_v67_1_FULL_UNIFIED_partB.bin MitoPulse_v67_1_FULL_UNIFIED.zip
-echo Done. Created MitoPulse_v67_1_FULL_UNIFIED.zip
+copy /b MitoPulse_v70_DEFINITIVE_FULL_WORKSPACE_partA.bin + MitoPulse_v70_DEFINITIVE_FULL_WORKSPACE_partB.bin MitoPulse_v70_DEFINITIVE_FULL_WORKSPACE.zip
+echo Done. Created MitoPulse_v70_DEFINITIVE_FULL_WORKSPACE.zip
 pause

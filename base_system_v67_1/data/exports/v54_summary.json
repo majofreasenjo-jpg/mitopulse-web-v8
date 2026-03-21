@@ -1,0 +1,7 @@
+{
+  "events_seeded": 90000,
+  "evaluations_seeded": 60000,
+  "votes_seeded": 180000,
+  "graph_nodes": 1400,
+  "graph_links": 13000
+}

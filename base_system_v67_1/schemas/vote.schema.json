@@ -1,0 +1,30 @@
+{
+  "title": "ValidationVote",
+  "type": "object",
+  "properties": {
+    "vote_id": {
+      "type": "string"
+    },
+    "evaluation_id": {
+      "type": "integer"
+    },
+    "anchor_id": {
+      "type": "string"
+    },
+    "confidence": {
+      "type": "number"
+    },
+    "vote": {
+      "type": "string"
+    },
+    "ts": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "vote_id",
+    "evaluation_id",
+    "anchor_id",
+    "vote"
+  ]
+}

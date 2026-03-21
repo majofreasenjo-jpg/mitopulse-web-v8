@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero"><h1>Vertical Mode</h1><p>Pack inicial enfocado en Banking / Fraud y Mining.</p></section>
+<section class="grid">
+  <div class="card"><h3>Banking Pack</h3><p>Coordinated fraud, hidden clusters, trust break, actionability.</p></div>
+  <div class="card"><h3>Mining Pack</h3><p>Pressure build-up, structural distortion, critical transition, early action.</p></div>
+</section>
+<section class="card">
+  <h3>Seed Cases</h3>
+  <ul>
+  {% for c in cases %}
+    <li>{{c.id}} — {{c.title}} — {{c.vertical}}</li>
+  {% endfor %}
+  </ul>
+</section>
+{% endblock %}

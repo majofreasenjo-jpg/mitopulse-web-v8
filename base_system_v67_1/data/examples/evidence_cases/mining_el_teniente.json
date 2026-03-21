@@ -1,0 +1,15 @@
+{
+  "id": "mining_el_teniente",
+  "vertical": "mining",
+  "title": "El Teniente Stress Cascade",
+  "mode": "past",
+  "event": "Load / stability pressure cascade in critical mining environment",
+  "impact": "$12.5M estimated operational disruption",
+  "protocol_value": "anticipates systemic pressure before visible collapse",
+  "states": [
+    "DEVIATION",
+    "PRESSURE",
+    "INSTABILITY",
+    "CRITICAL"
+  ]
+}

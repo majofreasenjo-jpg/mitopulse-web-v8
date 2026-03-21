@@ -1,25 +1,35 @@
-# MitoPulse v68 — Module 6 Federation + Quorum
+# MitoPulse v70 — Definitive Full Workspace
 
-Módulo real para validación distribuida, quorum y lock-in protocolar.
+Este paquete consolida en un solo workspace:
 
-## Qué incluye
-- Modelo de voto de nodos
-- Cálculo de quorum ponderado
-- Registro de anchors / validators
-- Simulación multi-node
-- API básica para federación
-- Broadcast y recolección de votos
-- Trazabilidad de decisión federada
+- Base grande unificada v67.1
+- Módulos v68:
+  - Module 1 Live Data
+  - Module 2 Propagation Engine
+  - Module 3 Benchmark Engine
+  - Module 4 Trust Layer
+  - Module 5 SDK + API
+  - Module 6 Federation + Quorum
+  - Module 7 Visual God Mode
+  - Module 8 Impact / ROI
+- Documentos de protocolo y patente:
+  - SPEC v1.2
+  - Patente blindada v1.4
+  - Patente ultra v1.5
 
-## Instalación
-pip install -r requirements.txt
+## Estructura
+- `base_system_v67_1/` → base unificada pesada
+- `modules_v68/` → módulos completos separados y listos para integrar
+- `protocol_patent_docs/` → documentos de protocolo y patente
 
-## Demo local
-python scripts/run_federation_api.py
+## Qué es este bloque
+Es el bloque consolidado más completo de trabajo del proyecto hasta este punto.
+Su función es darte una única base descargable pesada y ordenada para seguir desarrollando
+sin volver a combinar versiones anteriores.
 
-## Endpoints principales
-- GET /health
-- GET /validators
-- POST /vote
-- POST /quorum/evaluate
-- POST /federation/broadcast_demo
+## Qué no hace por sí solo
+No convierte mágicamente todos los módulos en una única app enterprise final acoplada al 100%.
+Eso sigue siendo el trabajo de integración técnica sobre esta misma base.
+
+## Recomendación
+Trabajar desde este workspace en adelante como base única del proyecto.

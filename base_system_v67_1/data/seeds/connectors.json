@@ -1,0 +1,34 @@
+{
+  "connectors": [
+    {
+      "name": "REST API",
+      "status": "ready_stub",
+      "type": "api"
+    },
+    {
+      "name": "Warehouse Adapter",
+      "status": "ready_stub",
+      "type": "warehouse"
+    },
+    {
+      "name": "SIEM / Logs Adapter",
+      "status": "ready_stub",
+      "type": "security"
+    },
+    {
+      "name": "ERP / CRM Adapter",
+      "status": "ready_stub",
+      "type": "enterprise"
+    },
+    {
+      "name": "IoT / Sensor Adapter",
+      "status": "ready_stub",
+      "type": "industrial"
+    },
+    {
+      "name": "Blockchain Adapter",
+      "status": "ready_stub",
+      "type": "crypto"
+    }
+  ]
+}

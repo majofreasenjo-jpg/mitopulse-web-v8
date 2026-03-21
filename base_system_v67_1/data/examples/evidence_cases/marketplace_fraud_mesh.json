@@ -1,0 +1,14 @@
+{
+  "id": "marketplace_fraud_mesh",
+  "vertical": "marketplace",
+  "title": "Seller Mesh Fraud Pattern",
+  "mode": "near-real",
+  "event": "Seller-buyer feedback manipulation and payout routing",
+  "impact": "$1.7M estimated loss avoidance",
+  "protocol_value": "reveals hidden relational mesh behind reputation inflation",
+  "states": [
+    "PRESSURE",
+    "INSTABILITY",
+    "CRITICAL"
+  ]
+}
