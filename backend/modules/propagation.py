@@ -24,5 +24,5 @@ def propagate(signal: float):
         "tpi": profile.tpi,
         "scr": profile.scr,
         "mdi": profile.mdi,
-        "state": profile.state
+        "state": profile.risk_state
     }

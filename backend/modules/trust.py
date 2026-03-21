@@ -21,6 +21,6 @@ def trust_score(propagation_data: dict):
         "base_trust": profile.trust_score,
         "velocity": profile.trust_velocity,
         "volatility": profile.trust_volatility,
-        "reserve_buffer": profile.reserve,
-        "machine_state": profile.state
+        "reserve_buffer": profile.trust_reserve,
+        "machine_state": profile.trust_state
     }
