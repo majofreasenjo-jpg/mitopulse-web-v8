@@ -1,0 +1,18 @@
+
+<html>
+<body style="background:black;color:white">
+<h1>MitoPulse v72 LIVE SYSTEM</h1>
+<script>
+async function run(){
+    let res = await fetch("/run", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({signal:Math.random()})
+    });
+    let data = await res.json();
+    document.body.innerHTML += "<pre>"+JSON.stringify(data,null,2)+"</pre>";
+}
+run();
+</script>
+</body>
+</html>
