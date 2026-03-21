@@ -1,18 +1,54 @@
 
 <html>
-<body style="background:black;color:white">
-<h1>MitoPulse v72 LIVE SYSTEM</h1>
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body style="margin:0;background:black;">
 <script>
-async function run(){
-    let res = await fetch("/run", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({signal:Math.random()})
-    });
-    let data = await res.json();
-    document.body.innerHTML += "<pre>"+JSON.stringify(data,null,2)+"</pre>";
+let scene = new THREE.Scene();
+let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+let renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+let geometry = new THREE.SphereGeometry(0.2, 16, 16);
+let material = new THREE.MeshBasicMaterial({color:0x00ff00});
+
+let nodes = [];
+for(let i=0;i<20;i++){
+    let sphere = new THREE.Mesh(geometry, material);
+    sphere.position.x = (Math.random()-0.5)*5;
+    sphere.position.y = (Math.random()-0.5)*5;
+    scene.add(sphere);
+    nodes.push(sphere);
 }
-run();
+
+camera.position.z = 5;
+
+async function update(){
+    let res = await fetch("/stream");
+    let data = await res.json();
+    
+    // Change node color based on Structural Risk
+    let rColor = new THREE.Color(data.risk > 0.65 ? 0xff0000 : (data.trust > 0.8 ? 0x00ffff : 0x00ff00));
+    material.color.lerp(rColor, 0.1);
+
+    nodes.forEach((n,i)=>{
+        // Animate positions using the native mathematical nodes if provided, else organic noise
+        let t_node = data.nodes ? data.nodes[i % data.nodes.length] : 0.05;
+        n.position.x += (Math.random()-0.5) * (data.risk * 0.15 + t_node*0.1);
+        n.position.y += (Math.random()-0.5) * (data.risk * 0.15 + t_node*0.1);
+        n.position.z += (Math.random()-0.5) * 0.02;
+    });
+}
+
+function animate(){
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+}
+// 1000ms loop for live streaming
+setInterval(update, 1000);
+animate();
 </script>
 </body>
 </html>
