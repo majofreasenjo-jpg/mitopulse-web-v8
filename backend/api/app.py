@@ -15,7 +15,7 @@ def root():
     if os.path.exists(html_path):
         with open(html_path, "r", encoding="utf-8") as f:
             return f.read()
-    return "<h1>MitoPulse V72: Frontend Not Mounted</h1>"
+    return "<h1>MitoPulse V75: Frontend Not Mounted</h1>"
 
 from pydantic import BaseModel
 
