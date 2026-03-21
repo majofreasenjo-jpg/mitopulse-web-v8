@@ -15,6 +15,11 @@ def root():
             return f.read()
     return "<h1>MitoPulse V72: Frontend Not Mounted</h1>"
 
+from pydantic import BaseModel
+
+class SignalRequest(BaseModel):
+    signal: float
+
 @app.post("/run")
-def run(signal: float):
-    return run_pipeline(signal)
+def run(req: SignalRequest):
+    return run_pipeline(req.signal)
