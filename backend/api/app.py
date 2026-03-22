@@ -1,8 +1,9 @@
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Header, HTTPException
 from backend.core.pipeline import run_pipeline
 from backend.services.binance_client import get_ticker, get_multi_tickers
 from backend.services.analysis import score_signal, impact_report, build_story
+from backend.v79_core.services.orchestrator import Orchestrator
 
 import importlib.util
 import os
@@ -20,6 +21,7 @@ spec.loader.exec_module(verify_ledger)
 
 ledger = verify_ledger.LedgerService()
 rfdc_engine = RelationalFieldDynamicsCore()
+viability_orchestrator = Orchestrator()
 
 app = FastAPI()
 
@@ -61,7 +63,33 @@ import random
 def run(req: SignalRequest):
     return run_pipeline(req.signal)
 
-from fastapi import Header, HTTPException
+@app.get("/api/project")
+def project_future(horizon: str = "24h", x_api_key: str = Header(None)):
+    if x_api_key != "mitopulse-key":
+        raise HTTPException(status_code=401, detail="V83 Enterprise Unauthorized: Core Oracle Access Denied.")
+        
+    raw_viability = {
+        "tick": int(time.time()),
+        "energy_flow": 0.85,
+        "behavior_noise": 0.51,
+        "identity_drift": 0.42,
+        "relational_density": 0.77,
+        "propagation_pressure": 0.63,
+        "structural_strain": 0.88,
+        "homeostasis_loss": 0.31,
+        "mutation_pressure": 0.28,
+        "defense_activation": 0.94
+    }
+    
+    current = viability_orchestrator.build_state(raw_viability)
+    projected = viability_orchestrator.project_state(raw_viability, horizon=horizon)
+    return {
+        "current_tick": current.tick,
+        "projected_tick": projected.tick,
+        "horizon": horizon,
+        "current_state": current.model_dump(),
+        "projected_state": projected.model_dump(),
+    }
 
 @app.get("/stream")
 def stream(x_api_key: str = Header(None)):
@@ -153,6 +181,24 @@ def stream(x_api_key: str = Header(None)):
     future_scr = metrics['scr'] + (metrics['climate_pressure'] * 0.8) + (metrics['wave_max'] * 0.5)
     forecast_scr = min(round(future_scr, 2), 99.99)
     
+    # V83: The Viability Integration (Predictive Quantum/Biology Engines)
+    # Mapping real-time RFDC Tensors into the V79 Viability Kit format
+    raw_viability = {
+        "tick": int(time.time()),
+        "energy_flow": max(0.0, min(1.0, 1.0 - (metrics.get('scr', 0) / 100.0))),
+        "behavior_noise": max(0.0, min(1.0, metrics.get('entropy', 0.5))),
+        "identity_drift": max(0.0, min(1.0, metrics.get('climate_pressure', 0.5) / 100.0 if metrics.get('climate_pressure', 0.5) > 1.0 else metrics.get('climate_pressure', 0.5))),
+        "relational_density": max(0.0, min(1.0, metrics.get('gravity', 0.5) / 10.0)),
+        "propagation_pressure": max(0.0, min(1.0, metrics.get('mdi', 0.5) / 100.0 if metrics.get('mdi', 0.5) > 1.0 else metrics.get('mdi', 0.5))),
+        "structural_strain": max(0.0, min(1.0, metrics.get('tpi', 50.0) / 100.0)),
+        "homeostasis_loss": max(0.0, min(1.0, 1.0 - (metrics.get('homeostasis', 50.0) / 100.0))),
+        "mutation_pressure": max(0.0, min(1.0, metrics.get('cross_pulse', 0.5) / 10.0)),
+        "defense_activation": max(0.0, min(1.0, metrics.get('criticality', 50.0) / 100.0))
+    }
+    
+    # Generate the V83 Future 24h Prediction State 
+    exec_state = viability_orchestrator.project_state(raw_viability, horizon="24h")
+
     return {
         "nodes": nodes,
         "edges": edges,
@@ -166,5 +212,6 @@ def stream(x_api_key: str = Header(None)):
         "ledger": ledger.chain[-6:], # Send the latest cryptographic blocks
         "forecast": forecast_scr,
         "vortex": metrics['vortex_score'],
-        "wave": metrics['wave_max']
+        "wave": metrics['wave_max'],
+        "viability": exec_state.model_dump()
     }
