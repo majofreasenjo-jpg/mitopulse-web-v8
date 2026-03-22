@@ -4,6 +4,7 @@ from backend.core.pipeline import run_pipeline
 from backend.services.binance_client import get_ticker, get_multi_tickers
 from backend.services.analysis import score_signal, impact_report, build_story
 from backend.v79_core.services.orchestrator import Orchestrator
+from backend.v79_core.engines.institutional import ViabilityEngine
 
 import importlib.util
 import os
@@ -23,6 +24,7 @@ spec.loader.exec_module(verify_ledger)
 ledger = verify_ledger.LedgerService()
 rfdc_engine = RelationalFieldDynamicsCore()
 viability_orchestrator = Orchestrator()
+inst_engine = ViabilityEngine()
 
 app = FastAPI()
 
@@ -200,6 +202,17 @@ def stream(x_api_key: str = Header(None)):
     # Generate the V83 Future 24h Prediction State 
     exec_state = viability_orchestrator.project_state(raw_viability, horizon="24h")
 
+    # V85: Institutional Viability (NHI, ACI, AVS)
+    inst_drivers = {
+        "identity_drift": raw_viability["identity_drift"],
+        "behavior_drift": raw_viability["behavior_noise"],
+        "propagation_pressure": raw_viability["propagation_pressure"],
+        "systemic_strain": raw_viability["structural_strain"],
+        "homeostasis_loss": raw_viability["homeostasis_loss"]
+    }
+    viability_state = inst_engine.compute(int(time.time()), inst_drivers)
+    inst_metrics = inst_engine.as_dict(viability_state)
+
     return {
         "nodes": nodes,
         "edges": edges,
@@ -214,5 +227,6 @@ def stream(x_api_key: str = Header(None)):
         "forecast": forecast_scr,
         "vortex": metrics['vortex_score'],
         "wave": metrics['wave_max'],
-        "viability": exec_state.model_dump()
+        "viability": exec_state.model_dump(),
+        "institutional": inst_metrics
     }

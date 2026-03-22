@@ -105,6 +105,9 @@
                 <div class="hud-row" style="margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.1);"><span style="color:var(--text-muted)">BASE TRUST:</span> <strong id="hud-trust">--%</strong></div>
                 <div class="hud-row"><span style="color:var(--text-muted)">VORTEX SCORE (GSI):</span> <strong id="hud-vortex">--</strong></div>
                 <div class="hud-row"><span style="color:var(--text-muted)">WAVE MAX (GSI):</span> <strong id="hud-wave">--</strong></div>
+                <div class="hud-row" style="margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.1);"><span style="color:var(--text-muted)">NETWORK HEALTH (NHI):</span> <strong id="hud-nhi">--</strong></div>
+                <div class="hud-row"><span style="color:var(--text-muted)">ADAPTIVE CAPACITY (ACI):</span> <strong id="hud-aci">--</strong></div>
+                <div class="hud-row"><span style="color:var(--text-muted)">VIABILITY SCORE (AVS):</span> <strong id="hud-avs" style="color:var(--primary)">--</strong></div>
                 <div class="hud-row" style="margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
                     <span style="color:var(--warning)">V83 PREDICTIVE ACTION:</span> <strong id="hud-decision" class="tag tag-success">--</strong>
                 </div>
@@ -310,6 +313,14 @@
                     document.getElementById('hud-forecast').textContent = data.forecast.toFixed(2) + '%';
                     document.getElementById('hud-vortex').textContent = data.vortex.toFixed(2);
                     document.getElementById('hud-wave').textContent = data.wave.toFixed(3);
+                }
+                
+                // V85 Institutional Metrics Rendering
+                if(data.institutional) {
+                    document.getElementById('hud-nhi').textContent = (data.institutional.nhi * 100).toFixed(2) + '%';
+                    document.getElementById('hud-aci').textContent = (data.institutional.aci * 100).toFixed(2) + '%';
+                    document.getElementById('hud-avs').textContent = (data.institutional.avs * 100).toFixed(2) + '%';
+                    document.getElementById('hud-avs').style.color = data.institutional.avs > 0.60 ? '#10b981' : (data.institutional.avs > 0.35 ? '#f59e0b' : '#ef4444');
                 }
                 
                 const decEl = document.getElementById('hud-decision');
