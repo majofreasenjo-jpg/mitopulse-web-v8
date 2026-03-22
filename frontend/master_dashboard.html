@@ -161,20 +161,26 @@
 
         <!-- TAB 4: LIVE CONNECTORS -->
         <div id="tab-connectors" class="tab-content">
-            <h1 class="tab-title">Live Connectors & Ingestion</h1>
+            <h1 class="tab-title">V81 Live Connectors & Multi-Node Ingestion</h1>
             <div class="card">
-                <div class="card-title">BINANCE REST API (BTC/USDT)</div>
-                <p style="color: var(--text-muted); margin-bottom: 24px;">Currently streaming 1Hz live market volatility into the End-to-End Orchestrator.</p>
-                <button class="btn" style="background: var(--success);">Connector Active (Live)</button>
-                <button class="btn" style="background: var(--surface); border: 1px solid var(--border); color: #fff; margin-left: 12px;">Pause Ingestion</button>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="card-title">BINANCE MULTI-ASSET REST API</div>
+                    <div style="color: var(--success); font-weight: bold; border: 1px solid var(--success); padding: 4px 8px; border-radius: 4px;">ACTIVE</div>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 24px; margin-top: 12px;">Successfully streaming 5-Asset synchronized tensor data into the End-to-End Orchestrator. (Phase V81 Awakening Activo)</p>
+                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 24px;">
+                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;">BTCUSDT</div>
+                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;">ETHUSDT</div>
+                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;">BNBUSDT</div>
+                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;">SOLUSDT</div>
+                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;">XRPUSDT</div>
+                </div>
+                <button class="btn" style="background: var(--surface); border: 1px solid var(--border); color: #fff;">Pause Ingestion</button>
             </div>
             
-
-            
-            <div class="card" style="margin-top: 24px; opacity: 0.5;">
-                <div class="card-title">MULTI-ASSET WEBSOCKET (ETH, SOL, BNB)</div>
-                <p style="color: var(--text-muted); margin-bottom: 24px;">Deploy standard V76 protocol hooks to ingest entire cryptographic sectors simultaneously.</p>
-                <button class="btn">Initialize Multi-Asset</button>
+            <div class="card" style="margin-top: 24px; border-color: var(--success);">
+                <div class="card-title" style="color: var(--success);">SHADOW COORDINATION ARMED</div>
+                <p style="color: var(--text-muted); margin-bottom: 0;">Los motores matemáticos RelationalDarkMatter y FraudDetectionEngine ahora reciben suficiente densidad de red para operar a su máxima capacidad.</p>
             </div>
         </div>
     </main>
@@ -242,12 +248,38 @@
                 const themeColor = isCritical ? '#ef4444' : '#10b981';
                 const threeColor = isCritical ? 0xef4444 : 0x10b981;
 
-                // Update 3D Spheres
+                // Update 3D Spheres to reflect V81 Reality (5 Assets)
+                const realNodes = data.nodes || [];
+                
+                while(spheres.length < realNodes.length) {
+                    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+                    const sphere = new THREE.Mesh(geometry, material);
+                    sphere.position.set((Math.random()-0.5)*30, (Math.random()-0.5)*30, (Math.random()-0.5)*30);
+                    scene.add(sphere);
+                    spheres.push({ mesh: sphere, target: sphere.position.clone() });
+                }
+                while(spheres.length > realNodes.length) {
+                    const s = spheres.pop();
+                    scene.remove(s.mesh);
+                }
+
                 spheres.forEach((obj, i) => {
-                    obj.mesh.material.color.setHex(threeColor);
-                    // Scatter violently if risk > 0.65, otherwise smooth orbit
+                    const n = realNodes[i];
+                    if(!n) return;
+                    
+                    let nodeColor = 0x10b981; // Green
+                    if(n.risk > 0.65) nodeColor = 0xef4444; // Red
+                    else if(n.risk > 0.40) nodeColor = 0xf59e0b; // Orange
+                    
+                    obj.mesh.material.color.setHex(nodeColor);
+                    
+                    // Size of asset node is proportional to structural risk
+                    const scale = 0.5 + (n.risk * 2.5);
+                    obj.mesh.scale.set(scale, scale, scale);
+                    
+                    // Scatter violently if high risk
                     if (Math.random() < 0.1) {
-                        const spread = isCritical ? 40 : 15;
+                        const spread = n.risk > 0.65 ? 40 : 15;
                         obj.target.set((Math.random()-0.5)*spread, (Math.random()-0.5)*spread, (Math.random()-0.5)*spread);
                     }
                 });

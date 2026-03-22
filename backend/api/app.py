@@ -172,8 +172,9 @@ def stream(x_api_key: str = Header(None)):
     # Log Cryptographic Immutable Ledger Event (V78 SQLite Integration)
     tx_id = ledger.record_event("Acme_Bank_Prod", "BTC_Live_Feed", action, f"Immune: {risk*100}% | SCR: {metrics['scr']}")
     
-    # Graph Engine Vectors
-    nodes = [(random.random() * max(0.1, risk)) for _ in range(20)]
+    # Graph Engine Vectors (V81 Sync)
+    # The Visualizer will now receive the precise 5-Asset array instead of random phantoms
+    nodes = [{"id": sig["entity_id"], "risk": sig["severity"]} for sig in signals_data]
     edges = [(random.random() * trust) for _ in range(10)]
     
     # V79: The Predictive Forecast WaveEngine
