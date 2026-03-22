@@ -63,36 +63,62 @@ def run(req: SignalRequest):
 
 @app.get("/stream")
 def stream():
+    # 1. Ingest Multi-Node Synchronous Binance Pulse (V81 Awakening)
+    symbols = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT"]
+    tickers = get_multi_tickers(symbols)
+    
+    current_time = time.time()
+    events_data = []
+    signals_data = []
+    
     # Build Network Graph Topology (V62 Integration)
     G = nx.Graph()
-    G.add_node("BTCUSDT", node_type="device", signal_severity=min(abs(change_pct)*2.0, 1.0))
     G.add_node("GodMode_Core", node_type="customer")
-    G.add_edge("BTCUSDT", "GodMode_Core", label="normal", context="salary")
     
-    # Calculate True Bioinspired Metrics
+    last_price = 65000.0
+    change_pct = 0.0
+    
+    for idx, t in enumerate(tickers):
+        sym = t.get("symbol", symbols[idx])
+        price = t.get("last_price", random.uniform(50, 100))
+        change = t.get("price_change_percent", random.uniform(-2, 2))
+        
+        if sym == "BTCUSDT":
+            last_price = price
+            change_pct = change
+            
+        sev = min(abs(change) * 2.0, 1.0)
+        
+        G.add_node(sym, node_type="device", signal_severity=sev)
+        G.add_edge(sym, "GodMode_Core", label="normal", context="transaction")
+        
+        events_data.append({
+            "event_id": f"evt_{sym}_{int(current_time * 1000)}",
+            "timestamp": current_time,  # CRITICAL: Synchronized timestamp guarantees Shadow Coordination
+            "source_id": sym,
+            "target_id": "GodMode_Orchestrator",
+            "amount": price,
+            "currency": sym.replace("USDT",""),
+            "risk_score": sev * 100
+        })
+        
+        signals_data.append({
+            "signal_id": f"sig_{sym}_{int(current_time * 1000)}",
+            "timestamp": current_time,
+            "entity_id": sym,
+            "severity": sev
+        })
+    
+    # Calculate True Bioinspired Metrics (focusing on BTC reference)
     bio_risk = bioinspired_node_risk(G, "BTCUSDT")
     risk = bio_risk["immune_risk_score"]
     trust = bio_risk["allostatic_reserve"]
     pulse = bio_risk["pulse_score"]
     action = bio_risk["recommended_action"]
     
-    
-    # Execute the V68 Relational Field Dynamics Core
-    events_df = pd.DataFrame([{
-        "event_id": f"evt_{int(time.time() * 1000)}",
-        "timestamp": time.time(),
-        "source_id": "BTCUSDT",
-        "target_id": "GodMode_Orchestrator",
-        "amount": last_price,
-        "currency": "USDT",
-        "risk_score": risk * 100
-    }])
-    signals_df = pd.DataFrame([{
-        "signal_id": f"sig_{int(time.time() * 1000)}",
-        "timestamp": time.time(),
-        "entity_id": "BTCUSDT",
-        "severity": min(abs(change_pct) * 2.0, 1.0)
-    }])
+    # Execute the V68 Relational Field Dynamics Core (Now Armed with Multi-Node Tensors)
+    events_df = pd.DataFrame(events_data)
+    signals_df = pd.DataFrame(signals_data)
     
     rfdc_output = rfdc_engine.run(events_df, signals_df, client_type="finance")
     metrics = rfdc_output["metrics"]
