@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MitoPulse Verify V2 (Mobile Simulator)</title>
+    <style>
+/* Base Styles */
+body { margin:0; font-family: Arial, Helvetica, sans-serif; background:#091121; color:#edf3ff; }
+.hero { background:linear-gradient(135deg, rgba(97,164,255,.18), rgba(93,211,158,.06)); border:1px solid rgba(255,255,255,.08); border-radius:20px; padding:22px; margin-bottom:16px; margin: 20px; }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; margin: 20px; }
+.card { background:#121c3b; border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:16px; margin-bottom:16px; }
+canvas { width:100%; max-width:980px; background:#0d1630; border-radius:14px; }
+.btn { background:#4e7bff; color:white; border:none; border-radius:8px; padding:8px 12px; cursor:pointer; }
+/* Verify Styles */
+.verify-stage { background:linear-gradient(180deg, rgba(6,16,42,.98), rgba(4,11,28,1)); }
+.verify-header { text-align:center; font-size:14px; letter-spacing:4px; color:#aebddd; margin-bottom:14px; }
+.verify-layout { display:grid; grid-template-columns: 1fr 1fr; gap:20px; align-items:center; }
+.verify-card { background:rgba(16,29,62,.92); border:1px solid rgba(255,255,255,.08); border-radius:20px; padding:18px; margin-bottom:16px; box-shadow: 0 12px 28px rgba(0,0,0,.22); }
+.verify-row { display:flex; justify-content:space-between; gap:14px; padding:8px 0; font-size:15px; }
+.verify-row span { color:#9db2da; }
+.verify-alert { border-radius:18px; padding:18px; margin-bottom:16px; border:1px solid rgba(255,255,255,.14); box-shadow: 0 10px 24px rgba(0,0,0,.18); transition: all 0.3s ease; }
+.verify-alert.critical { background:rgba(63,18,28,.56); border-color:rgba(255,91,91,.9); }
+.verify-alert.watch { background:rgba(62,46,14,.45); border-color:rgba(255,209,102,.85); }
+.verify-alert.safe { background:rgba(10,46,58,.42); border-color:rgba(76,201,240,.85); }
+.verify-alert-title { font-size:18px; font-weight:700; margin-bottom:10px; }
+.verify-alert-text { color:#f0f4ff; line-height:1.45; }
+.verify-mini-title { font-size:18px; font-weight:700; margin-bottom:10px; }
+.trace-line { padding:7px 0; border-bottom:1px solid rgba(255,255,255,.06); color:#dce7ff; transition: color 0.3s; }
+.verify-actions { display:flex; justify-content:center; gap:10px; margin-top:12px; flex-wrap:wrap; }
+.verify-primary { width:100%; font-size:28px; padding:20px 16px; border-radius:22px; font-weight:700; transition: background 0.3s; }
+.verify-primary.blocked { background:linear-gradient(135deg, #643040, #b1454e); }
+.verify-primary.review { background:linear-gradient(135deg, #6d571c, #c79c2f); }
+.verify-primary.safe { background:linear-gradient(135deg, #1d5470, #3e9ec8); }
+.verify-secondary { width:100%; font-size:26px; padding:20px 16px; border-radius:22px; background:rgba(7,18,42,.94); border:1px solid rgba(76,137,255,.5); }
+@media (max-width: 900px) {
+  .verify-layout { grid-template-columns: 1fr; }
+}
+    </style>
+</head>
+<body>
+<section class="hero">
+  <h1 style="margin-top:0;">MitoPulse Verify V80</h1>
+  <p>System Verification End-User Interface. Bridging the V78 Master Orchestrator to the final Banking or Wallet layer.</p>
+</section>
+
+<section class="grid">
+  <div class="card verify-stage">
+    <div class="verify-header">RELATIONAL PULSE CHALLENGE</div>
+    <div class="verify-layout">
+      <div class="verify-left">
+        <canvas id="verifyRing" width="360" height="360"></canvas>
+        <div class="verify-actions">
+          <button class="btn" onclick="VerifyV2.setScenario('critical')" style="background: rgba(255,91,91,.9);">Simulate Fraud (Alert)</button>
+          <button class="btn" onclick="VerifyV2.setScenario('watch')" style="background: rgba(255,209,102,.85); color: #000;">Simulate Coercion (Review)</button>
+          <button class="btn" onclick="VerifyV2.setScenario('safe')" style="background: rgba(76,201,240,.85); color: #000;">Simulate Safe (Pass)</button>
+        </div>
+      </div>
+      <div class="verify-right">
+        <div class="verify-card">
+          <div class="verify-row"><span>Sender</span><strong>Alex (You)</strong></div>
+          <div class="verify-row"><span>Receiver</span><strong id="receiverName">Marco_Crypto99</strong></div>
+          <div class="verify-row"><span>Amount</span><strong>$4,500.00</strong></div>
+          <div class="verify-row"><span>Confidence</span><strong id="confidenceValue">94%</strong></div>
+          <div class="verify-row"><span>Risk Horizon</span><strong id="horizonValue">Immediate</strong></div>
+        </div>
+
+        <div id="verifyAlert" class="verify-alert critical">
+          <div class="verify-alert-title">⚠ Shadow Coordination Detected</div>
+          <div id="verifyAlertText" class="verify-alert-text">
+            Hidden relational links detected across a known scam ring. Protocol defense escalated.
+          </div>
+        </div>
+
+        <div class="verify-card">
+          <div class="verify-mini-title">Decision Trace</div>
+          <div id="traceLine1" class="trace-line">Signal detected across receiver neighborhood.</div>
+          <div id="traceLine2" class="trace-line">Quorum validation exceeded threshold.</div>
+          <div id="traceLine3" class="trace-line">Policy triggered: restrict / block.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="grid">
+  <div class="card">
+    <h3 style="margin-top:0; margin-bottom: 12px; color: #aebddd;">Micro Playback</h3>
+    <canvas id="verifyTimeline" width="620" height="170"></canvas>
+  </div>
+  <div class="card">
+    <h3 style="margin-top:0; margin-bottom: 12px; color: #aebddd;">Relational Pulse Micrograph</h3>
+    <canvas id="verifyMicroGraph" width="620" height="170"></canvas>
+  </div>
+</section>
+
+<section class="grid">
+  <div class="card" style="background: transparent; border: none;">
+    <button id="primaryDecision" class="btn verify-primary blocked">Transaction Blocked</button>
+  </div>
+  <div class="card" style="background: transparent; border: none;">
+    <button class="btn verify-secondary">Cancel Transfer</button>
+  </div>
+</section>
+
+<script>
+window.__VERIFY_SCENARIOS__ = {
+  critical: {
+    score: 91,
+    state: "CRITICAL",
+    confidence: "94%",
+    horizon: "Immediate",
+    receiver: "Marco_Crypto99",
+    alertTitle: "⚠ Shadow Coordination Detected",
+    alertText: "The receiver has hidden relational edges to a known scam ring. Immune defense activated.",
+    primaryText: "Transaction Blocked",
+    primaryClass: "blocked",
+    trace: [
+      "Signal detected across receiver neighborhood.",
+      "Hidden cluster correlation matched known predatory pattern.",
+      "Policy triggered: block and isolate."
+    ],
+    color: "#ff5b5b"
+  },
+  watch: {
+    score: 63,
+    state: "PRESSURE",
+    confidence: "82%",
+    horizon: "Short-term",
+    receiver: "Global_Exchange_Z",
+    alertTitle: "⚠ Elevated Relational Pressure",
+    alertText: "The receiver shows indirect coordination markers. Enhanced monitoring recommended.",
+    primaryText: "Review Transfer",
+    primaryClass: "review",
+    trace: [
+      "Signal detected in secondary relational field.",
+      "Quorum reached watch-level confirmation.",
+      "Policy triggered: review and monitor."
+    ],
+    color: "#ffd166"
+  },
+  safe: {
+    score: 18,
+    state: "STABLE",
+    confidence: "97%",
+    horizon: "Low / distant",
+    receiver: "Trusted_Contact_21",
+    alertTitle: "✓ Relational Pattern Verified",
+    alertText: "No critical hidden coordination detected. Trust profile remains stable.",
+    primaryText: "Proceed Transfer",
+    primaryClass: "safe",
+    trace: [
+      "No abnormal cluster activation detected.",
+      "Trust profile remained stable under validation.",
+      "Policy triggered: allow."
+    ],
+    color: "#4cc9f0"
+  }
+};
+
+(() => {
+  const scenarios = window.__VERIFY_SCENARIOS__ || {};
+  const ring = document.getElementById('verifyRing');
+  const tl = document.getElementById('verifyTimeline');
+  const mg = document.getElementById('verifyMicroGraph');
+  if (!ring || !tl || !mg) return;
+
+  const rctx = ring.getContext('2d');
+  const tctx = tl.getContext('2d');
+  const gctx = mg.getContext('2d');
+
+  const state = {
+    scenario: scenarios.critical,
+    time: 0,
+    playing: true
+  };
+
+  function drawRing(){
+    const c = ring.width / 2;
+    const score = state.scenario.score;
+    const pct = score / 100;
+    rctx.clearRect(0,0,ring.width,ring.height);
+
+    const bg = rctx.createRadialGradient(c,c,20,c,c,160);
+    bg.addColorStop(0, 'rgba(11,18,40,1)');
+    bg.addColorStop(1, 'rgba(5,10,22,1)');
+    rctx.fillStyle = bg;
+    rctx.fillRect(0,0,ring.width,ring.height);
+
+    const wavePulse = (Math.sin(state.time*2)+1)/2;
+    const aura = 18 + wavePulse * 14;
+    const ag = rctx.createRadialGradient(c,c,10,c,c,130+aura);
+    const col = state.scenario.color;
+    const alpha = state.scenario.state === 'CRITICAL' ? 0.35 : state.scenario.state === 'PRESSURE' ? 0.22 : 0.18;
+    ag.addColorStop(0, hexToRgba(col, alpha));
+    ag.addColorStop(1, 'rgba(0,0,0,0)');
+    rctx.fillStyle = ag;
+    rctx.beginPath();
+    rctx.arc(c,c,130+aura,0,Math.PI*2);
+    rctx.fill();
+
+    rctx.beginPath();
+    rctx.arc(c,c,108,0,Math.PI*2);
+    rctx.strokeStyle = 'rgba(140,170,230,0.22)';
+    rctx.lineWidth = 10;
+    rctx.stroke();
+
+    rctx.beginPath();
+    rctx.arc(c,c,108,-Math.PI/2, -Math.PI/2 + Math.PI*2*pct);
+    rctx.strokeStyle = col;
+    rctx.lineWidth = 10;
+    rctx.stroke();
+
+    rctx.beginPath();
+    rctx.arc(c,c,132 + Math.sin(state.time*3)*4,0,Math.PI*2);
+    rctx.strokeStyle = hexToRgba(col, 0.28);
+    rctx.lineWidth = 3;
+    rctx.stroke();
+
+    rctx.fillStyle = '#ffffff';
+    rctx.textAlign = 'center';
+    rctx.font = 'bold 64px Arial';
+    rctx.fillStyle = col;
+    rctx.fillText(String(score), c, c+12);
+
+    rctx.font = 'bold 18px Arial';
+    rctx.fillStyle = '#dce7ff';
+    rctx.fillText(state.scenario.state, c, c+52);
+  }
+
+  function drawTimeline(){
+    tctx.clearRect(0,0,tl.width,tl.height);
+    tctx.fillStyle = '#0b1327';
+    tctx.fillRect(0,0,tl.width,tl.height);
+
+    const items = [
+      {label:'signal', v:0.45},
+      {label:'cluster', v:0.76},
+      {label:'quorum', v:0.84},
+      {label:'policy', v:0.92},
+      {label:'action', v:0.96}
+    ];
+
+    const pad = 26;
+    const w = tl.width - pad*2;
+    const baseY = 120;
+    tctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    tctx.beginPath();
+    tctx.moveTo(pad, baseY);
+    tctx.lineTo(pad+w, baseY);
+    tctx.stroke();
+
+    items.forEach((it, i) => {
+      const x = pad + i * (w/(items.length-1));
+      const y = baseY - it.v*68;
+      tctx.beginPath();
+      tctx.arc(x, y, 7, 0, Math.PI*2);
+      tctx.fillStyle = state.scenario.color;
+      tctx.fill();
+
+      if(i < items.length-1){
+        const nx = pad + (i+1) * (w/(items.length-1));
+        const ny = baseY - items[i+1].v*68;
+        tctx.beginPath();
+        tctx.moveTo(x,y);
+        tctx.lineTo(nx,ny);
+        tctx.strokeStyle = hexToRgba(state.scenario.color, 0.65);
+        tctx.lineWidth = 2.5;
+        tctx.stroke();
+      }
+
+      tctx.fillStyle = '#dce7ff';
+      tctx.font = '12px Arial';
+      tctx.textAlign = 'center';
+      tctx.fillText(it.label, x, 145);
+
+      const pulseIndex = Math.floor((state.time*2) % items.length);
+      if(pulseIndex === i){
+        tctx.beginPath();
+        tctx.arc(x, y, 14 + Math.sin(state.time*4)*2, 0, Math.PI*2);
+        tctx.strokeStyle = 'rgba(255,255,255,0.8)';
+        tctx.lineWidth = 1;
+        tctx.stroke();
+      }
+    });
+  }
+
+  function drawMicroGraph(){
+    gctx.clearRect(0,0,mg.width,mg.height);
+    gctx.fillStyle = '#0b1327';
+    gctx.fillRect(0,0,mg.width,mg.height);
+
+    const nodes = [
+      {x:90,y:90,r:24,label:'You',risk:14},
+      {x:220,y:86,r:18,label:'R1',risk:40},
+      {x:348,y:92,r:22,label:'R2',risk:62},
+      {x:482,y:82,r:30,label:'Target',risk:state.scenario.score},
+      {x:560,y:128,r:18,label:'C1',risk:88},
+      {x:430,y:132,r:16,label:'C2',risk:74},
+      {x:300,y:128,r:14,label:'C3',risk:51},
+    ];
+    const links = [[0,1],[1,2],[2,3],[3,4],[3,5],[2,6],[5,6]];
+
+    links.forEach(([a,b], idx) => {
+      const na = nodes[a], nb = nodes[b];
+      gctx.beginPath();
+      gctx.moveTo(na.x,na.y);
+      gctx.lineTo(nb.x,nb.y);
+      gctx.strokeStyle = idx >= 3 ? hexToRgba('#ff5b5b',0.38) : 'rgba(110,145,230,0.35)';
+      gctx.lineWidth = idx >= 3 ? 2.5 : 1.4;
+      gctx.stroke();
+
+      const t = ((state.time*0.65)+idx*0.13)%1;
+      const px = na.x + (nb.x-na.x)*t;
+      const py = na.y + (nb.y-na.y)*t;
+      gctx.beginPath();
+      gctx.arc(px, py, 2.4, 0, Math.PI*2);
+      gctx.fillStyle = idx >= 3 ? '#ff5b5b' : '#7bdcff';
+      gctx.fill();
+    });
+
+    nodes.forEach(n => {
+      gctx.beginPath();
+      gctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+      gctx.fillStyle = n.risk >= 75 ? '#ff6b6b' : n.risk >= 40 ? '#ffd166' : '#4cc9f0';
+      gctx.fill();
+      gctx.fillStyle = '#eef3ff';
+      gctx.font = '12px Arial';
+      gctx.textAlign = 'center';
+      gctx.fillText(n.label, n.x, n.y + n.r + 16);
+    });
+
+    if(state.scenario.state === 'CRITICAL'){
+      const target = nodes[3];
+      gctx.beginPath();
+      gctx.arc(target.x,target.y,46 + Math.sin(state.time*3)*4,0,Math.PI*2);
+      gctx.strokeStyle = 'rgba(255,91,91,0.44)';
+      gctx.lineWidth = 2;
+      gctx.stroke();
+    }
+  }
+
+  function hexToRgba(hex, alpha){
+    const h = hex.replace('#','');
+    const bigint = parseInt(h, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgba(${r},${g},${b},${alpha})`;
+  }
+
+  function applyScenario(key){
+    state.scenario = scenarios[key] || scenarios.critical;
+    document.getElementById('receiverName').textContent = state.scenario.receiver;
+    document.getElementById('confidenceValue').textContent = state.scenario.confidence;
+    document.getElementById('horizonValue').textContent = state.scenario.horizon;
+    
+    document.querySelector('.verify-alert-title').textContent = state.scenario.alertTitle;
+    document.getElementById('verifyAlertText').textContent = state.scenario.alertText;
+    document.getElementById('traceLine1').textContent = state.scenario.trace[0];
+    document.getElementById('traceLine2').textContent = state.scenario.trace[1];
+    document.getElementById('traceLine3').textContent = state.scenario.trace[2];
+    
+    const btn = document.getElementById('primaryDecision');
+    btn.textContent = state.scenario.primaryText;
+    
+    // Animate DOM changes
+    const alertBox = document.getElementById('verifyAlert');
+    alertBox.style.opacity = '0';
+    setTimeout(() => {
+        alertBox.className = 'verify-alert ' + (
+          state.scenario.state === 'CRITICAL' ? 'critical' :
+          state.scenario.state === 'PRESSURE' ? 'watch' : 'safe'
+        );
+        btn.className = 'btn verify-primary ' + state.scenario.primaryClass;
+        
+        // Let the CSS transition make it smooth
+        alertBox.style.opacity = '1';
+    }, 100);
+  }
+
+  function frame(){
+    state.time += 0.02;
+    drawRing();
+    drawTimeline();
+    drawMicroGraph();
+    requestAnimationFrame(frame);
+  }
+
+  window.VerifyV2 = { setScenario: applyScenario };
+  applyScenario('critical');
+  frame();
+})();
+</script>
+</body>
+</html>

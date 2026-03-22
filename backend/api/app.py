@@ -42,6 +42,14 @@ def verify_dashboard():
             return f.read()
     return "<h1>Verify Dashboard Not Found</h1>"
 
+@app.get("/verify-app", response_class=HTMLResponse)
+def mobile_verify():
+    html_path = os.path.join("frontend", "mobile_verify.html")
+    if os.path.exists(html_path):
+        with open(html_path, "r", encoding="utf-8") as f:
+            return f.read()
+    return "<h1>MitoPulse Verify V80 Not Mounted</h1>"
+
 from pydantic import BaseModel
 
 class SignalRequest(BaseModel):
