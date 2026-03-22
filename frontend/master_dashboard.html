@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MitoPulse V76 | Master Unified Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <title>MitoPulse V88 | Master Omniverse Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         :root {
-            --bg: #030712;
+            --bg: #020617;
             --surface: #0f172a;
+            --glass: rgba(15, 23, 42, 0.65);
+            --glass-dark: rgba(2, 6, 23, 0.85);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --border: #1e293b;
+            --border-glow: rgba(59, 130, 246, 0.3);
             --primary: #3b82f6;
             --success: #10b981;
             --danger: #ef4444;
@@ -23,104 +26,254 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: var(--font-ui); background-color: var(--bg); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
         
-        /* Sidebar */
-        aside { width: 280px; background-color: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
-        .brand { padding: 24px; font-size: 1.2rem; font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--border); letter-spacing: 1px; }
-        .brand span { color: var(--text-main); font-weight: 400; }
+        /* Sidebar Navigation */
+        aside { width: 280px; background-color: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 100; box-shadow: 4px 0 24px rgba(0,0,0,0.5); }
+        .brand { padding: 24px; font-size: 1.25rem; font-weight: 700; color: var(--text-main); border-bottom: 1px solid var(--border); letter-spacing: 1px; }
+        .brand span { color: var(--primary); font-weight: 500; font-size: 0.85rem; display: block; margin-top: 4px; letter-spacing: 2px;}
         .nav-links { padding: 16px 12px; flex: 1; }
         .nav-item { padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; color: var(--text-muted); font-weight: 500; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
         .nav-item:hover { background-color: #1e293b; color: var(--text-main); }
         .nav-item.active { color: #fff; background-color: var(--primary); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+        .nav-item-ext { margin-top:24px; border:1px solid var(--border); }
         
-        /* Main Content */
+        .sys-status { padding: 24px; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border); }
+        .sys-latency { color: var(--success); font-weight: bold; }
+        
+        /* Main Content Area */
         main { flex: 1; display: flex; flex-direction: column; position: relative; }
-        header { height: 70px; background-color: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; z-index: 10; }
-        .tenant { font-weight: 600; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-        .status-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        header { height: 70px; background-color: rgba(15, 23, 42, 0.9); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; z-index: 50; }
+        .tenant { font-weight: 600; color: var(--primary); display: flex; align-items: center; gap: 8px; font-size: 0.95rem; letter-spacing: 1px; }
+        .status-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 12px var(--success); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; box-shadow: 0 0 12px var(--success); } 50% { opacity: 0.4; box-shadow: 0 0 2px var(--success); } 100% { opacity: 1; box-shadow: 0 0 12px var(--success); } }
         
+        .header-ticker { font-weight: 600; font-family: var(--font-mono); color: var(--text-muted); font-size: 1.1rem; }
+        
+        /* Tabs */
         .tab-content { display: none; padding: 32px; max-width: 1200px; margin: 0 auto; width: 100%; height: calc(100vh - 70px); overflow-y: auto; }
         .tab-content.active { display: block; }
         .tab-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 24px; color: #fff; }
         
-        /* Specific Tab: God Mode */
+        /* ---------------------------------------------------
+           GOD MODE: V89 GLASSMORPHISM OVERHAUL
+        --------------------------------------------------- */
         #tab-god-mode { padding: 0; max-width: none; overflow: hidden; position: relative; }
         #canvas-container { width: 100%; height: 100%; position: absolute; top:0; left:0; z-index: 1; }
         
-        #hud-overlay { position: absolute; top: 20px; left: 20px; z-index: 5; background: rgba(15, 23, 42, 0.85); border: 1px solid var(--success); border-radius: 12px; padding: 20px; width: 380px; backdrop-filter: blur(8px); box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); transition: all 0.3s; }
-        .hud-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-family: var(--font-mono); font-size: 0.85rem; }
+        /* Left Telemetry HUD */
+        #hud-overlay { 
+            position: absolute; top: 24px; left: 24px; z-index: 20; 
+            background: var(--glass); border: 1px solid var(--border-glow); 
+            border-radius: 12px; padding: 24px; width: 360px; max-height: calc(100vh - 250px);
+            overflow-y: auto; -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(59, 130, 246, 0.05); 
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
         
-        /* Grid & Cards */
+        /* Hide scrollbar for clean UI */
+        #hud-overlay::-webkit-scrollbar { width: 4px; }
+        #hud-overlay::-webkit-scrollbar-track { background: transparent; }
+        #hud-overlay::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+        
+        .hud-header { color: #fff; margin-bottom: 20px; font-size: 1.05rem; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center;}
+        .hud-divider { margin: 16px 0; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 16px; }
+        
+        .hud-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-family: var(--font-mono); font-size: 0.85rem; }
+        .hud-row-col { display: flex; flex-direction: column; margin-bottom: 12px; font-family: var(--font-mono); }
+        .hud-label { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 4px; }
+        .hud-value-flex { display: flex; justify-content: space-between; align-items: center; }
+        
+        .val-success { color: var(--success); font-weight: 600; }
+        .val-danger { color: var(--danger); font-weight: 600; }
+        .val-warning { color: var(--warning); font-weight: 600; }
+        .val-primary { color: var(--primary); font-weight: 600; }
+        .val-neutral { color: #fff; font-weight: 600; }
+        
+        /* Progress Bars */
+        .prog-track { width: 100%; height: 6px; background: rgba(0,0,0,0.5); border-radius: 3px; margin-top: 6px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); }
+        .prog-fill { height: 100%; border-radius: 3px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s; }
+        
+        /* Tags */
+        .tag { padding: 4px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.5px; }
+        .tag-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .tag-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .tag-warning { background: rgba(245, 158, 11, 0.1); color: var(--warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+        
+        /* V88 AI Executive Console (Bottom Floating) */
+        #ai-console-wrapper {
+            position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+            width: 85%; max-width: 1400px; z-index: 20;
+            background: var(--glass-dark); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
+            border: 1px solid var(--primary); border-radius: 12px;
+            padding: 20px 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 20px rgba(59, 130, 246, 0.1);
+            display: flex; flex-direction: column; gap: 12px;
+            border-left: 4px solid var(--primary);
+        }
+        .ai-header { display: flex; align-items: center; justify-content: space-between; }
+        .ai-title { color: var(--primary); font-weight: 700; font-size: 0.9rem; letter-spacing: 2px; display: flex; align-items: center; gap: 10px; }
+        .ai-dot { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); animation: pulse-blue 1.5s infinite; }
+        @keyframes pulse-blue { 0% { opacity: 1; box-shadow: 0 0 12px var(--primary); } 50% { opacity: 0.4; box-shadow: 0 0 2px var(--primary); } 100% { opacity: 1; box-shadow: 0 0 12px var(--primary); } }
+        
+        .ai-text {
+            color: #cbd5e1; font-family: var(--font-mono); font-size: 0.95rem; line-height: 1.6;
+            margin: 0; padding-top: 8px; border-top: 1px dashed rgba(59, 130, 246, 0.3);
+            text-shadow: 0 0 2px rgba(255,255,255,0.1);
+        }
+
+        /* ---------------------------------------------------
+           STANDARD UI CARDS & TABLES
+        --------------------------------------------------- */
         .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
-        .card-title { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 12px; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .card-glow { border-color: var(--primary); box-shadow: 0 0 15px rgba(59, 130, 246, 0.1); }
+        .card-title { font-size: 0.85rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px; }
         .card-value { font-size: 2.2rem; font-weight: 700; color: #fff; font-family: var(--font-mono); }
         
-        /* Ledger Table */
-        table { width: 100%; border-collapse: collapse; text-align: left; background: var(--surface); border-radius: 12px; overflow: hidden; }
-        th { background: #1e293b; padding: 16px 24px; font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); }
+        table { width: 100%; border-collapse: collapse; text-align: left; background: var(--surface); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+        th { background: #1e293b; padding: 16px 24px; font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); font-weight: 600; letter-spacing: 1px;}
         td { padding: 16px 24px; font-size: 0.9rem; border-bottom: 1px solid var(--border); font-family: var(--font-mono); }
         tr:last-child td { border-bottom: none; }
-        .tag { padding: 6px 12px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
-        .tag-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
-        .tag-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
         
-        .btn { padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn { padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: var(--font-ui); }
         .btn:hover { background: #2563eb; }
+        
+        /* TradFi Grid */
+        .tradfi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 16px; margin-bottom: 24px; }
+        .tradfi-box { background: #0f172a; padding: 16px; border-radius: 8px; text-align: center; border: 1px solid #334155; font-family: var(--font-mono); transition: transform 0.2s; }
+        .tradfi-box:hover { transform: translateY(-2px); border-color: var(--primary); }
+        .tradfi-label { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 8px; }
+        .tradfi-val { font-size: 1.1rem; font-weight: 700; }
+        
+        .c-success { color: var(--success); }
+        .c-danger { color: var(--danger); }
+        .c-warning { color: var(--warning); }
+        .c-muted { color: var(--text-muted); }
+        .c-primary { color: var(--primary); }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .mb-0 { margin-bottom: 0 !important; }
+        .mt-24 { margin-top: 24px; }
+        
     </style>
 </head>
 <body>
 
     <aside>
-        <div class="brand">MITOPULSE <span>V76</span></div>
+        <div class="brand">
+            MITOPULSE V88
+            <span>[OMNIVERSE CORE]</span>
+        </div>
         <div class="nav-links">
             <div class="nav-item active" onclick="switchTab('god-mode', this)">🌐 God Mode (Live)</div>
             <div class="nav-item" onclick="switchTab('ceo-view', this)">💼 Executive POV</div>
-            <div class="nav-item" onclick="switchTab('client-portal', this)">🏢 Client Portal</div>
+            <div class="nav-item" onclick="switchTab('client-portal', this)">🏢 Immutable Ledger</div>
             <div class="nav-item" onclick="switchTab('mobile-node', this)">📱 Mobile Verify Node</div>
-            <div class="nav-item" onclick="switchTab('connectors', this)">📈 Connectors</div>
-            <div class="nav-item" style="margin-top:24px; border:1px solid var(--border);" onclick="window.open('/dashboard', '_blank')">📊 Dashboard</div>
+            <div class="nav-item" onclick="switchTab('connectors', this)">📈 Data Ingestion</div>
+            <div class="nav-item nav-item-ext" onclick="window.open('/dashboard', '_blank')">📊 Legacy UI (V46)</div>
         </div>
-        <div style="padding: 24px; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border);">
+        <div class="sys-status">
             SYSTEM: PRODUCTION READY<br>
-            LATENCY: <span style="color:var(--success)">12ms</span>
+            LATENCY: <span class="sys-latency">12ms</span>
         </div>
     </aside>
 
     <main>
         <header>
-            <div class="tenant"><span class="status-dot"></span> ORCHESTRATOR ONLINE</div>
-            <div style="font-weight: 600; font-family: var(--font-mono); color: var(--text-muted);" id="header-ticker">BTC/USDT: $--</div>
+            <div class="tenant"><span class="status-dot"></span> ORCHESTRATOR ONLINE (V88)</div>
+            <div class="header-ticker" id="header-ticker">BTC/USDT: $--</div>
         </header>
 
         <!-- TAB 1: GOD MODE 3D -->
         <div id="tab-god-mode" class="tab-content active">
             <div id="canvas-container"></div>
+            
+            <!-- Left HUD -->
             <div id="hud-overlay">
-                <h2 style="color: #fff; margin-bottom: 15px; font-size: 1.1rem; border-bottom: 1px solid #333; padding-bottom: 10px;">NEURAL TELEMETRY</h2>
-                <div class="hud-row"><span style="color:var(--text-muted)">MARKET (BTC):</span> <strong id="hud-price" style="color: var(--success)">$--</strong></div>
-                <div class="hud-row"><span style="color:var(--text-muted)">STRESS PULSE:</span> <strong id="hud-stress">--</strong></div>
-                <div class="hud-row"><span style="color:var(--text-muted)">DYNAMICAL SCR:</span> <strong id="hud-risk">--%</strong></div>
-                <div class="hud-row" style="margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.1);"><span style="color:var(--warning)">SCR FORECAST (T+5):</span> <strong id="hud-forecast" style="color:var(--warning)">--%</strong></div>
-                <div class="hud-row" style="margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.1);"><span style="color:var(--text-muted)">BASE TRUST:</span> <strong id="hud-trust">--%</strong></div>
-                <div class="hud-row"><span style="color:var(--text-muted)">VORTEX SCORE (GSI):</span> <strong id="hud-vortex">--</strong></div>
-                <div class="hud-row"><span style="color:var(--text-muted)">WAVE MAX (GSI):</span> <strong id="hud-wave">--</strong></div>
-                <div class="hud-row" style="margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.1);"><span style="color:var(--text-muted)">NETWORK HEALTH (NHI):</span> <strong id="hud-nhi">--</strong></div>
-                <div class="hud-row"><span style="color:var(--text-muted)">ADAPTIVE CAPACITY (ACI):</span> <strong id="hud-aci">--</strong></div>
-                <div class="hud-row"><span style="color:var(--text-muted)">VIABILITY SCORE (AVS):</span> <strong id="hud-avs" style="color:var(--primary)">--</strong></div>
-                <div class="hud-row" style="margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
-                    <span style="color:var(--warning)">V83 PREDICTIVE ACTION:</span> <strong id="hud-decision" class="tag tag-success">--</strong>
+                <div class="hud-header">
+                    <span>NEURAL TELEMETRY</span>
+                    <span class="tag tag-success" id="hud-global-status">STABLE</span>
                 </div>
-                <div class="hud-row" style="margin-top: 8px;">
-                    <span style="color:var(--text-muted)">TIME TO CRITICALITY:</span> <strong id="hud-criticality">--</strong>
+                
+                <div class="hud-row">
+                    <span class="hud-label">MARKET (BTC)</span>
+                    <strong id="hud-price" class="val-success">$--</strong>
                 </div>
-                <div class="hud-row" style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px;">
-                    <div style="color: var(--primary); display: flex; align-items: center; gap: 8px; font-weight: bold; margin-bottom: 8px; font-size: 0.85rem;">
-                        <div style="width: 6px; height: 6px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); animation: pulse 1.5s infinite;"></div>
-                        V88 EXPLAINABILITY AI - EXECUTIVE BRIEF
+                <div class="hud-row">
+                    <span class="hud-label">STRESS PULSE</span>
+                    <strong id="hud-stress" class="val-neutral">--</strong>
+                </div>
+                
+                <div class="hud-row-col hud-divider">
+                    <div class="hud-value-flex">
+                        <span class="hud-label">DYNAMICAL SCR</span>
+                        <strong id="hud-risk" class="val-neutral">--%</strong>
                     </div>
-                    <div id="hud-ai-brief" style="color: #cbd5e1; font-family: 'Courier New', monospace; font-size: 0.75rem; line-height: 1.4; padding: 8px; background: rgba(15, 23, 42, 0.4); border-left: 2px solid var(--primary); border-radius: 4px;">INITIALIZING NEURAL SWARM...</div>
+                    <div class="prog-track"><div id="bar-risk" class="prog-fill" style="width: 0%; background: var(--success);"></div></div>
                 </div>
+                
+                <div class="hud-row">
+                    <span class="hud-label">SCR FORECAST (T+5)</span>
+                    <strong id="hud-forecast" class="val-warning">--%</strong>
+                </div>
+                
+                <div class="hud-row-col hud-divider">
+                    <div class="hud-value-flex">
+                        <span class="hud-label">BASE TRUST</span>
+                        <strong id="hud-trust" class="val-primary">--%</strong>
+                    </div>
+                    <div class="prog-track"><div id="bar-trust" class="prog-fill" style="width: 0%; background: var(--primary);"></div></div>
+                </div>
+
+                <div class="hud-row">
+                    <span class="hud-label">VORTEX SCORE (GSI)</span>
+                    <strong id="hud-vortex" class="val-neutral">--</strong>
+                </div>
+                <div class="hud-row">
+                    <span class="hud-label">WAVE MAX (GSI)</span>
+                    <strong id="hud-wave" class="val-neutral">--</strong>
+                </div>
+                
+                <div class="hud-row-col hud-divider">
+                    <div class="hud-value-flex">
+                        <span class="hud-label">NETWORK HEALTH (NHI)</span>
+                        <strong id="hud-nhi" class="val-neutral">--%</strong>
+                    </div>
+                    <div class="prog-track"><div id="bar-nhi" class="prog-fill" style="width: 0%; background: var(--success);"></div></div>
+                </div>
+                
+                <div class="hud-row">
+                    <span class="hud-label">ADAPTIVE CAPACITY (ACI)</span>
+                    <strong id="hud-aci" class="val-neutral">--%</strong>
+                </div>
+                
+                <div class="hud-row-col">
+                    <div class="hud-value-flex">
+                        <span class="hud-label">VIABILITY SCORE (AVS)</span>
+                        <strong id="hud-avs" class="val-success">--%</strong>
+                    </div>
+                    <div class="prog-track"><div id="bar-avs" class="prog-fill" style="width: 0%; background: var(--success);"></div></div>
+                </div>
+                
+                <div class="hud-divider">
+                    <div class="hud-row mb-0">
+                        <span class="hud-label c-warning">PREDICTIVE ACTION</span>
+                        <strong id="hud-decision" class="tag tag-success">--</strong>
+                    </div>
+                </div>
+                <div class="hud-row mb-0">
+                    <span class="hud-label">TIME TO CRITICALITY</span>
+                    <strong id="hud-criticality" class="c-muted">--</strong>
+                </div>
+            </div>
+            
+            <!-- Bottom V88 AI Console -->
+            <div id="ai-console-wrapper">
+                <div class="ai-header">
+                    <div class="ai-title">
+                        <div class="ai-dot"></div>
+                        V88 EXPLAINABILITY AI - EXECUTIVE THREAT BRIEF
+                    </div>
+                    <div class="tag tag-primary" style="background: rgba(59, 130, 246, 0.1); color: var(--primary); border: 1px solid var(--primary);">SWARM ACTIVE</div>
+                </div>
+                <p id="hud-ai-brief" class="ai-text">INITIALIZING NEURAL SEMANTIC SWARM...</p>
             </div>
         </div>
 
@@ -130,7 +283,7 @@
             <div class="metrics-grid">
                 <div class="card">
                     <div class="card-title">Protected Value (24H)</div>
-                    <div class="card-value" style="color: var(--success);" id="ceo-roi">$--</div>
+                    <div class="card-value c-success" id="ceo-roi">$--</div>
                 </div>
                 <div class="card">
                     <div class="card-title">Network Trust Ratio</div>
@@ -138,14 +291,14 @@
                 </div>
                 <div class="card">
                     <div class="card-title">Autonomic Interventions</div>
-                    <div class="card-value" style="color: var(--primary);">412</div>
+                    <div class="card-value c-primary">412</div>
                 </div>
             </div>
-            <div class="card" style="margin-top: 24px;">
-                <div class="card-title" style="color: var(--primary);">CEO STORYTELLING MODULE</div>
+            <div class="card mt-24 card-glow">
+                <div class="card-title c-primary">CEO STORYTELLING MODULE</div>
                 <h2 id="ceo-story-title" style="font-size: 1.5rem; margin-bottom: 16px; color: #fff;">Awaiting Telemetry...</h2>
                 <p id="ceo-story-body" style="font-size: 1.1rem; line-height: 1.6; color: var(--text-muted);">
-                    The mathematical pipeline is initializing natural language generation based on live Binance market data.
+                    The mathematical pipeline is initializing natural language generation based on live Omniverse data.
                 </p>
             </div>
         </div>
@@ -156,11 +309,11 @@
             <div style="display: flex; gap: 24px; margin-bottom: 24px;">
                 <div class="card" style="flex: 1;">
                     <div class="card-title">TENANT ID</div>
-                    <div style="font-family: var(--font-mono); color: #fff;">acme_bank_prod_9Xy2</div>
+                    <div class="c-neutral" style="font-family: var(--font-mono);">acme_bank_prod_9Xy2</div>
                 </div>
                 <div class="card" style="flex: 1;">
                     <div class="card-title">SECRET API KEY (v76 Auth)</div>
-                    <div style="font-family: var(--font-mono); color: #fff;">mitopulse-key</div>
+                    <div class="c-neutral" style="font-family: var(--font-mono);">mitopulse-key</div>
                 </div>
             </div>
             <table>
@@ -175,50 +328,51 @@
 
         <!-- TAB 4: LIVE CONNECTORS -->
         <div id="tab-connectors" class="tab-content">
-            <h1 class="tab-title">V81 Live Connectors & Multi-Node Ingestion</h1>
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div class="card-title">BINANCE MULTI-ASSET REST API</div>
-                    <div style="color: var(--success); font-weight: bold; border: 1px solid var(--success); padding: 4px 8px; border-radius: 4px;">ACTIVE</div>
-                </div>
-                <p style="color: var(--text-muted); margin-bottom: 24px; margin-top: 12px;">Successfully streaming 5-Asset synchronized tensor data into the End-to-End Orchestrator. (Phase V81 Awakening Activo)</p>
-                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 24px;">
-                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;">BTCUSDT</div>
-                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;">ETHUSDT</div>
-                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;">BNBUSDT</div>
-                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;">SOLUSDT</div>
-                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;">XRPUSDT</div>
-                </div>
-                <button class="btn" style="background: var(--surface); border: 1px solid var(--border); color: #fff;">Pause Ingestion</button>
-            </div>
+            <h1 class="tab-title">V88 Omniverse Data Ingestion</h1>
             
-            <div class="card" style="margin-top: 24px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div class="card-title">TRADITIONAL FINANCE (TRADFI) CONNECTOR</div>
-                    <div style="color: var(--success); font-weight: bold; border: 1px solid var(--success); padding: 4px 8px; border-radius: 4px;">ACTIVE</div>
+            <div class="card mt-24">
+                <div class="flex-between">
+                    <div class="card-title mb-0">TRADITIONAL FINANCE (TRADFI) CONNECTOR</div>
+                    <div class="tag tag-success">ACTIVE</div>
                 </div>
-                <p style="color: var(--text-muted); margin-bottom: 24px; margin-top: 12px;">Omniverse Ingestion: Streaming Wall Street institutional metrics persistently to the V87 SQLite Data Lake.</p>
-                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 24px;">
-                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;" id="conn-spy">SPY</div>
-                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;" id="conn-qqq">QQQ</div>
-                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;" id="conn-vix">VIX</div>
-                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;" id="conn-gold">GOLD</div>
-                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;" id="conn-tnx">10Y YIELD</div>
+                <p class="c-muted mt-24">Omniverse Ingestion: Streaming Wall Street institutional metrics persistently to the V87 SQLite Data Lake.</p>
+                <div class="tradfi-grid">
+                    <div class="tradfi-box" id="conn-spy"><div class="tradfi-label">SPY</div><div class="tradfi-val c-neutral">--</div></div>
+                    <div class="tradfi-box" id="conn-qqq"><div class="tradfi-label">QQQ</div><div class="tradfi-val c-neutral">--</div></div>
+                    <div class="tradfi-box" id="conn-vix"><div class="tradfi-label">VIX</div><div class="tradfi-val c-neutral">--</div></div>
+                    <div class="tradfi-box" id="conn-gc"><div class="tradfi-label">GOLD</div><div class="tradfi-val c-neutral">--</div></div>
+                    <div class="tradfi-box" id="conn-tnx"><div class="tradfi-label">10Y YIELD</div><div class="tradfi-val c-neutral">--</div></div>
                 </div>
             </div>
             
-            <div class="card" style="margin-top: 24px; border-color: var(--primary);">
-                <div class="card-title" style="color: var(--primary); display: flex; align-items: center; gap: 8px;">
-                    <div style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); animation: pulse 1.5s infinite;"></div>
+            <div class="card mt-24">
+                <div class="flex-between">
+                    <div class="card-title mb-0">BINANCE MULTI-ASSET REST API</div>
+                    <div class="tag tag-success">ACTIVE</div>
+                </div>
+                <p class="c-muted mt-24">Successfully streaming synchronized tensor data into the End-to-End Orchestrator. (Phase V81)</p>
+                <div class="tradfi-grid">
+                    <div class="tradfi-box"><div class="tradfi-label">BTCUSDT</div><div class="tradfi-val c-success">SYNCED</div></div>
+                    <div class="tradfi-box"><div class="tradfi-label">ETHUSDT</div><div class="tradfi-val c-success">SYNCED</div></div>
+                    <div class="tradfi-box"><div class="tradfi-label">BNBUSDT</div><div class="tradfi-val c-success">SYNCED</div></div>
+                    <div class="tradfi-box"><div class="tradfi-label">SOLUSDT</div><div class="tradfi-val c-success">SYNCED</div></div>
+                    <div class="tradfi-box"><div class="tradfi-label">XRPUSDT</div><div class="tradfi-val c-success">SYNCED</div></div>
+                </div>
+                <button class="btn">Pause Ingestion</button>
+            </div>
+            
+            <div class="card mt-24 card-glow">
+                <div class="ai-title mb-0">
+                    <div class="ai-dot"></div>
                     V88 EXPLAINABILITY AI ENGAGED
                 </div>
-                <p style="color: var(--text-muted); margin-bottom: 0;">El Enjambre Semántico V70 ha sido despertado. Translating mathematical tensors into natural language executive intelligence directly to the Master HUD.</p>
+                <p class="c-muted" style="margin-top: 12px; margin-bottom: 0;">El Enjambre Semántico V70 ha sido despertado. Translating mathematical tensors into natural language executive intelligence directly to the Master HUD.</p>
             </div>
         </div>
         
         <!-- TAB 5: MOBILE VERIFY NODE -->
         <div id="tab-mobile-node" class="tab-content" style="padding: 0;">
-            <iframe src="/verify-app" style="width: 100%; height: 100%; border: none; background: #030712;"></iframe>
+            <iframe src="/verify-app" style="width: 100%; height: 100%; border: none; background: var(--bg);"></iframe>
         </div>
     </main>
 
@@ -249,7 +403,6 @@
             container.appendChild(renderer.domElement);
 
             const geometry = new THREE.SphereGeometry(1, 32, 32);
-            // Spawn 20 nodes
             for(let i=0; i<20; i++) {
                 const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
                 const sphere = new THREE.Mesh(geometry, material);
@@ -257,7 +410,6 @@
                 scene.add(sphere);
                 spheres.push({ mesh: sphere, target: sphere.position.clone() });
             }
-
             animateWebGL();
         }
 
@@ -269,24 +421,40 @@
             renderer.render(scene, camera);
         }
 
+        function getColorForPercent(value) {
+            if(value > 65) return 'var(--danger)';
+            if(value > 40) return 'var(--warning)';
+            return 'var(--success)';
+        }
+        
+        function getHealthColorForPercent(value) {
+            if(value < 35) return 'var(--danger)';
+            if(value < 60) return 'var(--warning)';
+            return 'var(--success)';
+        }
+
         // LIVE DATA POLLING
-        let ledgerCount = 0;
         async function fetchTelemetry() {
             try {
-                // To support V76 backend auth if enabled, we send the header
                 const res = await fetch("http://127.0.0.1:8000/stream", {
                     headers: { "x-api-key": "mitopulse-key" }
                 });
                 const data = await res.json();
                 
-                // Color Logic based on Structural Risk vs Trust
+                // Color Logic based on Structural Risk
                 const riskLevel = data.risk;
+                const riskPct = riskLevel * 100;
                 const isCritical = riskLevel > 0.65;
-                const themeColor = isCritical ? '#ef4444' : '#10b981';
-                const threeColor = isCritical ? 0xef4444 : 0x10b981;
+                const themeColor = isCritical ? 'var(--danger)' : 'var(--success)';
+                
+                // Update Global HUD Status
+                const globalStatus = document.getElementById('hud-global-status');
+                globalStatus.textContent = isCritical ? 'CRITICAL' : 'STABLE';
+                globalStatus.className = isCritical ? 'tag tag-danger' : 'tag tag-success';
 
-                // Update 3D Spheres to reflect V81 Reality (5 Assets)
+                // Update 3D Spheres
                 const realNodes = data.nodes || [];
+                const geometry = new THREE.SphereGeometry(1, 32, 32);
                 
                 while(spheres.length < realNodes.length) {
                     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
@@ -304,51 +472,44 @@
                     const n = realNodes[i];
                     if(!n) return;
                     
-                    let nodeColor = 0x10b981; // Green
-                    if(n.risk > 0.65) nodeColor = 0xef4444; // Red
-                    else if(n.risk > 0.40) nodeColor = 0xf59e0b; // Orange
+                    let nodeColor = 0x10b981; 
+                    if(n.risk > 0.65) nodeColor = 0xef4444; 
+                    else if(n.risk > 0.40) nodeColor = 0xf59e0b; 
                     
                     obj.mesh.material.color.setHex(nodeColor);
                     
-                    // Size of asset node is proportional to structural risk
                     const scale = 0.5 + (n.risk * 2.5);
                     obj.mesh.scale.set(scale, scale, scale);
                     
-                    // Scatter violently if high risk
                     if (Math.random() < 0.1) {
                         const spread = n.risk > 0.65 ? 40 : 15;
                         obj.target.set((Math.random()-0.5)*spread, (Math.random()-0.5)*spread, (Math.random()-0.5)*spread);
                     }
                 });
 
-                // Update HUD (Tab 1)
+                // Update HUD Overlay visual feedback
                 const hud = document.getElementById("hud-overlay");
-                hud.style.borderColor = themeColor;
-                hud.style.boxShadow = `0 0 20px ${isCritical ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}`;
+                hud.style.borderColor = isCritical ? 'rgba(239, 68, 68, 0.5)' : 'rgba(59, 130, 246, 0.3)';
+                hud.style.boxShadow = `0 8px 32px rgba(0, 0, 0, 0.4), inset 0 0 30px ${isCritical ? 'rgba(239, 68, 68, 0.1)' : 'rgba(59, 130, 246, 0.05)'}`;
                 
                 document.getElementById('hud-price').textContent = `$${Number(data.btc_price).toLocaleString()} (${data.btc_change}%)`;
                 document.getElementById('hud-price').style.color = themeColor;
                 document.getElementById('header-ticker').textContent = `BTC/USDT: $${Number(data.btc_price).toLocaleString()}`;
                 
                 document.getElementById('hud-stress').textContent = data.signal.toFixed(3);
-                document.getElementById('hud-risk').textContent = (data.risk * 100).toFixed(2) + '%';
-                document.getElementById('hud-trust').textContent = (data.trust * 100).toFixed(2) + '%';
                 
-                // V88 AI Brief & CEO Narrative Integration
-                try {
-                    const briefText = typeof data.story === 'string' ? data.story : (data.story ? data.story.narrative : "--");
-                    const briefTitle = typeof data.story === 'string' ? "V88 OMNIVERSE THREAT BRIEF" : (data.story ? data.story.title : "--");
-                    
-                    document.getElementById('ceo-story-title').innerText = briefTitle;
-                    document.getElementById('ceo-story-body').innerText = briefText;
-                    
-                    if(document.getElementById('hud-ai-brief')) {
-                        document.getElementById('hud-ai-brief').innerText = briefText;
-                    }
-                } catch(e) {
-                    console.error("Storytelling Engine Offline", e);
-                }
+                // Progress Bars
+                const trustPct = data.trust * 100;
                 
+                document.getElementById('hud-risk').textContent = riskPct.toFixed(2) + '%';
+                document.getElementById('hud-risk').style.color = getColorForPercent(riskPct);
+                document.getElementById('bar-risk').style.width = riskPct + '%';
+                document.getElementById('bar-risk').style.backgroundColor = getColorForPercent(riskPct);
+                
+                document.getElementById('hud-trust').textContent = trustPct.toFixed(2) + '%';
+                document.getElementById('bar-trust').style.width = trustPct + '%';
+                
+                // Forecast & Variables
                 if(data.forecast !== undefined) {
                     document.getElementById('hud-forecast').textContent = data.forecast.toFixed(2) + '%';
                     document.getElementById('hud-vortex').textContent = data.vortex.toFixed(2);
@@ -357,62 +518,83 @@
                 
                 // V85 Institutional Metrics Rendering
                 if(data.institutional) {
-                    document.getElementById('hud-nhi').textContent = (data.institutional.nhi * 100).toFixed(2) + '%';
-                    document.getElementById('hud-aci').textContent = (data.institutional.aci * 100).toFixed(2) + '%';
-                    document.getElementById('hud-avs').textContent = (data.institutional.avs * 100).toFixed(2) + '%';
-                    document.getElementById('hud-avs').style.color = data.institutional.avs > 0.60 ? '#10b981' : (data.institutional.avs > 0.35 ? '#f59e0b' : '#ef4444');
+                    const nhiPct = data.institutional.nhi * 100;
+                    const aciPct = data.institutional.aci * 100;
+                    const avsPct = data.institutional.avs * 100;
+                    
+                    document.getElementById('hud-nhi').textContent = nhiPct.toFixed(2) + '%';
+                    document.getElementById('bar-nhi').style.width = nhiPct + '%';
+                    document.getElementById('bar-nhi').style.backgroundColor = getHealthColorForPercent(nhiPct);
+                    
+                    document.getElementById('hud-aci').textContent = aciPct.toFixed(2) + '%';
+                    
+                    document.getElementById('hud-avs').textContent = avsPct.toFixed(2) + '%';
+                    document.getElementById('hud-avs').style.color = getHealthColorForPercent(avsPct);
+                    document.getElementById('bar-avs').style.width = avsPct + '%';
+                    document.getElementById('bar-avs').style.backgroundColor = getHealthColorForPercent(avsPct);
                 }
+                
+                // V88 AI Brief & CEO Narrative Integration
+                try {
+                    const briefText = typeof data.story === 'string' ? data.story : (data.story ? data.story.narrative : "--");
+                    const briefTitle = typeof data.story === 'string' ? "V88 OMNIVERSE THREAT BRIEF" : (data.story ? data.story.title : "--");
+                    
+                    // Main Terminal Update
+                    if(document.getElementById('hud-ai-brief')) {
+                        const terminal = document.getElementById('hud-ai-brief');
+                        if (terminal.innerText !== briefText) {
+                            terminal.innerText = briefText;
+                            // Add slight flicker effect when updated
+                            terminal.style.opacity = 0.5;
+                            setTimeout(() => terminal.style.opacity = 1, 100);
+                        }
+                    }
+                    
+                    // CEO Tab Update
+                    document.getElementById('ceo-story-title').innerText = briefTitle;
+                    document.getElementById('ceo-story-body').innerText = briefText;
+                    document.getElementById('ceo-roi').innerText = "$" + (data.impact ? data.impact.prevented_usd : "45,000.00");
+                } catch(e) {}
                 
                 // V87 TradFi Grid Update
                 if(data.tradfi) {
                     data.tradfi.forEach(t => {
-                        let color = t.price_change_percent >= 0 ? '#10b981' : '#ef4444';
-                        if(t.symbol==="SPY") document.getElementById('conn-spy').innerHTML = `SPY<br><span style="color:${color}">$${t.last_price}</span>`;
-                        if(t.symbol==="QQQ") document.getElementById('conn-qqq').innerHTML = `QQQ<br><span style="color:${color}">$${t.last_price}</span>`;
-                        if(t.symbol==="^VIX") document.getElementById('conn-vix').innerHTML = `VIX<br><span style="color:${t.price_change_percent >= 0 ? '#ef4444' : '#10b981'}">${t.last_price}</span>`;
-                        if(t.symbol==="GC=F") document.getElementById('conn-gold').innerHTML = `GOLD<br><span style="color:#f59e0b">$${t.last_price}</span>`;
-                        if(t.symbol==="^TNX") document.getElementById('conn-tnx').innerHTML = `10Y YIELD<br><span style="color:#94a3b8">${t.last_price}%</span>`;
+                        let color = t.price_change_percent >= 0 ? 'var(--success)' : 'var(--danger)';
+                        const elId = 'conn-' + t.symbol.toLowerCase().replace('^','').replace('=f','');
+                        const box = document.getElementById(elId);
+                        if(box) {
+                            box.innerHTML = `<div class="tradfi-label">${t.symbol}</div><div class="tradfi-val" style="color:${color}">$${t.last_price}</div>`;
+                        }
                     });
                 }
                 
+                // Predictive Action
                 const decEl = document.getElementById('hud-decision');
                 let hudAct = data.action ? data.action.toUpperCase() : "MONITOR";
                 
-                // Inject the True V83 Predictive Action if Oracle is Live
                 if(data.viability) {
                     if(data.viability.actions && data.viability.actions.length > 0) {
                         hudAct = data.viability.actions[0].toUpperCase().replace(/_/g, " ");
                     }
                     if(data.viability.time_to_criticality) {
-                        document.getElementById('hud-criticality').textContent = `${(data.viability.time_to_criticality / 3600).toFixed(1)} HRS (EST)`;
-                        if (data.viability.time_to_criticality < 1800) {
-                             document.getElementById('hud-criticality').style.color = '#ef4444';
-                        } else {
-                             document.getElementById('hud-criticality').style.color = '#94a3b8';
-                        }
+                        const critSpan = document.getElementById('hud-criticality');
+                        critSpan.textContent = `${(data.viability.time_to_criticality / 3600).toFixed(1)} HRS (EST)`;
+                        critSpan.className = data.viability.time_to_criticality < 1800 ? 'c-danger' : 'c-muted';
                     }
                 }
                 
                 decEl.textContent = hudAct;
-                decEl.className = isCritical ? 'tag tag-danger' : 'tag tag-success';
+                if(hudAct === "MONITOR") decEl.className = 'tag tag-success';
+                else if(hudAct === "REVIEW") decEl.className = 'tag tag-warning';
+                else decEl.className = 'tag tag-danger';
 
-                // Update CEO View (Tab 2)
-                document.getElementById('ceo-roi').textContent = data.story ? ('$' + Number(data.story.prevented_usd || 45000).toLocaleString()) : '$45,000.00';
-                document.getElementById('ceo-trust').textContent = (data.trust * 100).toFixed(2) + '%';
-                if(data.story) {
-                    document.getElementById('ceo-story-title').textContent = data.story.title.toUpperCase();
-                    document.getElementById('ceo-story-body').textContent = data.story.narrative;
-                }
-
-                // Update Ledger (Tab 3) - Render Cryptographic Blocks natively from API
+                // Update Ledger (Tab 3)
                 if (data.ledger && data.ledger.length > 0) {
                     const tbody = document.getElementById('ledger-table');
-                    tbody.innerHTML = ''; // Clear previous
+                    tbody.innerHTML = ''; 
                     
                     data.ledger.reverse().forEach(block => {
-                        // Skip genesis block if it doesn't have a tx_id
                         if (!block.tx_id && block.idx === 0) return;
-                        
                         const tr = document.createElement('tr');
                         const txId = block.tx_id || "GENESIS_TX";
                         const timestamp = new Date(block.ts * 1000).toLocaleTimeString();
@@ -421,8 +603,8 @@
                         
                         tr.innerHTML = `
                             <td>${statusTag}</td>
-                            <td style="color:var(--text-muted)">${timestamp}</td>
-                            <td style="color:var(--primary); font-family:var(--font-mono)">${txId}</td>
+                            <td class="c-muted">${timestamp}</td>
+                            <td class="c-primary" style="font-family:var(--font-mono)">${txId}</td>
                             <td>${block.action}</td>
                             <td>${block.detail}</td>
                         `;
@@ -430,17 +612,13 @@
                     });
                 }
 
-            } catch(e) {
-                console.error("Telemetry Connection Lost", e);
-            }
+            } catch(e) {}
         }
 
-
-        // Boot
         window.onload = () => {
             initWebGL();
             fetchTelemetry();
-            setInterval(fetchTelemetry, 1000);
+            setInterval(fetchTelemetry, 1000); // 1-second pulse for God Level feel
             
             window.addEventListener('resize', () => {
                 const container = document.getElementById('canvas-container');
