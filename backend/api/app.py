@@ -2,6 +2,8 @@
 from fastapi import FastAPI, Header, HTTPException
 from backend.core.pipeline import run_pipeline
 from backend.services.binance_client import get_ticker, get_multi_tickers
+from backend.services.market_client import get_tradfi_metrics
+from backend.services.data_lake import DataLakeService
 from backend.services.analysis import score_signal, impact_report, build_story
 from backend.v79_core.services.orchestrator import Orchestrator
 from backend.v79_core.engines.institutional import ViabilityEngine
@@ -25,6 +27,7 @@ ledger = verify_ledger.LedgerService()
 rfdc_engine = RelationalFieldDynamicsCore()
 viability_orchestrator = Orchestrator()
 inst_engine = ViabilityEngine()
+datalake = DataLakeService()
 
 app = FastAPI()
 
@@ -99,9 +102,12 @@ def stream(x_api_key: str = Header(None)):
     if x_api_key != "mitopulse-key":
         raise HTTPException(status_code=401, detail="V82 Enterprise Orchestrator: Cryptographic keys do not match. Unauthorized Access.")
         
-    # 1. Ingest Multi-Node Synchronous Binance Pulse (V81 Awakening)
-    symbols = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT"]
-    tickers = get_multi_tickers(symbols)
+    # 1. Ingest Multi-Node Synchronous Binance Pulse (V81 Awakening) & TradFi (V87)
+    crypto_symbols = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT"]
+    crypto_tickers = get_multi_tickers(crypto_symbols)
+    tradfi_tickers = get_tradfi_metrics()
+    
+    tickers = crypto_tickers + tradfi_tickers
     
     current_time = time.time()
     events_data = []
@@ -115,7 +121,7 @@ def stream(x_api_key: str = Header(None)):
     change_pct = 0.0
     
     for idx, t in enumerate(tickers):
-        sym = t.get("symbol", symbols[idx])
+        sym = t.get("symbol", f"NODE_{idx}")
         price = t.get("last_price", random.uniform(50, 100))
         change = t.get("price_change_percent", random.uniform(-2, 2))
         
@@ -213,6 +219,9 @@ def stream(x_api_key: str = Header(None)):
     viability_state = inst_engine.compute(int(time.time()), inst_drivers)
     inst_metrics = inst_engine.as_dict(viability_state)
 
+    # V87 Omniverse Data Lake Persistent Record
+    datalake.record_tick(crypto_tickers, tradfi_tickers, inst_metrics, action)
+
     return {
         "nodes": nodes,
         "edges": edges,
@@ -228,5 +237,6 @@ def stream(x_api_key: str = Header(None)):
         "vortex": metrics['vortex_score'],
         "wave": metrics['wave_max'],
         "viability": exec_state.model_dump(),
-        "institutional": inst_metrics
+        "institutional": inst_metrics,
+        "tradfi": tradfi_tickers
     }

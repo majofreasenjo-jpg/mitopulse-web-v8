@@ -185,6 +185,21 @@
                 <button class="btn" style="background: var(--surface); border: 1px solid var(--border); color: #fff;">Pause Ingestion</button>
             </div>
             
+            <div class="card" style="margin-top: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="card-title">TRADITIONAL FINANCE (TRADFI) CONNECTOR</div>
+                    <div style="color: var(--success); font-weight: bold; border: 1px solid var(--success); padding: 4px 8px; border-radius: 4px;">ACTIVE</div>
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 24px; margin-top: 12px;">Omniverse Ingestion: Streaming Wall Street institutional metrics persistently to the V87 SQLite Data Lake.</p>
+                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 24px;">
+                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;" id="conn-spy">SPY</div>
+                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;" id="conn-qqq">QQQ</div>
+                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;" id="conn-vix">VIX</div>
+                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;" id="conn-gold">GOLD</div>
+                    <div style="background: #1e293b; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #334155;" id="conn-tnx">10Y YIELD</div>
+                </div>
+            </div>
+            
             <div class="card" style="margin-top: 24px; border-color: var(--success);">
                 <div class="card-title" style="color: var(--success);">SHADOW COORDINATION ARMED</div>
                 <p style="color: var(--text-muted); margin-bottom: 0;">Los motores matemáticos RelationalDarkMatter y FraudDetectionEngine ahora reciben suficiente densidad de red para operar a su máxima capacidad.</p>
@@ -321,6 +336,18 @@
                     document.getElementById('hud-aci').textContent = (data.institutional.aci * 100).toFixed(2) + '%';
                     document.getElementById('hud-avs').textContent = (data.institutional.avs * 100).toFixed(2) + '%';
                     document.getElementById('hud-avs').style.color = data.institutional.avs > 0.60 ? '#10b981' : (data.institutional.avs > 0.35 ? '#f59e0b' : '#ef4444');
+                }
+                
+                // V87 TradFi Grid Update
+                if(data.tradfi) {
+                    data.tradfi.forEach(t => {
+                        let color = t.price_change_percent >= 0 ? '#10b981' : '#ef4444';
+                        if(t.symbol==="SPY") document.getElementById('conn-spy').innerHTML = `SPY<br><span style="color:${color}">$${t.last_price}</span>`;
+                        if(t.symbol==="QQQ") document.getElementById('conn-qqq').innerHTML = `QQQ<br><span style="color:${color}">$${t.last_price}</span>`;
+                        if(t.symbol==="^VIX") document.getElementById('conn-vix').innerHTML = `VIX<br><span style="color:${t.price_change_percent >= 0 ? '#ef4444' : '#10b981'}">${t.last_price}</span>`;
+                        if(t.symbol==="GC=F") document.getElementById('conn-gold').innerHTML = `GOLD<br><span style="color:#f59e0b">$${t.last_price}</span>`;
+                        if(t.symbol==="^TNX") document.getElementById('conn-tnx').innerHTML = `10Y YIELD<br><span style="color:#94a3b8">${t.last_price}%</span>`;
+                    });
                 }
                 
                 const decEl = document.getElementById('hud-decision');
