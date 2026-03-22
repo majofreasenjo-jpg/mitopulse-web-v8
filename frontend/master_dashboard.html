@@ -515,6 +515,13 @@
                 document.getElementById('hud-trust').textContent = trustPct.toFixed(2) + '%';
                 document.getElementById('bar-trust').style.width = trustPct + '%';
                 
+                // V88 Bugfix: Syncing Network Trust to CEO Executive Panel
+                const ceoTrust = document.getElementById('ceo-trust');
+                if (ceoTrust) {
+                    ceoTrust.textContent = trustPct.toFixed(2) + '%';
+                    ceoTrust.className = `card-value ${trustPct > 70 ? 'c-success' : 'c-warning'}`;
+                }
+                
                 // Forecast & Variables
                 if(data.forecast !== undefined) {
                     document.getElementById('hud-forecast').textContent = data.forecast.toFixed(2) + '%';
