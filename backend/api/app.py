@@ -8,6 +8,7 @@ from backend.services.analysis import score_signal, impact_report
 from backend.absolute_core.ai_aux.explainability_ai import ExplainabilitySwarm
 from backend.v79_core.services.orchestrator import Orchestrator
 from backend.v79_core.engines.institutional import ViabilityEngine
+from backend.services.identity import UserIdentityEngine
 
 import importlib.util
 import os
@@ -30,6 +31,7 @@ viability_orchestrator = Orchestrator()
 inst_engine = ViabilityEngine()
 datalake = DataLakeService()
 ai_swarm = ExplainabilitySwarm()
+identity_engine = UserIdentityEngine()
 
 app = FastAPI()
 
@@ -65,11 +67,28 @@ from pydantic import BaseModel
 class SignalRequest(BaseModel):
     signal: float
 
+class VerifyRequest(BaseModel):
+    scenario: str
+
 import random
 
 @app.post("/run")
 def run(req: SignalRequest):
     return run_pipeline(req.signal)
+
+@app.post("/api/verify/challenge")
+def verify_challenge(req: VerifyRequest):
+    sender = "Alex (You)"
+    amount = 4500.00
+    
+    if req.scenario == "critical":
+        receiver = "Marco_Crypto99" # Tied to Scam_Ring_Alpha in IdentityEngine
+    elif req.scenario == "watch":
+        receiver = "Global_Exchange_Z" # Unknown entity
+    else:
+        receiver = "Mom_Wallet" # High-weight trusted historical node
+        
+    return identity_engine.evaluate_transaction(sender, receiver, amount)
 
 @app.get("/api/project")
 def project_future(horizon: str = "24h", x_api_key: str = Header(None)):

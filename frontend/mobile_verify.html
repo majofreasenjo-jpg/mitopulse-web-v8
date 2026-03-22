@@ -104,59 +104,7 @@ canvas { width:100%; max-width:980px; background:#0d1630; border-radius:14px; }
 </section>
 
 <script>
-window.__VERIFY_SCENARIOS__ = {
-  critical: {
-    score: 91,
-    state: "CRITICAL",
-    confidence: "94%",
-    horizon: "Immediate",
-    receiver: "Marco_Crypto99",
-    alertTitle: "⚠ Shadow Coordination Detected",
-    alertText: "The receiver has hidden relational edges to a known scam ring. Immune defense activated.",
-    primaryText: "Transaction Blocked",
-    primaryClass: "blocked",
-    trace: [
-      "Signal detected across receiver neighborhood.",
-      "Hidden cluster correlation matched known predatory pattern.",
-      "Policy triggered: block and isolate."
-    ],
-    color: "#ff5b5b"
-  },
-  watch: {
-    score: 63,
-    state: "PRESSURE",
-    confidence: "82%",
-    horizon: "Short-term",
-    receiver: "Global_Exchange_Z",
-    alertTitle: "⚠ Elevated Relational Pressure",
-    alertText: "The receiver shows indirect coordination markers. Enhanced monitoring recommended.",
-    primaryText: "Review Transfer",
-    primaryClass: "review",
-    trace: [
-      "Signal detected in secondary relational field.",
-      "Quorum reached watch-level confirmation.",
-      "Policy triggered: review and monitor."
-    ],
-    color: "#ffd166"
-  },
-  safe: {
-    score: 18,
-    state: "STABLE",
-    confidence: "97%",
-    horizon: "Low / distant",
-    receiver: "Trusted_Contact_21",
-    alertTitle: "✓ Relational Pattern Verified",
-    alertText: "No critical hidden coordination detected. Trust profile remains stable.",
-    primaryText: "Proceed Transfer",
-    primaryClass: "safe",
-    trace: [
-      "No abnormal cluster activation detected.",
-      "Trust profile remained stable under validation.",
-      "Policy triggered: allow."
-    ],
-    color: "#4cc9f0"
-  }
-};
+/* V90: The static Mock dictionary has been replaced by the Active UserIdentityEngine tracking network via Python. */
 
 (() => {
   const scenarios = window.__VERIFY_SCENARIOS__ || {};
@@ -170,7 +118,11 @@ window.__VERIFY_SCENARIOS__ = {
   const gctx = mg.getContext('2d');
 
   const state = {
-    scenario: scenarios.critical,
+    scenario: {
+        score: 0,
+        state: "INIT",
+        color: "#ffffff"
+    },
     time: 0,
     playing: true
   };
@@ -349,34 +301,52 @@ window.__VERIFY_SCENARIOS__ = {
     return `rgba(${r},${g},${b},${alpha})`;
   }
 
-  function applyScenario(key){
-    state.scenario = scenarios[key] || scenarios.critical;
-    document.getElementById('receiverName').textContent = state.scenario.receiver;
-    document.getElementById('confidenceValue').textContent = state.scenario.confidence;
-    document.getElementById('horizonValue').textContent = state.scenario.horizon;
-    
-    document.querySelector('.verify-alert-title').textContent = state.scenario.alertTitle;
-    document.getElementById('verifyAlertText').textContent = state.scenario.alertText;
-    document.getElementById('traceLine1').textContent = state.scenario.trace[0];
-    document.getElementById('traceLine2').textContent = state.scenario.trace[1];
-    document.getElementById('traceLine3').textContent = state.scenario.trace[2];
-    
+  async function applyScenario(key){
     const btn = document.getElementById('primaryDecision');
-    btn.textContent = state.scenario.primaryText;
+    btn.textContent = "Verifying Identity Graph...";
     
-    // Animate DOM changes
-    const alertBox = document.getElementById('verifyAlert');
-    alertBox.style.opacity = '0';
-    setTimeout(() => {
-        alertBox.className = 'verify-alert ' + (
-          state.scenario.state === 'CRITICAL' ? 'critical' :
-          state.scenario.state === 'PRESSURE' ? 'watch' : 'safe'
-        );
-        btn.className = 'btn verify-primary ' + state.scenario.primaryClass;
+    try {
+        const response = await fetch('/api/verify/challenge', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ scenario: key })
+        });
         
-        // Let the CSS transition make it smooth
-        alertBox.style.opacity = '1';
-    }, 100);
+        if (!response.ok) throw new Error("V90 Relay Error");
+        
+        const data = await response.json();
+        state.scenario = data;
+        
+        document.getElementById('receiverName').textContent = data.receiver;
+        document.getElementById('confidenceValue').textContent = data.confidence;
+        document.getElementById('horizonValue').textContent = data.horizon;
+        
+        document.querySelector('.verify-alert-title').textContent = data.alertTitle;
+        document.getElementById('verifyAlertText').textContent = data.alertText;
+        document.getElementById('traceLine1').textContent = data.trace[0];
+        document.getElementById('traceLine2').textContent = data.trace[1];
+        document.getElementById('traceLine3').textContent = data.trace[2];
+        
+        btn.textContent = data.primaryText;
+        
+        // Animate DOM changes
+        const alertBox = document.getElementById('verifyAlert');
+        alertBox.style.opacity = '0';
+        setTimeout(() => {
+            alertBox.className = 'verify-alert ' + (
+              data.state === 'CRITICAL' ? 'critical' :
+              data.state === 'PRESSURE' ? 'watch' : 'safe'
+            );
+            btn.className = 'btn verify-primary ' + data.primaryClass;
+            
+            // Let the CSS transition make it smooth
+            alertBox.style.opacity = '1';
+        }, 100);
+        
+    } catch(err) {
+        console.error("V90 Identity Engine Offline:", err);
+        btn.textContent = "Error: Relay Offline";
+    }
   }
 
   function frame(){
