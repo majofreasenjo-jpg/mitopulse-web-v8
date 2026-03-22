@@ -61,8 +61,13 @@ import random
 def run(req: SignalRequest):
     return run_pipeline(req.signal)
 
+from fastapi import Header, HTTPException
+
 @app.get("/stream")
-def stream():
+def stream(x_api_key: str = Header(None)):
+    if x_api_key != "mitopulse-key":
+        raise HTTPException(status_code=401, detail="V82 Enterprise Orchestrator: Cryptographic keys do not match. Unauthorized Access.")
+        
     # 1. Ingest Multi-Node Synchronous Binance Pulse (V81 Awakening)
     symbols = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT"]
     tickers = get_multi_tickers(symbols)
