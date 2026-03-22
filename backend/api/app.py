@@ -55,10 +55,6 @@ def run(req: SignalRequest):
 
 @app.get("/stream")
 def stream():
-    # Fetch live Binance Metrics for Bitcoin
-    ticker = get_ticker("BTCUSDT")
-    change_pct = ticker.get("price_change_percent", 0.0)
-    
     # Build Network Graph Topology (V62 Integration)
     G = nx.Graph()
     G.add_node("BTCUSDT", node_type="device", signal_severity=min(abs(change_pct)*2.0, 1.0))
@@ -79,7 +75,7 @@ def stream():
         "timestamp": time.time(),
         "source_id": "BTCUSDT",
         "target_id": "GodMode_Orchestrator",
-        "amount": ticker.get("last_price", 0.0),
+        "amount": last_price,
         "currency": "USDT",
         "risk_score": risk * 100
     }])
@@ -113,6 +109,11 @@ def stream():
     nodes = [(random.random() * max(0.1, risk)) for _ in range(20)]
     edges = [(random.random() * trust) for _ in range(10)]
     
+    # V79: The Predictive Forecast WaveEngine
+    # Extrapolates future SCR trajectory using Systemic Climate Pressure and Wave Propagation Velocities
+    future_scr = metrics['scr'] + (metrics['climate_pressure'] * 0.8) + (metrics['wave_max'] * 0.5)
+    forecast_scr = min(round(future_scr, 2), 99.99)
+    
     return {
         "nodes": nodes,
         "edges": edges,
@@ -120,8 +121,11 @@ def stream():
         "trust": trust,
         "signal": pulse,
         "action": action,
-        "btc_price": ticker.get("last_price", 0.0),
+        "btc_price": last_price,
         "btc_change": change_pct,
         "story": story,
-        "ledger": ledger.chain[-6:] # Send the latest cryptographic blocks
+        "ledger": ledger.chain[-6:], # Send the latest cryptographic blocks
+        "forecast": forecast_scr,
+        "vortex": metrics['vortex_score'],
+        "wave": metrics['wave_max']
     }

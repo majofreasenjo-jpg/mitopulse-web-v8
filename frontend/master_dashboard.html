@@ -99,8 +99,11 @@
                 <h2 style="color: #fff; margin-bottom: 15px; font-size: 1.1rem; border-bottom: 1px solid #333; padding-bottom: 10px;">NEURAL TELEMETRY</h2>
                 <div class="hud-row"><span style="color:var(--text-muted)">MARKET (BTC):</span> <strong id="hud-price" style="color: var(--success)">$--</strong></div>
                 <div class="hud-row"><span style="color:var(--text-muted)">STRESS PULSE:</span> <strong id="hud-stress">--</strong></div>
-                <div class="hud-row"><span style="color:var(--text-muted)">STRUCTURAL RISK:</span> <strong id="hud-risk">--%</strong></div>
-                <div class="hud-row"><span style="color:var(--text-muted)">BASE TRUST:</span> <strong id="hud-trust">--%</strong></div>
+                <div class="hud-row"><span style="color:var(--text-muted)">DYNAMICAL SCR:</span> <strong id="hud-risk">--%</strong></div>
+                <div class="hud-row" style="margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.1);"><span style="color:var(--warning)">SCR FORECAST (T+5):</span> <strong id="hud-forecast" style="color:var(--warning)">--%</strong></div>
+                <div class="hud-row" style="margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255,255,255,0.1);"><span style="color:var(--text-muted)">BASE TRUST:</span> <strong id="hud-trust">--%</strong></div>
+                <div class="hud-row"><span style="color:var(--text-muted)">VORTEX SCORE (GSI):</span> <strong id="hud-vortex">--</strong></div>
+                <div class="hud-row"><span style="color:var(--text-muted)">WAVE MAX (GSI):</span> <strong id="hud-wave">--</strong></div>
                 <div class="hud-row" style="margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
                     <span style="color:var(--text-muted)">DECISION:</span> <strong id="hud-decision" class="tag tag-success">--</strong>
                 </div>
@@ -165,6 +168,8 @@
                 <button class="btn" style="background: var(--success);">Connector Active (Live)</button>
                 <button class="btn" style="background: var(--surface); border: 1px solid var(--border); color: #fff; margin-left: 12px;">Pause Ingestion</button>
             </div>
+            
+
             
             <div class="card" style="margin-top: 24px; opacity: 0.5;">
                 <div class="card-title">MULTI-ASSET WEBSOCKET (ETH, SOL, BNB)</div>
@@ -256,9 +261,15 @@
                 document.getElementById('hud-price').style.color = themeColor;
                 document.getElementById('header-ticker').textContent = `BTC/USDT: $${Number(data.btc_price).toLocaleString()}`;
                 
-                document.getElementById('hud-stress').textContent = data.signal;
+                document.getElementById('hud-stress').textContent = data.signal.toFixed(3);
                 document.getElementById('hud-risk').textContent = (data.risk * 100).toFixed(2) + '%';
                 document.getElementById('hud-trust').textContent = (data.trust * 100).toFixed(2) + '%';
+                
+                if(data.forecast !== undefined) {
+                    document.getElementById('hud-forecast').textContent = data.forecast.toFixed(2) + '%';
+                    document.getElementById('hud-vortex').textContent = data.vortex.toFixed(2);
+                    document.getElementById('hud-wave').textContent = data.wave.toFixed(3);
+                }
                 
                 const decEl = document.getElementById('hud-decision');
                 decEl.textContent = data.action.toUpperCase();
@@ -302,6 +313,7 @@
                 console.error("Telemetry Connection Lost", e);
             }
         }
+
 
         // Boot
         window.onload = () => {
