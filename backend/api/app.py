@@ -8,6 +8,7 @@ from backend.v79_core.services.orchestrator import Orchestrator
 import importlib.util
 import os
 import networkx as nx
+import random
 
 from engine.bioinspired_engine import bioinspired_node_risk
 from core.rfdc import RelationalFieldDynamicsCore
@@ -172,7 +173,6 @@ def stream(x_api_key: str = Header(None)):
     tx_id = ledger.record_event("Acme_Bank_Prod", "BTC_Live_Feed", action, f"Immune: {risk*100}% | SCR: {metrics['scr']}")
     
     # Graph Engine Vectors
-    import random
     nodes = [(random.random() * max(0.1, risk)) for _ in range(20)]
     edges = [(random.random() * trust) for _ in range(10)]
     
