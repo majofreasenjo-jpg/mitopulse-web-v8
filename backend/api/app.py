@@ -77,8 +77,8 @@ def stream():
     events_df = pd.DataFrame([{
         "event_id": f"evt_{int(time.time() * 1000)}",
         "timestamp": time.time(),
-        "source_node": "BTCUSDT",
-        "target_node": "GodMode_Orchestrator",
+        "source_id": "BTCUSDT",
+        "target_id": "GodMode_Orchestrator",
         "amount": ticker.get("last_price", 0.0),
         "currency": "USDT",
         "risk_score": risk * 100
@@ -86,7 +86,7 @@ def stream():
     signals_df = pd.DataFrame([{
         "signal_id": f"sig_{int(time.time() * 1000)}",
         "timestamp": time.time(),
-        "target_node": "BTCUSDT",
+        "entity_id": "BTCUSDT",
         "severity": min(abs(change_pct) * 2.0, 1.0)
     }])
     
