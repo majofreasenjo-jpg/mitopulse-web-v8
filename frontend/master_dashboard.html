@@ -61,9 +61,9 @@
         
         /* Left Telemetry HUD */
         #hud-overlay { 
-            position: absolute; top: 24px; left: 24px; z-index: 20; 
+            position: absolute; top: 20px; left: 20px; z-index: 20; 
             background: var(--glass); border: 1px solid var(--border-glow); 
-            border-radius: 12px; padding: 24px; width: 360px; max-height: calc(100vh - 250px);
+            border-radius: 12px; padding: 16px; width: 280px; max-height: calc(100vh - 180px);
             overflow-y: auto; -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); 
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 0 20px rgba(59, 130, 246, 0.05); 
             transition: border-color 0.3s, box-shadow 0.3s;
@@ -74,13 +74,13 @@
         #hud-overlay::-webkit-scrollbar-track { background: transparent; }
         #hud-overlay::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
         
-        .hud-header { color: #fff; margin-bottom: 20px; font-size: 1.05rem; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center;}
-        .hud-divider { margin: 16px 0; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 16px; }
+        .hud-header { color: #fff; margin-bottom: 16px; font-size: 0.9rem; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;}
+        .hud-divider { margin: 12px 0; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 12px; }
         
-        .hud-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-family: var(--font-mono); font-size: 0.85rem; }
-        .hud-row-col { display: flex; flex-direction: column; margin-bottom: 12px; font-family: var(--font-mono); }
-        .hud-label { color: var(--text-muted); font-size: 0.8rem; margin-bottom: 4px; }
-        .hud-value-flex { display: flex; justify-content: space-between; align-items: center; }
+        .hud-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-family: var(--font-mono); font-size: 0.75rem; }
+        .hud-row-col { display: flex; flex-direction: column; margin-bottom: 10px; font-family: var(--font-mono); }
+        .hud-label { color: var(--text-muted); font-size: 0.7rem; margin-bottom: 4px; }
+        .hud-value-flex { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;}
         
         .val-success { color: var(--success); font-weight: 600; }
         .val-danger { color: var(--danger); font-weight: 600; }
@@ -100,21 +100,21 @@
         
         /* V88 AI Executive Console (Bottom Floating) */
         #ai-console-wrapper {
-            position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
-            width: 85%; max-width: 1400px; z-index: 20;
+            position: absolute; bottom: 20px; left: calc(50% + 140px); transform: translateX(-50%);
+            width: 70%; max-width: 900px; z-index: 20;
             background: var(--glass-dark); -webkit-backdrop-filter: blur(24px); backdrop-filter: blur(24px);
             border: 1px solid var(--primary); border-radius: 12px;
-            padding: 20px 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 20px rgba(59, 130, 246, 0.1);
-            display: flex; flex-direction: column; gap: 12px;
+            padding: 16px 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 0 20px rgba(59, 130, 246, 0.1);
+            display: flex; flex-direction: column; gap: 8px;
             border-left: 4px solid var(--primary);
         }
         .ai-header { display: flex; align-items: center; justify-content: space-between; }
-        .ai-title { color: var(--primary); font-weight: 700; font-size: 0.9rem; letter-spacing: 2px; display: flex; align-items: center; gap: 10px; }
-        .ai-dot { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); animation: pulse-blue 1.5s infinite; }
+        .ai-title { color: var(--primary); font-weight: 700; font-size: 0.8rem; letter-spacing: 2px; display: flex; align-items: center; gap: 8px; }
+        .ai-dot { width: 6px; height: 6px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); animation: pulse-blue 1.5s infinite; }
         @keyframes pulse-blue { 0% { opacity: 1; box-shadow: 0 0 12px var(--primary); } 50% { opacity: 0.4; box-shadow: 0 0 2px var(--primary); } 100% { opacity: 1; box-shadow: 0 0 12px var(--primary); } }
         
         .ai-text {
-            color: #cbd5e1; font-family: var(--font-mono); font-size: 0.95rem; line-height: 1.6;
+            color: #cbd5e1; font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.5;
             margin: 0; padding-top: 8px; border-top: 1px dashed rgba(59, 130, 246, 0.3);
             text-shadow: 0 0 2px rgba(255,255,255,0.1);
         }
@@ -406,7 +406,8 @@
             for(let i=0; i<20; i++) {
                 const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
                 const sphere = new THREE.Mesh(geometry, material);
-                sphere.position.set((Math.random()-0.5)*30, (Math.random()-0.5)*30, (Math.random()-0.5)*30);
+                // Shift X to the right (Math.random() * 30 - 5) avoiding the left HUD
+                sphere.position.set((Math.random() * 35) - 10, (Math.random()-0.5)*25, (Math.random()-0.5)*25);
                 scene.add(sphere);
                 spheres.push({ mesh: sphere, target: sphere.position.clone() });
             }
@@ -459,7 +460,7 @@
                 while(spheres.length < realNodes.length) {
                     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
                     const sphere = new THREE.Mesh(geometry, material);
-                    sphere.position.set((Math.random()-0.5)*30, (Math.random()-0.5)*30, (Math.random()-0.5)*30);
+                    sphere.position.set((Math.random() * 35) - 10, (Math.random()-0.5)*25, (Math.random()-0.5)*25);
                     scene.add(sphere);
                     spheres.push({ mesh: sphere, target: sphere.position.clone() });
                 }
@@ -482,8 +483,12 @@
                     obj.mesh.scale.set(scale, scale, scale);
                     
                     if (Math.random() < 0.1) {
-                        const spread = n.risk > 0.65 ? 40 : 15;
-                        obj.target.set((Math.random()-0.5)*spread, (Math.random()-0.5)*spread, (Math.random()-0.5)*spread);
+                        const spreadX = n.risk > 0.65 ? 35 : 15;
+                        const spreadY = n.risk > 0.65 ? 25 : 15;
+                        // Target coordinates biased to center-right
+                        const targetX = (Math.random() * spreadX) - (spreadX * 0.3);
+                        const targetY = (Math.random() - 0.5) * spreadY;
+                        obj.target.set(targetX, targetY, (Math.random()-0.5)*spreadY);
                     }
                 });
 
