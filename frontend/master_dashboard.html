@@ -114,6 +114,13 @@
                 <div class="hud-row" style="margin-top: 8px;">
                     <span style="color:var(--text-muted)">TIME TO CRITICALITY:</span> <strong id="hud-criticality">--</strong>
                 </div>
+                <div class="hud-row" style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px;">
+                    <div style="color: var(--primary); display: flex; align-items: center; gap: 8px; font-weight: bold; margin-bottom: 8px; font-size: 0.85rem;">
+                        <div style="width: 6px; height: 6px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); animation: pulse 1.5s infinite;"></div>
+                        V88 EXPLAINABILITY AI - EXECUTIVE BRIEF
+                    </div>
+                    <div id="hud-ai-brief" style="color: #cbd5e1; font-family: 'Courier New', monospace; font-size: 0.75rem; line-height: 1.4; padding: 8px; background: rgba(15, 23, 42, 0.4); border-left: 2px solid var(--primary); border-radius: 4px;">INITIALIZING NEURAL SWARM...</div>
+                </div>
             </div>
         </div>
 
@@ -200,9 +207,12 @@
                 </div>
             </div>
             
-            <div class="card" style="margin-top: 24px; border-color: var(--success);">
-                <div class="card-title" style="color: var(--success);">SHADOW COORDINATION ARMED</div>
-                <p style="color: var(--text-muted); margin-bottom: 0;">Los motores matemáticos RelationalDarkMatter y FraudDetectionEngine ahora reciben suficiente densidad de red para operar a su máxima capacidad.</p>
+            <div class="card" style="margin-top: 24px; border-color: var(--primary);">
+                <div class="card-title" style="color: var(--primary); display: flex; align-items: center; gap: 8px;">
+                    <div style="width: 8px; height: 8px; background: var(--primary); border-radius: 50%; box-shadow: 0 0 10px var(--primary); animation: pulse 1.5s infinite;"></div>
+                    V88 EXPLAINABILITY AI ENGAGED
+                </div>
+                <p style="color: var(--text-muted); margin-bottom: 0;">El Enjambre Semántico V70 ha sido despertado. Translating mathematical tensors into natural language executive intelligence directly to the Master HUD.</p>
             </div>
         </div>
         
@@ -323,6 +333,21 @@
                 document.getElementById('hud-stress').textContent = data.signal.toFixed(3);
                 document.getElementById('hud-risk').textContent = (data.risk * 100).toFixed(2) + '%';
                 document.getElementById('hud-trust').textContent = (data.trust * 100).toFixed(2) + '%';
+                
+                // V88 AI Brief & CEO Narrative Integration
+                try {
+                    const briefText = typeof data.story === 'string' ? data.story : (data.story ? data.story.narrative : "--");
+                    const briefTitle = typeof data.story === 'string' ? "V88 OMNIVERSE THREAT BRIEF" : (data.story ? data.story.title : "--");
+                    
+                    document.getElementById('ceo-story-title').innerText = briefTitle;
+                    document.getElementById('ceo-story-body').innerText = briefText;
+                    
+                    if(document.getElementById('hud-ai-brief')) {
+                        document.getElementById('hud-ai-brief').innerText = briefText;
+                    }
+                } catch(e) {
+                    console.error("Storytelling Engine Offline", e);
+                }
                 
                 if(data.forecast !== undefined) {
                     document.getElementById('hud-forecast').textContent = data.forecast.toFixed(2) + '%';

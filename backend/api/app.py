@@ -4,7 +4,8 @@ from backend.core.pipeline import run_pipeline
 from backend.services.binance_client import get_ticker, get_multi_tickers
 from backend.services.market_client import get_tradfi_metrics
 from backend.services.data_lake import DataLakeService
-from backend.services.analysis import score_signal, impact_report, build_story
+from backend.services.analysis import score_signal, impact_report
+from backend.absolute_core.ai_aux.explainability_ai import ExplainabilitySwarm
 from backend.v79_core.services.orchestrator import Orchestrator
 from backend.v79_core.engines.institutional import ViabilityEngine
 
@@ -28,6 +29,7 @@ rfdc_engine = RelationalFieldDynamicsCore()
 viability_orchestrator = Orchestrator()
 inst_engine = ViabilityEngine()
 datalake = DataLakeService()
+ai_swarm = ExplainabilitySwarm()
 
 app = FastAPI()
 
@@ -222,6 +224,9 @@ def stream(x_api_key: str = Header(None)):
     # V87 Omniverse Data Lake Persistent Record
     datalake.record_tick(crypto_tickers, tradfi_tickers, inst_metrics, action)
 
+    # V88 Neural Explainability Brief Generation
+    ai_brief = ai_swarm.generate_brief(crypto_tickers, tradfi_tickers, inst_metrics, action)
+
     return {
         "nodes": nodes,
         "edges": edges,
@@ -231,7 +236,7 @@ def stream(x_api_key: str = Header(None)):
         "action": action,
         "btc_price": last_price,
         "btc_change": change_pct,
-        "story": story,
+        "story": ai_brief,
         "ledger": ledger.chain[-6:], # Send the latest cryptographic blocks
         "forecast": forecast_scr,
         "vortex": metrics['vortex_score'],
