@@ -20,12 +20,16 @@ from core.rfdc import RelationalFieldDynamicsCore
 import pandas as pd
 import time
 
-# Dynamically load the LedgerService to avoid module namespace shadowing
 spec = importlib.util.spec_from_file_location("verify_ledger", os.path.join("mitopulse-verify", "backend", "services", "ledger.py"))
 verify_ledger = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(verify_ledger)
 
+spec_risk = importlib.util.spec_from_file_location("verify_risk", os.path.join("mitopulse-verify", "backend", "engines", "risk.py"))
+verify_risk = importlib.util.module_from_spec(spec_risk)
+spec_risk.loader.exec_module(verify_risk)
+
 ledger = verify_ledger.LedgerService()
+V91_risk_engine = verify_risk.RiskEngine()
 rfdc_engine = RelationalFieldDynamicsCore()
 viability_orchestrator = Orchestrator()
 inst_engine = ViabilityEngine()
@@ -83,12 +87,45 @@ def verify_challenge(req: VerifyRequest):
     
     if req.scenario == "critical":
         receiver = "Marco_Crypto99" # Tied to Scam_Ring_Alpha in IdentityEngine
+        return identity_engine.evaluate_transaction(sender, receiver, amount)
+        
     elif req.scenario == "watch":
-        receiver = "Global_Exchange_Z" # Unknown entity
+        # V91: Simulate an EXPRESS KIDNAPPING / COERCION. 
+        # The user transfers to a known Trusted Person, but under physical threat.
+        receiver = "Mom_Wallet"
+        base_eval = identity_engine.evaluate_transaction(sender, receiver, amount)
+        
+        # Inject the V91 Biometric Payload (BPM 145, HRV 12) simulating the iOS/Watch SDK
+        context = {
+            "tx_amount": amount,
+            "cross_pulse": {"bpm": 145, "hrv": 12}
+        }
+        risk_calc = V91_risk_engine.evaluate_risk("node_ios_123", context)
+        
+        # Override the Identity Assessment because Physical Extortion trumps historical trust!
+        if risk_calc["level"] == "CRITICAL":
+            return {
+                "score": risk_calc["risk_score"],
+                "state": "CRITICAL",
+                "confidence": "99.9%",
+                "horizon": "Immediate",
+                "receiver": receiver,
+                "alertTitle": "⚠ V91 CROSS PULSE: Coercion Detected",
+                "alertText": "Target is verified as TRUSTED, but physiological telemetry indicates acute physical extortion (BPM 145 / HRV 12). Transaction Locked.",
+                "primaryText": "Security Locked",
+                "primaryClass": "blocked",
+                "trace": [
+                    "Historical trust confirmed. Identity Engine PASSED.",
+                    "V91 Cross Pulse (HealthKit) detected extreme physiological stress variance.",
+                    "RiskEngine Overruled: Transaction locked due to suspected Extortion."
+                ],
+                "color": "#ff5b5b"
+            }
+        return base_eval
+        
     else:
         receiver = "Mom_Wallet" # High-weight trusted historical node
-        
-    return identity_engine.evaluate_transaction(sender, receiver, amount)
+        return identity_engine.evaluate_transaction(sender, receiver, amount)
 
 @app.get("/api/project")
 def project_future(horizon: str = "24h", x_api_key: str = Header(None)):

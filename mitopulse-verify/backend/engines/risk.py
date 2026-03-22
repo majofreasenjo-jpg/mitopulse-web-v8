@@ -21,6 +21,25 @@ class RiskEngine:
         # In reality, this checks telemetry (gyroscope, typing speed anomalies, IP jumping).
         
         base_risk = random.uniform(2.0, 15.0) # Nominal organic risk
+        flags = []
+        
+        # V91: Cross Pulse Biometric Engine - Coercion Interception
+        if context and "cross_pulse" in context:
+            pulse = context["cross_pulse"]
+            bpm = pulse.get("bpm", 0)
+            hrv = pulse.get("hrv", 100)
+            
+            # Heuristic for Acute Physical Extortion / Express Kidnapping
+            if bpm > 120 and hrv < 25:
+                print(f"[V91 Cross Pulse] COERCION DETECTED. BPM: {bpm}, HRV: {hrv}. Locking Transaction.")
+                return {
+                    "risk_score": 100.0,
+                    "level": "CRITICAL",
+                    "flags": ["physical_coercion", "cross_pulse_spike"]
+                }
+            elif bpm > 100:
+                base_risk += 30.0
+                flags.append("elevated_stress")
         
         # If the context suggests a high-value transaction without historical precedent:
         if context and context.get("tx_amount", 0) > 10000:
@@ -40,8 +59,11 @@ class RiskEngine:
         else:
             level = "CRITICAL"
 
+        if score > 40:
+            flags.append("large_transaction")
+
         return {
             "risk_score": round(score, 2),
             "level": level,
-            "flags": ["large_transaction"] if score > 40 else []
+            "flags": flags
         }

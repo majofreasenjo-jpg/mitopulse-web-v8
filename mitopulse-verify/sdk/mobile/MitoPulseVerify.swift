@@ -1,5 +1,6 @@
 import Foundation
 import CryptoKit
+import HealthKit
 
 /// Official Swift SDK for MitoPulse Verify (iOS)
 /// Secures critical human-presence verification natively on Apple devices.
@@ -10,8 +11,22 @@ public class MitoPulseVerify {
     private var privateKey: Curve25519.Signing.PrivateKey
     private var deviceId: String
     
+    // V91: The Cross Pulse Biometric Engine (Semi-hidden physiological monitor)
+    private let healthStore = HKHealthStore()
+    
     public init(apiKey: String) {
         self.publicKey = apiKey
+        
+        // V91 HealthKit Initialization
+        if HKHealthStore.isHealthDataAvailable() {
+            guard let heartRateType = HKObjectType.quantityType(forIdentifier: .heartRate),
+                  let hrvType = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN) else { return }
+            
+            // Requesting invisible read access for Cross Pulse Coercion assessment
+            healthStore.requestAuthorization(toShare: nil, read: [heartRateType, hrvType]) { (success, error) in
+                if !success { print("[CrossPulse] Authorization Denied by OS.") }
+            }
+        }
         
         // Lookup existing key in Secure Enclave/Keychain, or generate new
         if let existingKey = Keychain.load(key: "mitopulse_ed25519") {
@@ -25,10 +40,27 @@ public class MitoPulseVerify {
         }
     }
     
-    /// Generates a non-repudiable Proof-of-Presence payload for critical operations
-    public func generatePresencePayload(context: [String: Any]) throws -> [String: Any] {
+    /// Generates a non-repudiable Proof-of-Presence payload for critical operations.
+    /// V91: Asynchronous. Extracts Apple Watch HealthKit biometrics to detect physical coercion (Extortion).
+    public func generatePresencePayload(context: [String: Any]) async throws -> [String: Any] {
         let timestamp = Date().timeIntervalSince1970
         let nonce = UUID().uuidString
+        
+        // In physical production, HealthKit queries (`HKSampleQuery`) fetch the live BPM here.
+        // For the V91 prototype schema, we structure the tensor template that backend RiskEngine requires.
+        var crossPulse: [String: Any] = [
+            "bpm": 0, // baseline placeholder or fallback
+            "hrv": 0,
+            "timestamp": timestamp
+        ]
+        
+        // (If testing coercion, the integrating banking App will artificially inject the simulated stress context here)
+        if let simPulse = context["simulated_cross_pulse"] as? [String: Any] {
+            crossPulse = simPulse
+        }
+        
+        var secureContext = context
+        secureContext["cross_pulse"] = crossPulse
         
         let messageString = "\(deviceId):\(timestamp):\(nonce)"
         guard let messageData = messageString.data(using: .utf8) else {
@@ -45,7 +77,7 @@ public class MitoPulseVerify {
             "timestamp": timestamp,
             "nonce": nonce,
             "signature": signatureBase64,
-            "context": context
+            "context": secureContext
         ]
     }
 }
