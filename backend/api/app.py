@@ -92,11 +92,16 @@ def stream():
     
     rfdc_output = rfdc_engine.run(events_df, signals_df, client_type="finance")
     metrics = rfdc_output["metrics"]
+    summ_data = rfdc_output["summary"]
+    
+    narrative_text = f"System State: {str(summ_data.get('system_state', '')).upper()} | {summ_data.get('main_risk', '')}\n"
+    narrative_text += f"Severity: {str(summ_data.get('severity', '')).upper()} | Confidence: {summ_data.get('confidence', '')}\n"
+    narrative_text += f"- The V62 Action Engine currently mandates a {str(summ_data.get('recommended_action', '')).upper()} protocol structure based on {summ_data.get('alerts_count', 0)} tensor alerts."
     
     # Overwrite the legacy V74 story with the True RFDC Execution
     story = {
         "title": f"RFDC TENSOR | SCR: {metrics['scr']} | MDI: {metrics['mdi']}",
-        "narrative": rfdc_output["summary"],
+        "narrative": narrative_text,
         "prevented_usd": (metrics['scr'] * 1250) if action in ["BLOCK", "REVIEW"] else 0
     }
     
