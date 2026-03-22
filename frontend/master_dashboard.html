@@ -406,8 +406,8 @@
             for(let i=0; i<20; i++) {
                 const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
                 const sphere = new THREE.Mesh(geometry, material);
-                // Shift X to the right (Math.random() * 30 - 5) avoiding the left HUD
-                sphere.position.set((Math.random() * 35) - 10, (Math.random()-0.5)*25, (Math.random()-0.5)*25);
+                // Restrict spawning exclusively to the TOP-RIGHT quadrant
+                sphere.position.set((Math.random() * 20) + 5, (Math.random() * 15) + 2, (Math.random()-0.5)*20);
                 scene.add(sphere);
                 spheres.push({ mesh: sphere, target: sphere.position.clone() });
             }
@@ -460,7 +460,8 @@
                 while(spheres.length < realNodes.length) {
                     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
                     const sphere = new THREE.Mesh(geometry, material);
-                    sphere.position.set((Math.random() * 35) - 10, (Math.random()-0.5)*25, (Math.random()-0.5)*25);
+                    // Restrict spawning exclusively to the TOP-RIGHT quadrant
+                    sphere.position.set((Math.random() * 20) + 5, (Math.random() * 15) + 2, (Math.random()-0.5)*20);
                     scene.add(sphere);
                     spheres.push({ mesh: sphere, target: sphere.position.clone() });
                 }
@@ -483,12 +484,12 @@
                     obj.mesh.scale.set(scale, scale, scale);
                     
                     if (Math.random() < 0.1) {
-                        const spreadX = n.risk > 0.65 ? 35 : 15;
-                        const spreadY = n.risk > 0.65 ? 25 : 15;
-                        // Target coordinates biased to center-right
-                        const targetX = (Math.random() * spreadX) - (spreadX * 0.3);
-                        const targetY = (Math.random() - 0.5) * spreadY;
-                        obj.target.set(targetX, targetY, (Math.random()-0.5)*spreadY);
+                        const spreadX = n.risk > 0.65 ? 20 : 10;
+                        const spreadY = n.risk > 0.65 ? 15 : 10;
+                        // Target coordinates strictly biased to TOP-RIGHT quadrant
+                        const targetX = (Math.random() * spreadX) + 5;
+                        const targetY = (Math.random() * spreadY) + 2;
+                        obj.target.set(targetX, targetY, (Math.random()-0.5)*15);
                     }
                 });
 
