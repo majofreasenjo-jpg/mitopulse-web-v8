@@ -4,6 +4,19 @@ from backend.core.pipeline import run_pipeline
 from backend.services.binance_client import get_ticker, get_multi_tickers
 from backend.services.analysis import score_signal, impact_report, build_story
 
+import importlib.util
+import os
+import networkx as nx
+
+from engine.bioinspired_engine import bioinspired_node_risk
+
+# Dynamically load the LedgerService to avoid module namespace shadowing
+spec = importlib.util.spec_from_file_location("verify_ledger", os.path.join("mitopulse-verify", "backend", "services", "ledger.py"))
+verify_ledger = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(verify_ledger)
+
+ledger = verify_ledger.LedgerService()
+
 app = FastAPI()
 
 from fastapi.responses import HTMLResponse
@@ -11,11 +24,19 @@ import os
 
 @app.get("/", response_class=HTMLResponse)
 def root():
-    html_path = os.path.join("frontend", "index.html")
+    html_path = os.path.join("frontend", "master_dashboard.html")
     if os.path.exists(html_path):
         with open(html_path, "r", encoding="utf-8") as f:
             return f.read()
-    return "<h1>MitoPulse V75: Frontend Not Mounted</h1>"
+    return "<h1>MitoPulse V76: Master Frontend Not Mounted</h1>"
+
+@app.get("/dashboard", response_class=HTMLResponse)
+def verify_dashboard():
+    html_path = os.path.join("mitopulse-verify", "dashboard", "index.html")
+    if os.path.exists(html_path):
+        with open(html_path, "r", encoding="utf-8") as f:
+            return f.read()
+    return "<h1>Verify Dashboard Not Found</h1>"
 
 from pydantic import BaseModel
 
@@ -34,22 +55,29 @@ def stream():
     ticker = get_ticker("BTCUSDT")
     change_pct = ticker.get("price_change_percent", 0.0)
     
-    # Calculate a Market Stress Factor based on 24h absolute volatility (scaled)
-    signal_pulse = max(1.0, min(15.0, abs(change_pct) * 2.0))
+    # Build Network Graph Topology (V62 Integration)
+    G = nx.Graph()
+    G.add_node("BTCUSDT", node_type="device", signal_severity=min(abs(change_pct)*2.0, 1.0))
+    G.add_node("GodMode_Core", node_type="customer")
+    G.add_edge("BTCUSDT", "GodMode_Core", label="normal", context="salary")
     
-    # Fully Orchestrate the pulse through the V72 End-to-End Pipeline
-    telemetry = run_pipeline(signal_pulse)
+    # Calculate True Bioinspired Metrics
+    bio_risk = bioinspired_node_risk(G, "BTCUSDT")
+    risk = bio_risk["immune_risk_score"]
+    trust = bio_risk["allostatic_reserve"]
+    pulse = bio_risk["pulse_score"]
+    action = bio_risk["recommended_action"]
     
-    # Generate the V74 Executive Story based on the live ticker
+    # Generate the V74 Executive Story based on the live ticker (Legacy fallback params)
     analysis = score_signal(ticker)
     impact = impact_report(ticker, analysis)
     story = build_story(ticker, analysis, impact)
     
-    # Extract the pure Protocol values calculated by the backend algorithms
-    risk = telemetry["propagation"]["scr"] / 100.0
-    trust = telemetry["trust"]["base_trust"]
+    # Log Cryptographic Immutable Ledger Event (V68 Integration)
+    tx_id = ledger.record_event("Acme_Bank_Prod", "BTC_Live_Feed", action, f"Immune Risk: {risk*100}%")
     
-    # Graph Engine: Output coordinate vectors mathematically bound to risk volatility
+    # Graph Engine Vectors
+    import random
     nodes = [(random.random() * max(0.1, risk)) for _ in range(20)]
     edges = [(random.random() * trust) for _ in range(10)]
     
@@ -58,10 +86,10 @@ def stream():
         "edges": edges,
         "risk": risk,
         "trust": trust,
-        "signal": round(signal_pulse, 2),
-        "protocol_quorum": telemetry["federation"]["is_approved"],
-        "action": telemetry["final_decision"],
+        "signal": pulse,
+        "action": action,
         "btc_price": ticker.get("last_price", 0.0),
         "btc_change": change_pct,
-        "story": story
+        "story": story,
+        "ledger": ledger.chain[-6:] # Send the latest cryptographic blocks
     }

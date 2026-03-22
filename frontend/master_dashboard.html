@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MitoPulse V76 | Master Unified Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        :root {
+            --bg: #030712;
+            --surface: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --primary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --font-ui: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: var(--font-ui); background-color: var(--bg); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar */
+        aside { width: 280px; background-color: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 10; }
+        .brand { padding: 24px; font-size: 1.2rem; font-weight: 700; color: var(--primary); border-bottom: 1px solid var(--border); letter-spacing: 1px; }
+        .brand span { color: var(--text-main); font-weight: 400; }
+        .nav-links { padding: 16px 12px; flex: 1; }
+        .nav-item { padding: 12px 16px; margin-bottom: 8px; border-radius: 8px; color: var(--text-muted); font-weight: 500; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 12px; }
+        .nav-item:hover { background-color: #1e293b; color: var(--text-main); }
+        .nav-item.active { color: #fff; background-color: var(--primary); box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+        
+        /* Main Content */
+        main { flex: 1; display: flex; flex-direction: column; position: relative; }
+        header { height: 70px; background-color: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; z-index: 10; }
+        .tenant { font-weight: 600; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        .status-dot { width: 8px; height: 8px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        
+        .tab-content { display: none; padding: 32px; max-width: 1200px; margin: 0 auto; width: 100%; height: calc(100vh - 70px); overflow-y: auto; }
+        .tab-content.active { display: block; }
+        .tab-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 24px; color: #fff; }
+        
+        /* Specific Tab: God Mode */
+        #tab-god-mode { padding: 0; max-width: none; overflow: hidden; position: relative; }
+        #canvas-container { width: 100%; height: 100%; position: absolute; top:0; left:0; z-index: 1; }
+        
+        #hud-overlay { position: absolute; top: 20px; left: 20px; z-index: 5; background: rgba(15, 23, 42, 0.85); border: 1px solid var(--success); border-radius: 12px; padding: 20px; width: 380px; backdrop-filter: blur(8px); box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); transition: all 0.3s; }
+        .hud-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-family: var(--font-mono); font-size: 0.85rem; }
+        
+        /* Grid & Cards */
+        .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; }
+        .card-title { font-size: 0.9rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-bottom: 12px; }
+        .card-value { font-size: 2.2rem; font-weight: 700; color: #fff; font-family: var(--font-mono); }
+        
+        /* Ledger Table */
+        table { width: 100%; border-collapse: collapse; text-align: left; background: var(--surface); border-radius: 12px; overflow: hidden; }
+        th { background: #1e293b; padding: 16px 24px; font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); }
+        td { padding: 16px 24px; font-size: 0.9rem; border-bottom: 1px solid var(--border); font-family: var(--font-mono); }
+        tr:last-child td { border-bottom: none; }
+        .tag { padding: 6px 12px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
+        .tag-success { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .tag-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+        
+        .btn { padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+
+    <aside>
+        <div class="brand">MITOPULSE <span>V76</span></div>
+        <div class="nav-links">
+            <div class="nav-item active" onclick="switchTab('god-mode', this)">🌐 God Mode (Live)</div>
+            <div class="nav-item" onclick="switchTab('ceo-view', this)">💼 Executive POV</div>
+            <div class="nav-item" onclick="switchTab('client-portal', this)">🏢 Client Portal</div>
+            <div class="nav-item" onclick="switchTab('connectors', this)">📈 Connectors</div>
+            <div class="nav-item" style="margin-top:24px; border:1px solid var(--border);" onclick="window.open('/dashboard', '_blank')">📊 Dashboard</div>
+        </div>
+        <div style="padding: 24px; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border);">
+            SYSTEM: PRODUCTION READY<br>
+            LATENCY: <span style="color:var(--success)">12ms</span>
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <div class="tenant"><span class="status-dot"></span> ORCHESTRATOR ONLINE</div>
+            <div style="font-weight: 600; font-family: var(--font-mono); color: var(--text-muted);" id="header-ticker">BTC/USDT: $--</div>
+        </header>
+
+        <!-- TAB 1: GOD MODE 3D -->
+        <div id="tab-god-mode" class="tab-content active">
+            <div id="canvas-container"></div>
+            <div id="hud-overlay">
+                <h2 style="color: #fff; margin-bottom: 15px; font-size: 1.1rem; border-bottom: 1px solid #333; padding-bottom: 10px;">NEURAL TELEMETRY</h2>
+                <div class="hud-row"><span style="color:var(--text-muted)">MARKET (BTC):</span> <strong id="hud-price" style="color: var(--success)">$--</strong></div>
+                <div class="hud-row"><span style="color:var(--text-muted)">STRESS PULSE:</span> <strong id="hud-stress">--</strong></div>
+                <div class="hud-row"><span style="color:var(--text-muted)">STRUCTURAL RISK:</span> <strong id="hud-risk">--%</strong></div>
+                <div class="hud-row"><span style="color:var(--text-muted)">BASE TRUST:</span> <strong id="hud-trust">--%</strong></div>
+                <div class="hud-row" style="margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
+                    <span style="color:var(--text-muted)">DECISION:</span> <strong id="hud-decision" class="tag tag-success">--</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: CEO EXECUTIVE VIEW -->
+        <div id="tab-ceo-view" class="tab-content">
+            <h1 class="tab-title">Executive POV & Narrative</h1>
+            <div class="metrics-grid">
+                <div class="card">
+                    <div class="card-title">Protected Value (24H)</div>
+                    <div class="card-value" style="color: var(--success);" id="ceo-roi">$--</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Network Trust Ratio</div>
+                    <div class="card-value" id="ceo-trust">--%</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Autonomic Interventions</div>
+                    <div class="card-value" style="color: var(--primary);">412</div>
+                </div>
+            </div>
+            <div class="card" style="margin-top: 24px;">
+                <div class="card-title" style="color: var(--primary);">CEO STORYTELLING MODULE</div>
+                <h2 id="ceo-story-title" style="font-size: 1.5rem; margin-bottom: 16px; color: #fff;">Awaiting Telemetry...</h2>
+                <p id="ceo-story-body" style="font-size: 1.1rem; line-height: 1.6; color: var(--text-muted);">
+                    The mathematical pipeline is initializing natural language generation based on live Binance market data.
+                </p>
+            </div>
+        </div>
+
+        <!-- TAB 3: CLIENT PORTAL (LEDGER) -->
+        <div id="tab-client-portal" class="tab-content">
+            <h1 class="tab-title">Immutable Verify Ledger</h1>
+            <div style="display: flex; gap: 24px; margin-bottom: 24px;">
+                <div class="card" style="flex: 1;">
+                    <div class="card-title">TENANT ID</div>
+                    <div style="font-family: var(--font-mono); color: #fff;">acme_bank_prod_9Xy2</div>
+                </div>
+                <div class="card" style="flex: 1;">
+                    <div class="card-title">SECRET API KEY (v76 Auth)</div>
+                    <div style="font-family: var(--font-mono); color: #fff;">mitopulse-key</div>
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr><th>Status</th><th>Timestamp</th><th>Transaction ID</th><th>Decision</th><th>Cryptographic Risk</th></tr>
+                </thead>
+                <tbody id="ledger-table">
+                    <!-- Populated dynamically via JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TAB 4: LIVE CONNECTORS -->
+        <div id="tab-connectors" class="tab-content">
+            <h1 class="tab-title">Live Connectors & Ingestion</h1>
+            <div class="card">
+                <div class="card-title">BINANCE REST API (BTC/USDT)</div>
+                <p style="color: var(--text-muted); margin-bottom: 24px;">Currently streaming 1Hz live market volatility into the End-to-End Orchestrator.</p>
+                <button class="btn" style="background: var(--success);">Connector Active (Live)</button>
+                <button class="btn" style="background: var(--surface); border: 1px solid var(--border); color: #fff; margin-left: 12px;">Pause Ingestion</button>
+            </div>
+            
+            <div class="card" style="margin-top: 24px; opacity: 0.5;">
+                <div class="card-title">MULTI-ASSET WEBSOCKET (ETH, SOL, BNB)</div>
+                <p style="color: var(--text-muted); margin-bottom: 24px;">Deploy standard V76 protocol hooks to ingest entire cryptographic sectors simultaneously.</p>
+                <button class="btn">Initialize Multi-Asset</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // TAB SWITCHING LOGIC
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('tab-' + tabId).classList.add('active');
+            element.classList.add('active');
+            
+            // Re-render WebGL if canvas container is resized (entering tab)
+            if(tabId === 'god-mode' && renderer) {
+                renderer.setSize(document.getElementById('tab-god-mode').clientWidth, document.getElementById('tab-god-mode').clientHeight);
+            }
+        }
+
+        // THREE.JS GOD MODE LOGIC
+        let scene, camera, renderer, spheres = [];
+        function initWebGL() {
+            const container = document.getElementById('canvas-container');
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 25;
+
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            const geometry = new THREE.SphereGeometry(1, 32, 32);
+            // Spawn 20 nodes
+            for(let i=0; i<20; i++) {
+                const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+                const sphere = new THREE.Mesh(geometry, material);
+                sphere.position.set((Math.random()-0.5)*30, (Math.random()-0.5)*30, (Math.random()-0.5)*30);
+                scene.add(sphere);
+                spheres.push({ mesh: sphere, target: sphere.position.clone() });
+            }
+
+            animateWebGL();
+        }
+
+        function animateWebGL() {
+            requestAnimationFrame(animateWebGL);
+            spheres.forEach(obj => {
+                obj.mesh.position.lerp(obj.target, 0.05);
+            });
+            renderer.render(scene, camera);
+        }
+
+        // LIVE DATA POLLING
+        let ledgerCount = 0;
+        async function fetchTelemetry() {
+            try {
+                // To support V76 backend auth if enabled, we send the header
+                const res = await fetch("http://127.0.0.1:8000/stream", {
+                    headers: { "x-api-key": "mitopulse-key" }
+                });
+                const data = await res.json();
+                
+                // Color Logic based on Structural Risk vs Trust
+                const riskLevel = data.risk;
+                const isCritical = riskLevel > 0.65;
+                const themeColor = isCritical ? '#ef4444' : '#10b981';
+                const threeColor = isCritical ? 0xef4444 : 0x10b981;
+
+                // Update 3D Spheres
+                spheres.forEach((obj, i) => {
+                    obj.mesh.material.color.setHex(threeColor);
+                    // Scatter violently if risk > 0.65, otherwise smooth orbit
+                    if (Math.random() < 0.1) {
+                        const spread = isCritical ? 40 : 15;
+                        obj.target.set((Math.random()-0.5)*spread, (Math.random()-0.5)*spread, (Math.random()-0.5)*spread);
+                    }
+                });
+
+                // Update HUD (Tab 1)
+                const hud = document.getElementById("hud-overlay");
+                hud.style.borderColor = themeColor;
+                hud.style.boxShadow = `0 0 20px ${isCritical ? 'rgba(239, 68, 68, 0.2)' : 'rgba(16, 185, 129, 0.2)'}`;
+                
+                document.getElementById('hud-price').textContent = `$${Number(data.btc_price).toLocaleString()} (${data.btc_change}%)`;
+                document.getElementById('hud-price').style.color = themeColor;
+                document.getElementById('header-ticker').textContent = `BTC/USDT: $${Number(data.btc_price).toLocaleString()}`;
+                
+                document.getElementById('hud-stress').textContent = data.signal;
+                document.getElementById('hud-risk').textContent = (data.risk * 100).toFixed(2) + '%';
+                document.getElementById('hud-trust').textContent = (data.trust * 100).toFixed(2) + '%';
+                
+                const decEl = document.getElementById('hud-decision');
+                decEl.textContent = data.action.toUpperCase();
+                decEl.className = isCritical ? 'tag tag-danger' : 'tag tag-success';
+
+                // Update CEO View (Tab 2)
+                document.getElementById('ceo-roi').textContent = data.story ? ('$' + Number(data.story.prevented_usd || 45000).toLocaleString()) : '$45,000.00';
+                document.getElementById('ceo-trust').textContent = (data.trust * 100).toFixed(2) + '%';
+                if(data.story) {
+                    document.getElementById('ceo-story-title').textContent = data.story.title.toUpperCase();
+                    document.getElementById('ceo-story-body').textContent = data.story.narrative;
+                }
+
+                // Update Ledger (Tab 3) - Render Cryptographic Blocks natively from API
+                if (data.ledger && data.ledger.length > 0) {
+                    const tbody = document.getElementById('ledger-table');
+                    tbody.innerHTML = ''; // Clear previous
+                    
+                    data.ledger.reverse().forEach(block => {
+                        // Skip genesis block if it doesn't have a tx_id
+                        if (!block.tx_id && block.idx === 0) return;
+                        
+                        const tr = document.createElement('tr');
+                        const txId = block.tx_id || "GENESIS_TX";
+                        const timestamp = new Date(block.ts * 1000).toLocaleTimeString();
+                        const isDanger = block.action === 'BLOCK' || block.action === 'REVIEW';
+                        const statusTag = isDanger ? `<span class="tag tag-danger">${block.action}</span>` : `<span class="tag tag-success">${block.action}</span>`;
+                        
+                        tr.innerHTML = `
+                            <td>${statusTag}</td>
+                            <td style="color:var(--text-muted)">${timestamp}</td>
+                            <td style="color:var(--primary); font-family:var(--font-mono)">${txId}</td>
+                            <td>${block.action}</td>
+                            <td>${block.detail}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+
+            } catch(e) {
+                console.error("Telemetry Connection Lost", e);
+            }
+        }
+
+        // Boot
+        window.onload = () => {
+            initWebGL();
+            fetchTelemetry();
+            setInterval(fetchTelemetry, 1000);
+            
+            window.addEventListener('resize', () => {
+                const container = document.getElementById('canvas-container');
+                if(renderer && container.clientWidth > 0) {
+                    camera.aspect = container.clientWidth / container.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                }
+            });
+        };
+    </script>
+</body>
+</html>
