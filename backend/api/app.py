@@ -9,6 +9,9 @@ import os
 import networkx as nx
 
 from engine.bioinspired_engine import bioinspired_node_risk
+from core.rfdc import RelationalFieldDynamicsCore
+import pandas as pd
+import time
 
 # Dynamically load the LedgerService to avoid module namespace shadowing
 spec = importlib.util.spec_from_file_location("verify_ledger", os.path.join("mitopulse-verify", "backend", "services", "ledger.py"))
@@ -16,6 +19,7 @@ verify_ledger = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(verify_ledger)
 
 ledger = verify_ledger.LedgerService()
+rfdc_engine = RelationalFieldDynamicsCore()
 
 app = FastAPI()
 
@@ -68,13 +72,36 @@ def stream():
     pulse = bio_risk["pulse_score"]
     action = bio_risk["recommended_action"]
     
-    # Generate the V74 Executive Story based on the live ticker (Legacy fallback params)
-    analysis = score_signal(ticker)
-    impact = impact_report(ticker, analysis)
-    story = build_story(ticker, analysis, impact)
     
-    # Log Cryptographic Immutable Ledger Event (V68 Integration)
-    tx_id = ledger.record_event("Acme_Bank_Prod", "BTC_Live_Feed", action, f"Immune Risk: {risk*100}%")
+    # Execute the V68 Relational Field Dynamics Core
+    events_df = pd.DataFrame([{
+        "event_id": f"evt_{int(time.time() * 1000)}",
+        "timestamp": time.time(),
+        "source_node": "BTCUSDT",
+        "target_node": "GodMode_Orchestrator",
+        "amount": ticker.get("last_price", 0.0),
+        "currency": "USDT",
+        "risk_score": risk * 100
+    }])
+    signals_df = pd.DataFrame([{
+        "signal_id": f"sig_{int(time.time() * 1000)}",
+        "timestamp": time.time(),
+        "target_node": "BTCUSDT",
+        "severity": min(abs(change_pct) * 2.0, 1.0)
+    }])
+    
+    rfdc_output = rfdc_engine.run(events_df, signals_df, client_type="finance")
+    metrics = rfdc_output["metrics"]
+    
+    # Overwrite the legacy V74 story with the True RFDC Execution
+    story = {
+        "title": f"RFDC TENSOR | SCR: {metrics['scr']} | MDI: {metrics['mdi']}",
+        "narrative": rfdc_output["summary"],
+        "prevented_usd": (metrics['scr'] * 1250) if action in ["BLOCK", "REVIEW"] else 0
+    }
+    
+    # Log Cryptographic Immutable Ledger Event (V78 SQLite Integration)
+    tx_id = ledger.record_event("Acme_Bank_Prod", "BTC_Live_Feed", action, f"Immune: {risk*100}% | SCR: {metrics['scr']}")
     
     # Graph Engine Vectors
     import random
