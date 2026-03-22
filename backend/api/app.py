@@ -96,7 +96,7 @@ def stream():
     
     narrative_text = f"System State: {str(summ_data.get('system_state', '')).upper()} | {summ_data.get('main_risk', '')}\n"
     narrative_text += f"Severity: {str(summ_data.get('severity', '')).upper()} | Confidence: {summ_data.get('confidence', '')}\n"
-    narrative_text += f"- The V62 Action Engine currently mandates a {str(summ_data.get('recommended_action', '')).upper()} protocol structure based on {summ_data.get('alerts_count', 0)} tensor alerts."
+    narrative_text += f"- The Autonomous Action Engine currently mandates a {str(summ_data.get('recommended_action', '')).upper()} protocol structure based on {summ_data.get('alerts_count', 0)} tensor alerts."
     
     # Overwrite the legacy V74 story with the True RFDC Execution
     story = {
