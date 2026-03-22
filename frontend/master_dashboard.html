@@ -77,6 +77,7 @@
             <div class="nav-item active" onclick="switchTab('god-mode', this)">🌐 God Mode (Live)</div>
             <div class="nav-item" onclick="switchTab('ceo-view', this)">💼 Executive POV</div>
             <div class="nav-item" onclick="switchTab('client-portal', this)">🏢 Client Portal</div>
+            <div class="nav-item" onclick="switchTab('mobile-node', this)">📱 Mobile Verify Node</div>
             <div class="nav-item" onclick="switchTab('connectors', this)">📈 Connectors</div>
             <div class="nav-item" style="margin-top:24px; border:1px solid var(--border);" onclick="window.open('/dashboard', '_blank')">📊 Dashboard</div>
         </div>
@@ -105,7 +106,10 @@
                 <div class="hud-row"><span style="color:var(--text-muted)">VORTEX SCORE (GSI):</span> <strong id="hud-vortex">--</strong></div>
                 <div class="hud-row"><span style="color:var(--text-muted)">WAVE MAX (GSI):</span> <strong id="hud-wave">--</strong></div>
                 <div class="hud-row" style="margin-top: 15px; border-top: 1px solid #333; padding-top: 15px;">
-                    <span style="color:var(--text-muted)">DECISION:</span> <strong id="hud-decision" class="tag tag-success">--</strong>
+                    <span style="color:var(--warning)">V83 PREDICTIVE ACTION:</span> <strong id="hud-decision" class="tag tag-success">--</strong>
+                </div>
+                <div class="hud-row" style="margin-top: 8px;">
+                    <span style="color:var(--text-muted)">TIME TO CRITICALITY:</span> <strong id="hud-criticality">--</strong>
                 </div>
             </div>
         </div>
@@ -182,6 +186,11 @@
                 <div class="card-title" style="color: var(--success);">SHADOW COORDINATION ARMED</div>
                 <p style="color: var(--text-muted); margin-bottom: 0;">Los motores matemáticos RelationalDarkMatter y FraudDetectionEngine ahora reciben suficiente densidad de red para operar a su máxima capacidad.</p>
             </div>
+        </div>
+        
+        <!-- TAB 5: MOBILE VERIFY NODE -->
+        <div id="tab-mobile-node" class="tab-content" style="padding: 0;">
+            <iframe src="/verify-app" style="width: 100%; height: 100%; border: none; background: #030712;"></iframe>
         </div>
     </main>
 
@@ -304,7 +313,24 @@
                 }
                 
                 const decEl = document.getElementById('hud-decision');
-                decEl.textContent = data.action.toUpperCase();
+                let hudAct = data.action ? data.action.toUpperCase() : "MONITOR";
+                
+                // Inject the True V83 Predictive Action if Oracle is Live
+                if(data.viability) {
+                    if(data.viability.actions && data.viability.actions.length > 0) {
+                        hudAct = data.viability.actions[0].toUpperCase().replace(/_/g, " ");
+                    }
+                    if(data.viability.time_to_criticality) {
+                        document.getElementById('hud-criticality').textContent = `${(data.viability.time_to_criticality / 3600).toFixed(1)} HRS (EST)`;
+                        if (data.viability.time_to_criticality < 1800) {
+                             document.getElementById('hud-criticality').style.color = '#ef4444';
+                        } else {
+                             document.getElementById('hud-criticality').style.color = '#94a3b8';
+                        }
+                    }
+                }
+                
+                decEl.textContent = hudAct;
                 decEl.className = isCritical ? 'tag tag-danger' : 'tag tag-success';
 
                 // Update CEO View (Tab 2)
